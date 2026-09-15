@@ -31,6 +31,8 @@ const locOf = (view: string, tab: TabId): Loc =>
       ? `tool:${tool.which}`
       : view === 'programme'
         ? 'programme'
+        : view === 'manifestation'
+          ? 'manifestation'
         : view === 'sleep'
           ? 'sleep'
           : view === 'sanctuary'
@@ -84,6 +86,10 @@ function applyLoc(loc: Loc): Loc {
   if (loc === 'programme') {
     app.setView('programme');
     return 'programme';
+  }
+  if (loc === 'manifestation') {
+    app.setView('manifestation');
+    return 'manifestation';
   }
   if (loc === 'sleep') {
     app.setView('sleep');

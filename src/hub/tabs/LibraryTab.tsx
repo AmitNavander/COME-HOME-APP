@@ -1,4 +1,4 @@
-import { Timer, Wind, Heart } from 'lucide-react';
+import { Timer, Wind, Heart, Sparkles } from 'lucide-react';
 import Reveal from '../../ui/Reveal';
 import PracticeCard from '../../ui/PracticeCard';
 import GradientIcon from '../../ui/GradientIcon';
@@ -9,6 +9,7 @@ import { useFavorites } from '../../store/favorites';
 import { LIBRARY_ITEMS } from '../../data/library';
 import { FEELINGS } from '../../data/feelings';
 import { PATHS } from '../../data/paths';
+import { app } from '../../store/app';
 
 /**
  * §6 Library (§Phase D). Browse the real content by felt-state — our categories are
@@ -52,8 +53,35 @@ export default function LibraryTab() {
           </button>
         </Reveal>
 
+        <Reveal delay={0.14}>
+          <div className="eyebrow" style={{ marginTop: 24, marginBottom: 10 }}>
+            Transform
+          </div>
+          <button
+            onClick={() => app.setView('manifestation')}
+            className="glass glass-gold flex w-full items-center gap-4 px-5 py-5 text-left transition-transform duration-300 active:scale-[0.99]"
+            style={{ borderRadius: 'var(--radius-card)', transitionTimingFunction: 'var(--ease-calm)' }}
+          >
+            <span
+              className="grid shrink-0 place-items-center"
+              style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(232,201,155,0.14)' }}
+            >
+              <Sparkles size={20} strokeWidth={1.5} color="var(--gold)" />
+            </span>
+            <span className="flex-1">
+              <span className="serif" style={{ display: 'block', color: 'var(--ink)', fontSize: 'var(--t-lg)' }}>
+                Manifestation
+              </span>
+              <span style={{ display: 'block', marginTop: 3, color: 'var(--ink-muted)', fontSize: 'var(--t-sm)' }}>
+                Clarity, belief, feeling and aligned action.
+              </span>
+            </span>
+            <span aria-hidden style={{ color: 'var(--gold)' }}>→</span>
+          </button>
+        </Reveal>
+
         {/* Self-directed practices — no content, no narrator (§Phase2). */}
-        <Reveal delay={0.16}>
+        <Reveal delay={0.2}>
           <div className="eyebrow" style={{ marginTop: 24, marginBottom: 10 }}>
             Practices
           </div>
