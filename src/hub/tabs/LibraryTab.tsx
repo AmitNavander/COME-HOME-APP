@@ -9,7 +9,7 @@ import { useFavorites } from '../../store/favorites';
 import { LIBRARY_ITEMS } from '../../data/library';
 import { FEELINGS } from '../../data/feelings';
 import { PATHS } from '../../data/paths';
-import { app } from '../../store/app';
+import { hub } from '../../store/hub';
 
 /**
  * §6 Library (§Phase D). Browse the real content by felt-state — our categories are
@@ -58,7 +58,7 @@ export default function LibraryTab() {
             Transform
           </div>
           <button
-            onClick={() => app.setView('manifestation')}
+            onClick={() => hub.setTab('manifest')}
             className="glass glass-gold flex w-full items-center gap-4 px-5 py-5 text-left transition-transform duration-300 active:scale-[0.99]"
             style={{ borderRadius: 'var(--radius-card)', transitionTimingFunction: 'var(--ease-calm)' }}
           >

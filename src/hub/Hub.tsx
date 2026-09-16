@@ -1,24 +1,26 @@
 import { lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
-import { Home, LifeBuoy, Moon, Library, User } from 'lucide-react';
+import { Home, Sparkles, PenLine, Library, User } from 'lucide-react';
 import TabBar, { type TabItem } from '../ui/TabBar';
 import { hub, useHubTab, type TabId } from '../store/hub';
 import { usePlayer } from '../store/player';
 import { useReducedMotion } from '../lib/motion';
+import JournalTab from '../journal/Journal';
 
 // Lazy-load hub tabs (§12) — each panel is its own chunk.
-const HomeTab = lazy(() => import('./tabs/HomeTab'));
+const HomeTab = lazy(() => import('../manifestation/JourneyToday'));
+const ManifestTab = lazy(() => import('../manifestation/ManifestWorkspace'));
 const SupportTab = lazy(() => import('./tabs/SupportTab'));
 const SleepTab = lazy(() => import('./tabs/SleepTab'));
 const LibraryTab = lazy(() => import('./tabs/LibraryTab'));
 const ProfileTab = lazy(() => import('./tabs/ProfileTab'));
 
 const TABS: TabItem[] = [
-  { id: 'home', label: 'Home', Icon: Home },
-  { id: 'support', label: 'Support', Icon: LifeBuoy },
-  { id: 'sleep', label: 'Sleep', Icon: Moon },
-  { id: 'library', label: 'Library', Icon: Library },
-  { id: 'profile', label: 'Profile', Icon: User },
+  { id: 'home', label: 'Today', Icon: Home },
+  { id: 'manifest', label: 'Manifest', Icon: Sparkles },
+  { id: 'library', label: 'Meditate', Icon: Library },
+  { id: 'journal', label: 'Journal', Icon: PenLine },
+  { id: 'profile', label: 'You', Icon: User },
 ];
 
 /** Returning-user hub (§6). Bottom tab bar; content scrolls above it. */
@@ -40,6 +42,8 @@ export default function Hub() {
           transition={{ duration: reduce ? 0.001 : 0.42, ease: [0.22, 0.61, 0.36, 1] }}
         >
           {tab === 'home' && <HomeTab />}
+          {tab === 'manifest' && <ManifestTab />}
+          {tab === 'journal' && <JournalTab />}
           {tab === 'support' && <SupportTab />}
           {tab === 'sleep' && <SleepTab />}
           {tab === 'library' && <LibraryTab />}
