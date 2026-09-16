@@ -18,7 +18,7 @@ Support and Sleep remain accessible from Today. Existing programme access remain
 
 ## Still required — do not advertise as complete
 
-- Approved full seven-day curriculum and guided media, beyond the reflection prompts.
+- Editorial approval of the new seven-day development curriculum and guided media.
 - Full approved Water daily teaching, ceremony, journal, action and integration content.
 - Private vision-board image storage and owner-scoped cloud persistence.
 - Server-verified subscriptions, entitlements, protected media and real checkout.
@@ -33,3 +33,12 @@ This checkpoint is not the completed product or a production-ready release.
 - Vite production build and TypeScript check pass.
 - Browser verification attempted but Chromium is absent; browser download timed out.
 - No main-branch edits or production promotion requested or performed.
+
+## Seven-day written journey update
+
+Each foundation day now has a teaching, three-step practice, affirmation,
+reflection, practical action and evening integration. New wording is explicitly
+labelled development content for review, not previously approved course text.
+Day drafts and completions preserve existing device-local reflections.
+Today identifies the next unfinished day; completed weeks offer revisiting.
+Content completeness, resume selection and storage-failure behaviour have automated tests.

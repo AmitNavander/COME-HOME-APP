@@ -3,10 +3,12 @@ import { openTool } from '../store/tool';
 import { usePrefs } from '../store/prefs';
 import { useJourney } from './journeyStore';
 import './journey.css';
+import { foundationDays, nextFoundationDay } from './foundationDays';
 
 export default function JourneyToday() {
   const prefs = usePrefs();
   const { data } = useJourney();
+  const nextDay = nextFoundationDay(data.completed);
   const items = [
     ['Arrive', 'Let’s be here right now.', () => openTool('breathe')],
     ['Align', 'Set today’s intention', () => hub.setTab('manifest')],
@@ -27,7 +29,7 @@ export default function JourneyToday() {
       </button>)}
     </section>
     <section className="journey-card"><div className="eyebrow">Today’s affirmation</div><p className="serif journey-quote">I align with what matters, act with clarity, and allow life to meet me there.</p></section>
-    <button className="journey-card journey-wide" onClick={() => hub.setTab('manifest')}><div className="eyebrow">My manifestation</div><h2 className="serif">{data.goal || 'What are you ready to create?'}</h2><p>{data.completed.length} of 7 foundation reflections completed · Continue →</p></button>
+    <button className="journey-card journey-wide" onClick={() => hub.setTab('manifest')}><div className="eyebrow">My manifestation</div><h2 className="serif">{data.goal || 'What are you ready to create?'}</h2><p>{data.completed.length} of 7 days completed</p><p>{nextDay === null ? 'Foundation complete · Revisit your journey →' : `Continue day ${nextDay + 1} · ${foundationDays[nextDay].title} →`}</p></button>
     <div className="journey-grid"><button className="journey-button" onClick={() => hub.setTab('support')}>I need support now</button><button className="journey-button" onClick={() => hub.setTab('sleep')}>Help me rest</button></div>
   </main></div>;
 }
