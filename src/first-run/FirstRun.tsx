@@ -150,7 +150,7 @@ export default function FirstRun() {
           </p>
           <div className="mt-3 flex justify-center">
             <Button variant="ghost" onClick={skip}>
-              Maybe later
+              Explore as guest
             </Button>
           </div>
         </Reveal>

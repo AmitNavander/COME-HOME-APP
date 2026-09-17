@@ -24,6 +24,7 @@ import { feelingLabel } from '../../data/feelings';
 import type { Checkin } from '../../store/session';
 import { programme, useProgrammeProgress } from '../../store/programme';
 import { PROGRAMMES, type Programme } from '../../data/programmes';
+import JourneyProgress from '../../manifestation/JourneyProgress';
 
 const CHECKIN_PHRASE: Record<Checkin, string> = {
   calmer: 'felt calmer',
@@ -104,6 +105,7 @@ export default function ProfileTab() {
           </h1>
         </Reveal>
 
+        <JourneyProgress />
         {/* Gentle journeys — a static 2×2 grid, all in view; missing content shows a calm shell. */}
         <Reveal delay={0.12}>
           <div className="eyebrow" style={{ marginBottom: 12 }}>

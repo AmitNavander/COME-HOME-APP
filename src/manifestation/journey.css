@@ -18,4 +18,8 @@
 .journey-page progress { width: 100%; accent-color: var(--gold); }
 .journey-page button:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
 .journey-grid { display: flex; flex-wrap: wrap; }
+.vision-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
+.vision-card { border: 1px solid var(--ink-muted); border-radius: 16px; overflow: hidden; padding: 12px; overflow-wrap: anywhere; }
+.vision-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; }
+.journey-button:disabled { opacity: .5; cursor: wait; }
 .journey-label select { display: block; width: 100%; padding: 12px; margin-top: 8px; border-radius: 12px; background: var(--surface, #19303d); color: var(--ink); border: 1px solid var(--ink-muted); }

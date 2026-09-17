@@ -20,7 +20,7 @@ Support and Sleep remain accessible from Today. Existing programme access remain
 
 - Editorial approval of the new seven-day development curriculum and guided media.
 - Full approved Water daily teaching, ceremony, journal, action and integration content.
-- Private vision-board image storage and owner-scoped cloud persistence.
+- Owner-scoped cloud persistence for the device-local vision board.
 - Server-verified subscriptions, entitlements, protected media and real checkout.
 - Personalized onboarding connected to Today recommendations.
 - End-to-end browser and authenticated-account tests; production deployment verification.
@@ -31,7 +31,7 @@ This checkpoint is not the completed product or a production-ready release.
 ## Verification
 
 - Vite production build and TypeScript check pass.
-- Browser verification attempted but Chromium is absent; browser download timed out.
+- Live browser verification reaches Vercel authentication; in-app verification remains blocked.
 - No main-branch edits or production promotion requested or performed.
 
 ## Seven-day written journey update
@@ -56,3 +56,11 @@ not full daily teachings or ceremony scripts. Their day titles/order also differ
 from the approved prototype. Existing prototype sequence is retained until the
 final curriculum is supplied. No bonus modules were imported.
 Full lessons and paid enrollment remain unavailable and explicitly labelled.
+
+## Functional preview update — September 17, 2026
+
+- Vision board supports intentions, optional JPG/PNG/WebP images (up to 5 MB),
+  persistent IndexedDB storage, save errors, and confirmed card removal.
+- You displays actual foundation completion and Water journal record counts.
+- Entry screen explicitly offers Explore as guest.
+- Personal preview data stays in the current browser; this is not account sync.

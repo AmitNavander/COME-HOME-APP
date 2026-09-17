@@ -5,6 +5,7 @@ import './journey.css';
 import FoundationSession from './FoundationSession';
 import { foundationDays, nextFoundationDay } from './foundationDays';
 import WaterWorkbook from './WaterWorkbook';
+import VisionBoard from './VisionBoard';
 
 const waterDays = ['Sacred Initiation', 'Water of Clarity', 'Release', 'Emotional Healing', 'Gratitude', 'Forgiveness', 'Purification Ceremony', 'Intention', 'Voice Imprinting', 'Belief', 'Visualization', 'Embodied Feeling', 'Aligned Action', 'Prosperity Flow', 'Receiving', 'Trust', 'Surrender', 'Expansion', 'Synchronicity', 'Integration', 'Become'];
 
@@ -41,6 +42,7 @@ export default function ManifestWorkspace() {
     <section className="journey-card journey-hero"><div className="eyebrow">Signature journey · COME HOME+</div><h2 className="serif">Manifesting Through Water™</h2><p>Purify. Charge. Flow. Receive. Become.</p><p>Water as a mindful anchor for intention, reflection and aligned action.</p><button className="journey-button" aria-expanded={water} onClick={() => setWater(!water)}>{water ? 'Close' : 'Explore'} the 21-day journey</button>
       {water && <WaterWorkbook titles={waterDays} />}
     </section>
-    <p className="journey-muted">Your intention and reflections stay in this browser, including on shared devices. Cloud sync and a private image vision board are not yet connected. Practices support reflection and action, not guaranteed outcomes.</p>
+    <VisionBoard />
+    <p className="journey-muted">Your intention, reflections and vision board stay in this browser, including on shared devices. Cloud sync is not connected. Practices support reflection and action, not guaranteed outcomes.</p>
   </main></div>;
 }
