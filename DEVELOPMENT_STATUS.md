@@ -88,3 +88,21 @@ The app's You screen shows actual Water completion separately from old records.
 
 Validation: build and TypeScript pass; content coverage and preservation/resume
 tests added. Live interaction testing remains blocked by browser access.
+
+## Self-guided written workshop expansion
+
+Supersedes the condensed presentation: all 21 days now include preparation,
+three additional teaching paragraphs, four sequential practice instructions,
+day-specific writing guidance, concrete action instructions and an evening
+review. Each daily page can be followed independently without audio or a
+facilitator. Timing is a flexible estimate, not a validated session duration.
+
+Added explicit reading pauses, clean-water closing instructions, practice-note
+fields, intermediate save buttons and a persisted optional five-part checklist.
+Existing reflections, plans and completion records keep their keys. No records
+are reset. An empty checklist does not block completion or accessible adaptation.
+The new text is labelled an expanded adapted edition, not a verbatim reproduction
+of the supplied manuscript. No unverified scientific or outcome claims restored.
+
+Validation includes coverage for all 21 expanded guides plus preservation and
+resume tests. Live interaction testing remains blocked by browser access.

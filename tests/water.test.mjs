@@ -1,6 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { waterDays, waterWeeks, nextWaterDay, waterAnswers, waterPrefix } from '../src/manifestation/waterCourse.ts';
+import { waterGuides } from '../src/manifestation/waterGuide.ts';
+
+test('each day has a complete standalone reading and practical instructions', () => {
+  assert.equal(waterGuides.length, waterDays.length);
+  for (const guide of waterGuides) {
+    assert.equal(guide.teaching.length, 3);
+    assert.equal(guide.practice.length, 4);
+    for (const key of ['prepare', 'journal', 'action', 'evening']) assert.ok(guide[key].trim().length > 60, key);
+    assert.ok(guide.teaching.join(' ').split(/\s+/).length > 100);
+  }
+});
 
 test('all 21 supplied day titles have eight substantive sections', () => {
   assert.equal(waterWeeks.length, 3);
