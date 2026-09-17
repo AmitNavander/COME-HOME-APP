@@ -13,13 +13,13 @@ Support and Sleep remain accessible from Today. Existing programme access remain
 - Seven written reflection steps based on Vision / Why / Feel / See / Align / Act / Notice.
 - Saved drafts and completion counts (no fabricated progress).
 - Existing Supabase-backed foundation practice collection remains available separately.
-- Recovered 21-day Water outline, clearly marked as an outline, not a released paid course.
+- 21-day Water written journey adapted from Amit's supplied manuscript; earlier prototype workbook preserved separately.
 - Existing Journal and Profile are reused; no existing user records are migrated or deleted.
 
 ## Still required — do not advertise as complete
 
 - Editorial approval of the new seven-day development curriculum and guided media.
-- Full approved Water daily teaching, ceremony, journal, action and integration content.
+- Editorial approval of the condensed Water app adaptation and guided audio production.
 - Owner-scoped cloud persistence for the device-local vision board.
 - Server-verified subscriptions, entitlements, protected media and real checkout.
 - Personalized onboarding connected to Today recommendations.
@@ -64,3 +64,27 @@ Full lessons and paid enrollment remain unavailable and explicitly labelled.
 - You displays actual foundation completion and Water journal record counts.
 - Entry screen explicitly offers Explore as guest.
 - Personal preview data stays in the current browser; this is not account sync.
+
+## Supplied Water curriculum integration — September 17, 2026
+
+Supersedes the content blocker above: Amit supplied a complete 21-day manuscript
+in chat. The app now uses its day titles and sequence across The Clear Lake,
+The Flowing River and The Ocean. Each day includes all eight section types.
+The app copy is explicitly a condensed, safety-edited adaptation for review,
+not a verbatim edition or a claim of editorial approval.
+
+Spiritual imagery is framed as symbolism, not established claims of molecular
+memory, DNA reprogramming, trauma treatment or guaranteed wealth. Practices use
+optional ordinary sipping, normal breathing, clean food-safe vessels and plain
+water. Replaced forced drinking, rapid breathing, essential-oil immersion,
+burning/flushing paper, forced forgiveness and impulsive spending/investment
+challenges with gentle, bounded alternatives. No audio or clinical efficacy is claimed.
+
+New responses use water-course:v2 keys. Earlier water keys remain unchanged and
+are accessible under Earlier prototype journals with their original day names.
+Draft saving, explicit completion, undoing completion, next unfinished day and
+a Day 21 90-day planning field are implemented. Completion records participation.
+The app's You screen shows actual Water completion separately from old records.
+
+Validation: build and TypeScript pass; content coverage and preservation/resume
+tests added. Live interaction testing remains blocked by browser access.

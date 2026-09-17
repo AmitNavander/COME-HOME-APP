@@ -12,7 +12,7 @@ export default function WaterWorkbook({ titles }: { titles: readonly string[] })
   const recorded = titles.filter((_, i) => data.answers[`water:${i}:saved`] === '1').length;
   if (day !== null) return <WaterEntry key={day} day={day} title={titles[day]} onClose={() => setDay(null)} />;
   return <section>
-    <p>The daily journal is available to try. Full teachings, ceremonies, audio and paid enrollment are not yet available.</p>
+    <p>Earlier prototype workbook. Your original entries remain available here.</p>
     <p>{recorded} of 21 journal days recorded. This does not count as course completion.</p>
     <progress aria-label="Water journal days recorded" max={21} value={recorded} />
     <ol>{titles.map((title, i) => <li key={title}><button className="journey-row" onClick={() => setDay(i)}><span>Day {i + 1} · {title}</span><span>{data.answers[`water:${i}:saved`] === '1' ? 'Edit journal' : 'Open journal'} →</span></button></li>)}</ol>
