@@ -18,3 +18,4 @@
 .journey-page progress { width: 100%; accent-color: var(--gold); }
 .journey-page button:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
 .journey-grid { display: flex; flex-wrap: wrap; }
+.journey-label select { display: block; width: 100%; padding: 12px; margin-top: 8px; border-radius: 12px; background: var(--surface, #19303d); color: var(--ink); border: 1px solid var(--ink-muted); }

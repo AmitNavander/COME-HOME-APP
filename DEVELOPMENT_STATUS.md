@@ -42,3 +42,17 @@ labelled development content for review, not previously approved course text.
 Day drafts and completions preserve existing device-local reflections.
 Today identifies the next unfinished day; completed weeks offer revisiting.
 Content completeness, resume selection and storage-failure behaviour have automated tests.
+
+## Water workbook checkpoint — September 17, 2026
+
+Added 21 day-specific journal screens with exact shared workbook prompts and
+Clarity / Self-Trust / Gratitude / Alignment scales from
+Manifesting_Through_Water_Premium_Deck.pptx (June 20, 2026).
+Records are device-local and use water-prefixed keys, preserving foundation records.
+The counter measures journal days recorded, never course completion.
+
+Content blocker: the read Premium Deck and 21 Day Course deck contain outlines,
+not full daily teachings or ceremony scripts. Their day titles/order also differ
+from the approved prototype. Existing prototype sequence is retained until the
+final curriculum is supplied. No bonus modules were imported.
+Full lessons and paid enrollment remain unavailable and explicitly labelled.
