@@ -10,6 +10,7 @@ import { LIBRARY_ITEMS } from '../../data/library';
 import { FEELINGS } from '../../data/feelings';
 import { PATHS } from '../../data/paths';
 import { hub } from '../../store/hub';
+import MeditationCollection from '../MeditationCollection';
 
 /**
  * §6 Library (§Phase D). Browse the real content by felt-state — our categories are
@@ -25,11 +26,13 @@ export default function LibraryTab() {
     <div className="screen">
       <div className="mx-auto w-full max-w-md pt-6 pb-10">
         <Reveal delay={0.05}>
-          <div className="eyebrow">Library</div>
+          <div className="eyebrow">Meditate</div>
           <h1 className="serif" style={{ fontSize: 'var(--t-2xl)', marginTop: 8, marginBottom: 20 }}>
             Find what you need.
           </h1>
         </Reveal>
+
+        <MeditationCollection />
 
         {/* Sanctuary — the saved collection lives in its own calm view. */}
         <Reveal delay={0.1}>

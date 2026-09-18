@@ -32,3 +32,8 @@
 .water-steps li { padding-left: 4px; margin: 18px 0; }
 .water-check { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; }
 .water-check input { flex-shrink: 0; width: 20px; height: 20px; margin-top: 3px; accent-color: var(--gold); }
+.goal-stages { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0; }
+.goal-stages button { border: 1px solid var(--ink-muted); border-radius: 12px; padding: 10px 12px; }
+.goal-stages button[aria-current="step"] { border-color: var(--gold); background: rgba(232,201,155,.18); }
+.goal-workflow h3 { font-size: 24px; margin: 20px 0 12px; }
+.goal-actions { display: flex; flex-wrap: wrap; }

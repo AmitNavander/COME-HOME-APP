@@ -106,3 +106,32 @@ of the supplied manuscript. No unverified scientific or outcome claims restored.
 
 Validation includes coverage for all 21 expanded guides plus preservation and
 resume tests. Live interaction testing remains blocked by browser access.
+
+## Meditation access and structured goal workflow — September 18, 2026
+
+Repository comparison found no removed original audio assets or meditation data.
+The redesigned Today screen had dropped direct meditation/programme entry points.
+Restored these and added a searchable Meditate collection spanning the existing
+session paths, released programmes, sleep items and feeling-support practices.
+Coming-soon programmes are excluded from the available collection. Reused audio
+is disclosed; these are not advertised as new or distinct narrated recordings.
+Removed the existing misleading “music continues after voice” player label.
+All 15 referenced local audio files exist; playback quality is not verified.
+
+Manifest now starts with Define → Prepare → Visualize → Act → Review. Users set
+a measure, baseline, target and review date; prepare an obstacle response; rehearse
+both progress and the work required; schedule an action; and record its result,
+evidence, learning and next step. Goal achievement is explicitly self-reported.
+Visualization is optional and cannot mark an action or goal achieved.
+
+Goal-specific, date-specific practice records and review snapshots preserve
+earlier work. Changing a goal archives its old plan and starts a new daily record.
+History surfaces saved actions and rehearsals as well as reviews. Saving a review
+again updates that goal/day rather than inflating its count. Today shows the next
+unfinished workflow step. No new notifications, cloud sync or backend writes.
+
+Build, TypeScript and nine tests pass, including resume, legacy intention recovery,
+date/goal isolation and review requirements. Full live browser/audio verification
+remains blocked. This is a functional development update, not a production-readiness
+or guaranteed-results claim. Audio commissioning, cloud persistence and complete
+device/account testing remain outstanding.

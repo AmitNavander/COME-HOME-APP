@@ -6,7 +6,7 @@ import Transport from '../../audio/Transport';
 import Reveal from '../../ui/Reveal';
 import Button from '../../ui/Button';
 
-const LINES = ['Feel your feet.', 'Feel this breath.', "You're safe here."];
+const LINES = ['Feel your feet.', 'Feel this breath.', 'Let’s be here right now.'];
 
 /** §6.4 Support (player). Guided lines fade in over the dusk scene; transport below. */
 export default function Support() {
@@ -20,7 +20,7 @@ export default function Support() {
     <div className="screen">
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col">
         <Reveal delay={0.05} className="pt-1">
-          <div className="eyebrow">Guided · now</div>
+          <div className="eyebrow">On-screen guidance · music</div>
           <div className="serif" style={{ fontSize: 'var(--t-xl)', marginTop: 2 }}>
             {pathTitle(path)}
           </div>
@@ -41,7 +41,7 @@ export default function Support() {
         <Reveal delay={0.3}>
           <Transport favKey={path ? `path:${path}` : undefined} />
           <p style={{ color: 'var(--ink-muted)', textAlign: 'center', fontSize: 'var(--t-sm)', marginTop: 16 }}>
-            Music continues after voice.
+            Read the prompts at your pace. The music can continue while you rest.
           </p>
           <div className="mt-5 flex justify-center">
             <Button variant="ghost" onClick={() => session.go('music')}>
