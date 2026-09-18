@@ -59,3 +59,9 @@
 .journey-disclosure[open] > summary { margin-bottom: 20px; }
 .journey-primary { background: var(--gold); color: #14232c; font-weight: 600; }
 .journey-disclosure > summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 5px; border-radius: 4px; }
+
+.practice-reminder { margin: 20px 0; }
+.reminder-button { width: 100%; display: flex; align-items: center; gap: 10px; border: 1px solid var(--gold); color: var(--gold); min-height: 48px; text-align: left; }
+.reminder-button svg { flex-shrink: 0; }
+.reminder-button span:last-child { margin-left: auto; }
+.reminder-settings { padding: 16px 4px; }

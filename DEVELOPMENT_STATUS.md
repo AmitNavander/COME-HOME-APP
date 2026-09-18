@@ -198,3 +198,8 @@ iPhone instructions: https://support.apple.com/en-us/102638
 - Added bounded daily-21 and weekly-4 schedules alongside once and daily-7. Calendar descriptions now identify the relevant destination and explain fixed reminder text. Private action inclusion remains opt-in.
 - No automatic calendar writes, cloud scheduling or push notifications. Users must import and confirm each reminder; edit/cancel in their calendar.
 - TypeScript, production build and 15 tests pass. Real phone import and alert delivery remain unverified.
+
+## Practice reminder discoverability
+- Replaced the small disclosure text with a full-width, gold-bordered bell button at every existing practice reminder location. It expands accessible inline time/repeat controls, preserving the current draft when collapsed.
+- Per Amit's direction, no reminder entry or tab was added to Today. Reminders remain beside workshop actions, evening reflections, goal work, vision board, programmes and journal.
+- TypeScript and build pass; reminder tests previously passed unchanged. Phone rendering remains unverified.
