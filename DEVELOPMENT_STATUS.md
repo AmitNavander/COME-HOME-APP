@@ -157,3 +157,26 @@ launch; frontend labels are not access control. Existing data remains available.
 
 Validation: TypeScript, build and account-choice persistence/routing tests, plus
 existing journey tests. Live authenticated/browser testing remains outstanding.
+
+## Carry your vision — wallpaper export
+
+Vision board now offers opt-in wallpaper creation from 1–6 selected cards. The
+user explicitly consents before generation, previews the actual PNG, then chooses
+download or native file sharing when supported. No wallpaper setting, background
+uploads or automatic sharing. All rendering uses local browser canvas and blobs.
+
+Tall (1080×2400) and classic (1080×1920) layouts reserve space for a clock and small
+COME HOME branding. Images use contain scaling; captions are optional on image
+cards, wrap at words, and visibly truncate if necessary. Text-only cards retain
+their text. Changing selections/options invalidates the previous export; closing
+releases blob URLs. Share cancellation is handled without claiming a saved image.
+Included iPhone/Android instructions and file-download fallback. This feature is
+part of the COME HOME+ free development preview.
+
+Validation: build, TypeScript, layout/bounds and caption tests; a six-card PNG was
+rendered with a local canvas adapter for visual inspection. This does not verify
+mobile share sheets, browser photo decoding or device wallpaper settings. Those
+still require real-device testing.
+API references: https://developer.mozilla.org/en-US/docs/Web/API/Navigator/share
+and https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob
+iPhone instructions: https://support.apple.com/en-us/102638

@@ -49,3 +49,5 @@
 .access-badge { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--gold); }
 .premium-preview { margin-top: 32px; }
 .premium-preview > .journey-card { margin-top: 8px; }
+.wallpaper-preview { display: block; width: min(100%, 270px); height: auto; margin: 20px auto; border: 1px solid var(--gold); border-radius: 20px; }
+.wallpaper-result h4 { margin-top: 20px; font-weight: 600; }

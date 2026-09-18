@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { get, update } from 'idb-keyval';
+import VisionWallpaper from './VisionWallpaper';
 
 type Vision = { id: string; caption: string; image?: Blob };
 const KEY = 'come-home:vision-board:v1';
@@ -50,6 +51,7 @@ export default function VisionBoard() {
     <p role="status">{status}</p>
     {!items.length && ready && <p>Your first card can be a small intention for today.</p>}
     <div className="vision-grid">{items.map(item => <VisionCard key={item.id} item={item} busy={busy} onRemove={() => void remove(item.id)} />)}</div>
+    <VisionWallpaper items={items} />
   </section>;
 }
 
