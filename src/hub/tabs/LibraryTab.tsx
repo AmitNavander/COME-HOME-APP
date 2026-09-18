@@ -1,21 +1,14 @@
 import { Timer, Wind, Heart } from 'lucide-react';
 import Reveal from '../../ui/Reveal';
 import PracticeCard from '../../ui/PracticeCard';
-import GradientIcon from '../../ui/GradientIcon';
-import { enterFlow } from '../../store/flow';
 import { openTool } from '../../store/tool';
 import { openSanctuary } from '../../sanctuary/Sanctuary';
 import { useFavorites } from '../../store/favorites';
 import { LIBRARY_ITEMS } from '../../data/library';
-import { FEELINGS } from '../../data/feelings';
 import { PATHS } from '../../data/paths';
-import MeditationCollection from '../MeditationCollection';
+import MeditationCollection, { beginMeditation } from '../MeditationCollection';
 
-/**
- * §6 Library (§Phase D). Browse the real content by felt-state — our categories are
- * the arrival states (no invented empty categories). Tapping a feeling launches the
- * same companion flow as the Support tab. Saved sessions live in the Sanctuary view.
- */
+// The full catalogue remains available behind a single browse entry.
 export default function LibraryTab() {
   const favs = useFavorites();
 
@@ -31,7 +24,8 @@ export default function LibraryTab() {
           </h1>
         </Reveal>
 
-        <MeditationCollection />
+        <section className="journey-card"><h2 className="serif">Take a moment for yourself.</h2><p>A simple practice with on-screen prompts and music.</p><button className="journey-button journey-primary" onClick={beginMeditation}>Begin meditation</button></section>
+        <details className="journey-disclosure"><summary>Browse all practices <small>Meditation · sleep · emotional support · programmes</small></summary><MeditationCollection /></details>
 
         {/* Sanctuary — the saved collection lives in its own calm view. */}
         <Reveal delay={0.1}>
@@ -66,31 +60,7 @@ export default function LibraryTab() {
           </div>
         </Reveal>
 
-        {/* Browse by felt-state — the six arrival states as calm glass tiles, mirroring
-            the Support grid. Tapping one launches the same companion flow. */}
-        <div style={{ marginTop: 26 }}>
-          <Reveal delay={0.22}>
-            <div className="eyebrow" style={{ marginBottom: 12 }}>
-              How are you feeling today?
-            </div>
-          </Reveal>
-          <Reveal delay={0.26}>
-            <div className="grid grid-cols-2 gap-3">
-              {FEELINGS.map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => enterFlow(f.id)}
-                  className="glass flex flex-col items-center justify-center gap-2 px-3 py-4 text-center transition-transform duration-300 active:scale-[0.98]"
-                  style={{ minHeight: 88, borderRadius: 'var(--radius-card)', transitionTimingFunction: 'var(--ease-calm)' }}
-                >
-                  <GradientIcon name={f.icon} size={24} />
-                  <span style={{ color: 'var(--ink)', fontSize: 'var(--t-sm)', lineHeight: 1.25 }}>{f.label}</span>
-                </button>
-              ))}
-            </div>
-          </Reveal>
-        </div>
+
       </div>
     </div>
   );

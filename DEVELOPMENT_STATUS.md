@@ -180,3 +180,9 @@ still require real-device testing.
 API references: https://developer.mozilla.org/en-US/docs/Web/API/Navigator/share
 and https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob
 iPhone instructions: https://support.apple.com/en-us/102638
+
+## Simplified entry and manifestation orientation
+- Today offers two clear paths. Meditate prioritizes beginning a practice, with the complete catalogue behind Browse all practices.
+- Manifest keeps the next foundation action visible, with full day lists, goal workflow, Water workshop and vision board in expandable sections. Native disclosures retain mounted drafts while closed.
+- Added a self-guided orientation: goal examples, preparation, process visualization, action, review, course selection, saving and returning. All 21 written Water lessons and original storage keys remain intact.
+- Validation: TypeScript, production build and all 12 tests pass. Live anonymous/mobile verification remains outstanding because of deployment access limitations.

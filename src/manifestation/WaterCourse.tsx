@@ -23,14 +23,14 @@ export default function WaterCourse() {
     <p>{completed} of 21 days marked complete</p>
     <progress aria-label="Water course progress" max={21} value={completed} />
     {next === null ? <p role="status">You have completed the written journey. Revisit any day at your pace.</p> : <button className="journey-button" onClick={() => setSelected(next)}>Continue Water day {next + 1} · {waterDays[next].title}</button>}
-    {waterWeeks.map((week, w) => <section key={week.title}>
-      <h3 className="serif">Week {w + 1} · {week.title}</h3><p>{week.theme} · {week.law}</p>
+    {waterWeeks.map((week, w) => <details className="journey-disclosure" key={week.title}>
+      <summary>Week {w + 1} · {week.title}<small>{week.theme}</small></summary><p>{week.law}</p>
       {waterDays.slice(w * 7, w * 7 + 7).map((day, offset) => {
         const i = w * 7 + offset;
         const prefix = waterPrefix(i);
         return <button className="journey-row" key={day.title} onClick={() => setSelected(i)}><span>Day {i + 1} · {day.title}<small>{data.answers[prefix + 'completed'] === '1' ? 'Complete · revisit' : data.answers[prefix + 'saved'] === '1' ? 'Draft saved' : 'Ready when you are'}</small></span><span aria-hidden="true">→</span></button>;
       })}
-    </section>)}
+    </details>)}
   </section>;
 }
 
