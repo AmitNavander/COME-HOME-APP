@@ -37,3 +37,15 @@
 .goal-stages button[aria-current="step"] { border-color: var(--gold); background: rgba(232,201,155,.18); }
 .goal-workflow h3 { font-size: 24px; margin: 20px 0 12px; }
 .goal-actions { display: flex; flex-wrap: wrap; }
+.entry-option { display: flex; align-items: flex-start; gap: 14px; border: 1px solid var(--ink-muted); border-radius: 20px; padding: 22px; margin: 16px 0; cursor: pointer; }
+.entry-option.selected { border-color: var(--gold); background: rgba(232,201,155,.12); }
+.entry-option input { width: 20px; height: 20px; flex-shrink: 0; margin-top: 4px; accent-color: var(--gold); }
+.entry-option strong { display: block; font-size: 20px; margin-bottom: 8px; }
+.entry-option span span { display: block; }
+.plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; }
+.plans-grid h3 { font-size: 22px; margin-top: 12px; }
+.plans-grid ul { list-style: disc; padding-left: 20px; }
+.plans-grid li { margin: 10px 0; }
+.access-badge { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--gold); }
+.premium-preview { margin-top: 32px; }
+.premium-preview > .journey-card { margin-top: 8px; }

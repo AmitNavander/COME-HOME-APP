@@ -1,135 +1,32 @@
 import { useState } from 'react';
-import Button from '../ui/Button';
-import Reveal from '../ui/Reveal';
 import { app } from '../store/app';
-import { prefsStore, usePrefs } from '../store/prefs';
+import { hub } from '../store/hub';
+import { useAuth } from '../lib/auth';
 import { markOnboardingDone } from '../lib/storage';
-import { FEELINGS } from '../data/feelings';
+import { entryTab, readEntryChoice, saveEntryChoice } from './entryChoice';
+import type { EntryChoice } from './entryChoice';
+import Plans from '../membership/Plans';
+import '../manifestation/journey.css';
 
-/**
- * Onboarding questions (§6 flow) — the three cards that run once after sign-up/
- * login and before Home: tried before? → how regularly? → struggling with what?
- * All optional and low-pressure; answers are stored for gentle personalisation.
- * A separate view (store/app) so it doesn't tangle with the login screen.
- */
-const FREQUENCIES: { value: string; label: string }[] = [
-  { value: 'daily', label: 'Daily' },
-  { value: 'weekly', label: 'A few times a week' },
-  { value: 'rarely', label: 'Rarely' },
-  { value: 'never', label: 'Never' },
+const options: { id: EntryChoice; title: string; text: string }[] = [
+  { id: 'meditate', title: 'I want to meditate', text: 'Find calm, breathe, rest and explore the meditation library. Begin with free practices.' },
+  { id: 'manifest', title: 'I want to manifest', text: 'Begin with the free seven-day foundation. Explore guided goal planning and the Water workshop with COME HOME+.' },
+  { id: 'both', title: 'I want to explore both', text: 'See two clearly separated paths on Today and choose what you need each day.' },
 ];
-
-const LAST = 2; // three question cards: 0, 1, 2
-
 export default function Onboarding() {
-  const prefs = usePrefs();
-  const [card, setCard] = useState(0);
-  const [triedBefore, setTriedBefore] = useState<boolean | null>(prefs.onboarding.triedBefore);
-  const [frequency, setFrequency] = useState(prefs.onboarding.frequency);
-  const [struggling, setStruggling] = useState<string[]>(prefs.onboarding.struggling);
-
-  const toggleStruggle = (id: string) =>
-    setStruggling((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
-
-  const finish = () => {
-    prefsStore.setOnboarding({ triedBefore, frequency, struggling });
-    markOnboardingDone();
-    app.setView('hub');
-  };
-
-  return (
-    <div className="screen">
-      <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
-        <Reveal delay={0.1}>
-          <div className="glass glass-strong" style={{ padding: 28, minHeight: 236 }}>
-            {card === 0 && (
-              <>
-                <p className="serif" style={{ fontSize: 'var(--t-xl)' }}>
-                  Have you tried meditating before?
-                </p>
-                <div className="mt-6 flex gap-3">
-                  <Chip on={triedBefore === true} onClick={() => setTriedBefore(true)}>Yes</Chip>
-                  <Chip on={triedBefore === false} onClick={() => setTriedBefore(false)}>No</Chip>
-                </div>
-              </>
-            )}
-            {card === 1 && (
-              <>
-                <p className="serif" style={{ fontSize: 'var(--t-xl)' }}>
-                  How regularly do you meditate?
-                </p>
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {FREQUENCIES.map((f) => (
-                    <Chip key={f.value} on={frequency === f.value} onClick={() => setFrequency(f.value)}>
-                      {f.label}
-                    </Chip>
-                  ))}
-                </div>
-              </>
-            )}
-            {card === 2 && (
-              <>
-                <p className="serif" style={{ fontSize: 'var(--t-xl)' }}>
-                  Are you struggling with something?
-                </p>
-                <p style={{ color: 'var(--ink-muted)', marginTop: 8, fontSize: 'var(--t-sm)' }}>
-                  Optional — pick any that fit.
-                </p>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {FEELINGS.map((f) => (
-                    <Chip key={f.id} on={struggling.includes(f.id)} onClick={() => toggleStruggle(f.id)}>
-                      {f.label}
-                    </Chip>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        </Reveal>
-
-        {/* progress dots */}
-        <div className="mt-6 flex justify-center gap-2" aria-hidden>
-          {[0, 1, 2].map((i) => (
-            <span
-              key={i}
-              style={{ width: 6, height: 6, borderRadius: 999, background: i === card ? 'var(--gold)' : 'var(--hairline)' }}
-            />
-          ))}
-        </div>
-
-        <div className="mt-7 flex flex-col items-center gap-2">
-          {card < LAST ? (
-            <Button onClick={() => setCard((c) => c + 1)}>Continue</Button>
-          ) : (
-            <Button onClick={finish}>Continue</Button>
-          )}
-          <Button variant="ghost" onClick={finish}>
-            Skip for now
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** A soft selectable pill for the onboarding answers. */
-function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      onClick={onClick}
-      aria-pressed={on}
-      className="transition-transform duration-300 active:scale-[0.97]"
-      style={{
-        padding: '9px 16px',
-        borderRadius: 999,
-        fontSize: 'var(--t-sm)',
-        color: on ? 'var(--gold)' : 'var(--ink)',
-        background: on ? 'rgba(232,201,155,0.14)' : 'transparent',
-        border: `1px solid ${on ? 'rgba(232,201,155,0.45)' : 'var(--hairline)'}`,
-        transitionTimingFunction: 'var(--ease-calm)',
-      }}
-    >
-      {children}
-    </button>
-  );
+  const { user, loading } = useAuth();
+  const [choice, setChoice] = useState<EntryChoice | null>(() => readEntryChoice(user.id));
+  const [error, setError] = useState('');
+  function finish() {
+    if (!choice || loading) return;
+    try { saveEntryChoice(user.id, choice); markOnboardingDone(); hub.setTab(entryTab(choice)); app.setView('hub'); }
+    catch { setError('Could not save your choice. Please allow browser storage and try again.'); }
+  }
+  return <div className="screen"><main className="journey-page entry-page">
+    <div className="eyebrow">Welcome to COME HOME</div><h1 className="serif">What brings you here?</h1>
+    <p>Choose where you want to start. You can change this later under You, and both paths remain available.</p>
+    <fieldset><legend className="eyebrow">Choose your starting path</legend>{options.map(option => <label key={option.id} className={`entry-option ${choice === option.id ? 'selected' : ''}`}><input type="radio" name="entry-path" value={option.id} checked={choice === option.id} onChange={() => setChoice(option.id)} /><span><strong>{option.title}</strong><span>{option.text}</span></span></label>)}</fieldset>
+    <button className="journey-button" disabled={!choice || loading} onClick={finish}>{choice === 'meditate' ? 'Enter Meditate' : choice === 'manifest' ? 'Enter Manifest' : choice === 'both' ? 'Explore both paths' : 'Choose a path to continue'}</button>
+    <p role="alert">{error}</p><details><summary>What is free and what is paid?</summary><Plans /></details>
+  </main></div>;
 }

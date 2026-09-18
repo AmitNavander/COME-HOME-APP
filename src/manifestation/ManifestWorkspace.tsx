@@ -8,6 +8,7 @@ import WaterWorkbook from './WaterWorkbook';
 import VisionBoard from './VisionBoard';
 import WaterCourse from './WaterCourse';
 import GoalWorkflow from './GoalWorkflow';
+import Plans, { PremiumPreview } from '../membership/Plans';
 
 const waterDays = ['Sacred Initiation', 'Water of Clarity', 'Release', 'Emotional Healing', 'Gratitude', 'Forgiveness', 'Purification Ceremony', 'Intention', 'Voice Imprinting', 'Belief', 'Visualization', 'Embodied Feeling', 'Aligned Action', 'Prosperity Flow', 'Receiving', 'Trust', 'Surrender', 'Expansion', 'Synchronicity', 'Integration', 'Become'];
 
@@ -20,7 +21,8 @@ export default function ManifestWorkspace() {
   return <div className="screen"><main className="journey-page">
     <div className="eyebrow">Manifest</div><h1 className="serif">What are you ready to create?</h1>
     <p>Awareness → intention → feeling → aligned action → reflection.</p>
-    <GoalWorkflow />
+    <p>Start with the free foundation, or explore the deeper COME HOME+ experiences below.</p>
+    <details><summary>Compare Free and COME HOME+</summary><Plans /></details>
     <section className="journey-card"><div className="eyebrow">Free · seven-day reflection journey</div><h2 className="serif">COME HOME Manifestation Foundations</h2>
       <p>A teaching, practice, affirmation, action and evening reflection each day. Begin at your pace; there is no missed-day penalty. Guided audio is not included yet.</p>
       <progress aria-label="Foundation progress" max={7} value={data.completed.length} /><p>{data.completed.length} of 7 completed</p>
@@ -28,10 +30,11 @@ export default function ManifestWorkspace() {
       {foundationDays.map(({title, minutes}, i) => <button className="journey-row" key={title} onClick={() => setSelected(i)}><span className="journey-number">{i + 1}</span><span>Day {i + 1} · {title}<small>{minutes} min · {data.completed.includes(i) ? 'Completed' : data.answers[String(i)] ? 'Draft saved' : 'Ready when you are'}</small></span><span aria-hidden>{data.completed.includes(i) ? '✓' : '→'}</span></button>)}
     </section>
     <button className="journey-card journey-wide" onClick={() => app.setView('manifestation')}><div className="eyebrow">Practice library</div><h2 className="serif">Explore the foundation practices →</h2><p>The existing published practice collection.</p></button>
-    <section className="journey-card journey-hero"><div className="eyebrow">Signature journey · COME HOME+</div><h2 className="serif">Manifesting Through Water™</h2><p>Purify. Charge. Flow. Receive. Become.</p><p>Water as a mindful anchor for intention, reflection and aligned action.</p><button className="journey-button" aria-expanded={water} onClick={() => setWater(!water)}>{water ? 'Close' : 'Explore'} the 21-day journey</button>
+    <PremiumPreview><GoalWorkflow /></PremiumPreview>
+    <PremiumPreview><section className="journey-card journey-hero"><div className="eyebrow">Signature journey · COME HOME+</div><h2 className="serif">Manifesting Through Water™</h2><p>Purify. Charge. Flow. Receive. Become.</p><p>Water as a mindful anchor for intention, reflection and aligned action.</p><button className="journey-button" aria-expanded={water} onClick={() => setWater(!water)}>{water ? 'Close' : 'Explore'} the 21-day journey</button>
       {water && <><WaterCourse /><details><summary>Earlier prototype journals</summary><p>These entries keep the earlier prototype day names. They are separate from the new curriculum and its completion tracking.</p><WaterWorkbook titles={waterDays} /></details></>}
-    </section>
-    <VisionBoard />
+    </section></PremiumPreview>
+    <PremiumPreview><VisionBoard /></PremiumPreview>
     <p className="journey-muted">Your intention, reflections and vision board stay in this browser, including on shared devices. Cloud sync is not connected. Practices support reflection and action, not guaranteed outcomes.</p>
   </main></div>;
 }

@@ -25,7 +25,7 @@ export default function MeditationCollection() {
   ];
   const visible = entries.filter(entry => (category === 'All' || entry.group === category) && `${entry.title} ${entry.detail}`.toLowerCase().includes(query.trim().toLowerCase()));
   return <section className="journey-card">
-    <h2 className="serif">Meditation & rest library</h2>
+    <p className="access-badge">Free · Included collection</p><h2 className="serif">Meditation & rest library</h2>
     <button className="journey-button" onClick={beginMeditation}>Begin a meditation</button>
     <label className="journey-label">Find a practice<input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Grounding, rest, fear…" /></label>
     <label className="journey-label">Browse collection<select value={category} onChange={e => setCategory(e.target.value)}>{['All', 'Meditation', 'Programmes', 'Sleep & sound', 'Emotional support'].map(label => <option key={label}>{label}</option>)}</select></label>

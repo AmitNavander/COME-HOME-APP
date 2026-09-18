@@ -25,6 +25,8 @@ import type { Checkin } from '../../store/session';
 import { programme, useProgrammeProgress } from '../../store/programme';
 import { PROGRAMMES, type Programme } from '../../data/programmes';
 import JourneyProgress from '../../manifestation/JourneyProgress';
+import Plans from '../../membership/Plans';
+import { app } from '../../store/app';
 
 const CHECKIN_PHRASE: Record<Checkin, string> = {
   calmer: 'felt calmer',
@@ -105,6 +107,8 @@ export default function ProfileTab() {
           </h1>
         </Reveal>
 
+        <button className="journey-button" onClick={() => app.setView('onboarding')}>Change my starting path</button>
+        <Plans />
         <JourneyProgress />
         {/* Gentle journeys — a static 2×2 grid, all in view; missing content shows a calm shell. */}
         <Reveal delay={0.12}>

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import LivingWater from './water/LivingWater';
 import Scene from './scene/Scene';
 import Atmosphere from './water/Atmosphere';
@@ -15,7 +15,9 @@ import FlowContainer from './flow/FlowContainer';
 import ManifestationHome from './manifestation/ManifestationHome';
 import PlayerHost from './audio/PlayerHost';
 import { app, useView } from './store/app';
-import { onboardingDone, markPresence } from './lib/storage';
+import { markPresence } from './lib/storage';
+import { entryTab, readEntryChoice } from './first-run/entryChoice';
+import { hub } from './store/hub';
 import { setDepth, setWaterTheme } from './store/water';
 import { usePrefs } from './store/prefs';
 import { setReduceMotionPref } from './lib/motion';
@@ -31,7 +33,8 @@ import { useAppHistory } from './nav/history';
  */
 export default function App() {
   const view = useView();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const routedUser = useRef<string | null>(null);
   const { reduceMotion, ambientMuted, theme, reminder } = usePrefs();
 
   // Keep hardware/browser Back inside the app (only Home-screen Back exits).
@@ -81,8 +84,11 @@ export default function App() {
   // New users answer the 3 onboarding questions once, after login, before Home —
   // every path lands on 'hub' first, so gate it here in one place (§6 flow).
   useEffect(() => {
-    if (view === 'hub' && !onboardingDone()) app.setView('onboarding');
-  }, [view]);
+    if (loading || view !== 'hub') return;
+    const choice = readEntryChoice(user.id);
+    if (!choice) { routedUser.current = user.id; app.setView('onboarding'); }
+    else if (routedUser.current !== user.id) { routedUser.current = user.id; hub.setTab(entryTab(choice)); }
+  }, [view, loading, user.id]);
 
   // Hub / first-run / onboarding sit at their own water depth (§4); the session flow manages its own.
   useEffect(() => {
@@ -99,7 +105,7 @@ export default function App() {
         {view === 'first-run' ? (
           <FirstRun />
         ) : view === 'onboarding' ? (
-          <Onboarding />
+          <Onboarding key={user.id} />
         ) : view === 'session' ? (
           <SessionFlow />
         ) : view === 'tool' ? (

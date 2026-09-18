@@ -135,3 +135,25 @@ date/goal isolation and review requirements. Full live browser/audio verificatio
 remains blocked. This is a functional development update, not a production-readiness
 or guaranteed-results claim. Audio commissioning, cloud persistence and complete
 device/account testing remain outstanding.
+
+## Clear entry and plan boundaries — September 18, 2026
+
+Replaced the meditation-only intake with Meditate / Manifest / Explore both.
+The choice persists per auth user ID (guest separate) in this browser. Initial
+routing waits for auth loading and takes returning users to their saved path.
+Existing users see this new choice once. You offers Change my starting path.
+This preference does not sync across devices; no auth/profile schema changed.
+Today is now two separate path cards, and Meditate no longer embeds the
+Manifestation promotional card ahead of its practices.
+
+Free: current meditation/sleep/tools collection, seven-day manifestation
+foundation, personal journal, saved practices and foundation progress.
+COME HOME+ at paid launch: 21-day Water workshop, structured goal workflow,
+vision board. These currently remain open as explicitly labelled free development
+previews. Shared plan comparison appears in onboarding, You and Manifest.
+No amount, subscription cadence, checkout or entitlement enforcement is claimed.
+Secure billing and server-side content authorization are required before a paid
+launch; frontend labels are not access control. Existing data remains available.
+
+Validation: TypeScript, build and account-choice persistence/routing tests, plus
+existing journey tests. Live authenticated/browser testing remains outstanding.
