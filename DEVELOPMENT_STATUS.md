@@ -192,3 +192,9 @@ iPhone instructions: https://support.apple.com/en-us/102638
 - Exports RFC 5545 calendar event with display alarm, floating local time, finite recurrence, escaped text and UTF-8 line folding. Calendar import confirmation is required; no claim that downloading schedules notifications.
 - Edit/cancel/snooze in the calendar. Reminders do not advance lessons or cancel on completion. No push service or new backend added.
 - TypeScript and production build pass; 14 tests pass including recurrence, past-time rejection, text injection and Unicode folding. Actual phone calendar import/alert delivery remains unverified.
+
+## Reminders across return and update flows
+- Reused the optional calendar reminder for foundation evening reflection, Water workshop return/action/evening, all goal workflow stages, vision board review, available meditation programmes and journal return.
+- Added bounded daily-21 and weekly-4 schedules alongside once and daily-7. Calendar descriptions now identify the relevant destination and explain fixed reminder text. Private action inclusion remains opt-in.
+- No automatic calendar writes, cloud scheduling or push notifications. Users must import and confirm each reminder; edit/cancel in their calendar.
+- TypeScript, production build and 15 tests pass. Real phone import and alert delivery remain unverified.

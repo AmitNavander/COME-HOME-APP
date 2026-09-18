@@ -1,3 +1,4 @@
+import PracticeReminder from './PracticeReminder';
 import { useEffect, useState } from 'react';
 import { get, update } from 'idb-keyval';
 import VisionWallpaper from './VisionWallpaper';
@@ -51,6 +52,7 @@ export default function VisionBoard() {
     <p role="status">{status}</p>
     {!items.length && ready && <p>Your first card can be a small intention for today.</p>}
     <div className="vision-grid">{items.map(item => <VisionCard key={item.id} item={item} busy={busy} onRemove={() => void remove(item.id)} />)}</div>
+    <PracticeReminder title="Review my vision board" action="Look at my vision board, notice what still matters, update a card and choose one practical action. Refresh my wallpaper if useful." prompt="Revisit your vision board. What still matters, and what would you like to update?" location="Manifest → My vision board" label="Remind me to review my vision board" />
     <VisionWallpaper items={items} />
   </section>;
 }

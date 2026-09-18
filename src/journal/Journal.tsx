@@ -1,3 +1,4 @@
+import PracticeReminder from '../manifestation/PracticeReminder';
 import { useEffect, useRef, useState } from 'react';
 import { PenLine, Trash2, ArrowLeft } from 'lucide-react';
 import Reveal from '../ui/Reveal';
@@ -80,6 +81,7 @@ export default function Journal() {
     <div className="screen">
       <ExitButton onExit={() => nav.back()} />
       <div className="mx-auto w-full max-w-md py-10">
+        <PracticeReminder title="Return to my journal" action="Pause, reflect and write a few honest lines in my journal." prompt="Make room for a short reflection. What have you noticed today?" location="Journal" label="Remind me to write" />
         <Reveal delay={0.05}>
           <div className="eyebrow">Journal</div>
           <h1 className="serif" style={{ fontSize: 'var(--t-2xl)', marginTop: 8, marginBottom: 8 }}>

@@ -1,3 +1,4 @@
+import PracticeReminder from './PracticeReminder';
 import { useEffect, useRef, useState } from 'react';
 import { useJourney } from './journeyStore';
 import { nextWaterDay, waterAnswers, waterDays, waterPrefix, waterWeeks } from './waterCourse';
@@ -20,6 +21,7 @@ export default function WaterCourse() {
       <p>Use a clean food-safe glass and fresh drinking water. A simple quiet space is enough; special vessels, crystals and purchases are not required. Keep ink, oils, decorative objects and used ritual water separate from drinking water.</p>
       <p>All sipping is optional. Drink normally, follow any prescribed fluid limits, breathe comfortably and stop if distressed. You may skip any exercise. These practices do not replace medical or mental-health care.</p>
     </details>
+    <PracticeReminder title="Return to the Water workshop" action="Continue the next unfinished Water day, or finish your saved practice." prompt="Make a little space for your Water workshop. Continue at your own pace." location="Manifest → Manifesting Through Water" label="Remind me to return to the workshop" />
     <p>{completed} of 21 days marked complete</p>
     <progress aria-label="Water course progress" max={21} value={completed} />
     {next === null ? <p role="status">You have completed the written journey. Revisit any day at your pace.</p> : <button className="journey-button" onClick={() => setSelected(next)}>Continue Water day {next + 1} · {waterDays[next].title}</button>}
@@ -74,9 +76,11 @@ function WaterLesson({ day, onClose }: { day: number; onClose: () => void }) {
     {lesson.prompts.map((prompt, i) => field(`reflection:${i}`, prompt))}
     <button className="journey-button" type="submit">Save my reflections</button>
     <h4>4. Aligned Action Challenge</h4><p>{lesson.action}</p><p>{guide.action}</p><p>Before leaving this page, decide what you will do and when. Afterward, return to record what happened. If the action was not possible, write the adjustment you want to try.</p>{field('action', 'My action, when I will do it, and what happened')}
+    <PracticeReminder day={day} title="Water · Aligned action" action={values.action || lesson.action} location={`Manifest → Manifesting Through Water → Day ${day + 1}`} label="Remind me to take my action" />
     {day === 20 && field('plan', 'My 90-day plan: priorities, weekly actions and review dates')}
     <h4>5. Water Reminder Practice</h4><p>At one ordinary water break today, pause briefly and return to these words. Use the pause as a reminder of your chosen action, without adding extra drinking or trying to monitor every sip.</p><blockquote>{lesson.reminder}</blockquote>
     <h4>6. Evening Water Integration</h4><p className="journey-muted">Return for 2–5 minutes before resting.</p><p>{lesson.evening}</p><p>{guide.evening}</p>{field('evening', 'My evening reflection')}
+    <PracticeReminder day={day} title="Water · Evening reflection" action={lesson.evening} prompt="Return for your evening reflection and record what you noticed today." location={`Manifest → Manifesting Through Water → Day ${day + 1}`} label="Remind me to return this evening" />
     <h4>7. Daily Milestone</h4><p>{lesson.milestone}</p><p>Use this optional checklist to remember where you stopped. It records your participation, not a guaranteed transformation. Adapted or skipped practices can be noted in your journal.</p>
     <fieldset><legend>My daily practice</legend>{[['reading', 'I read and reflected on the teaching'], ['practice', 'I tried or adapted the ceremony'], ['journal', 'I took time for the reflection'], ['action', 'I took or planned my action'], ['evening', 'I returned for the evening review']].map(([key, label]) => <label className="water-check" key={key}><input type="checkbox" checked={values[`check:${key}`] === '1'} onChange={e => setValues(old => ({ ...old, [`check:${key}`]: e.target.checked ? '1' : '0' }))} />{label}</label>)}</fieldset>
     <h4>8. Manifestation Evidence Tracker</h4><p>Write one concrete observation, the action you took and what happened afterward. Then add your interpretation separately. For example: “I sent a message and received a reply. I felt encouraged.” Include things that did not change. Coincidences do not establish cause and effect.</p>{field('evidence', 'What happened, what I noticed, and what I learned')}

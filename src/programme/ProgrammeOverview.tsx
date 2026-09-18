@@ -1,3 +1,4 @@
+import PracticeReminder from '../manifestation/PracticeReminder';
 import { useEffect, useState } from 'react';
 import { Check, Sparkles } from 'lucide-react';
 import Button from '../ui/Button';
@@ -112,6 +113,8 @@ export default function ProgrammeOverview() {
           </h1>
           <p style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-md)', lineHeight: 1.55 }}>{p.intro}</p>
         </Reveal>
+
+        {!soon && <PracticeReminder key={p.id} title={`Continue ${p.title}`} action="Return to the programme and continue your next sitting at your own pace." prompt="Take a quiet moment to return to your meditation programme." location={`Meditate → Browse all practices → ${p.title}`} label="Remind me to return to this programme" />}
 
         {/* Dot path — filled for days visited, a soft ring on where you are.
             (Only meaningful for a real, playable journey.) */}

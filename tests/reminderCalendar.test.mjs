@@ -22,3 +22,11 @@ test('invalid and past times are rejected and unicode calendar lines round-trip'
   for (const line of folded.split('\r\n')) assert.ok(Buffer.byteLength(line) <= 75);
   assert.ok(new Date(defaultReminderTime(now)) > now);
 });
+test('workshop and board schedules are bounded and point to their own destination', () => {
+  const workshop = reminderCalendar({ ...input, repeat: 'daily21', location: 'Manifest → Water' }, now);
+  const board = reminderCalendar({ ...input, repeat: 'weekly4', location: 'Manifest → My vision board' }, now).replace(/\r\n /g, '');
+  assert.match(workshop, /RRULE:FREQ=DAILY;COUNT=21/);
+  assert.match(board, /RRULE:FREQ=WEEKLY;COUNT=4/);
+  assert.match(board, /Manifest → My vision board/);
+  assert.doesNotMatch(board, /Manifest → Foundation/);
+});

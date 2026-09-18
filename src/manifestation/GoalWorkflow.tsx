@@ -1,3 +1,4 @@
+import PracticeReminder from './PracticeReminder';
 import { useEffect, useRef, useState } from 'react';
 import { useJourney } from './journeyStore';
 import { blankDay, dailyKey, localDay, nextStage, PLAN_KEY, planReady, readDay, readPlan, readReviews, reviewReady } from './goalWorkflow';
@@ -121,6 +122,7 @@ export default function GoalWorkflow() {
       </>}
       <div className="goal-actions"><button type="button" className="journey-button" onClick={() => persist()}>Save draft</button><button className="journey-button" type="submit">{stage === 4 ? 'Save my review' : `Save and continue to ${stages[stage + 1]}`}</button></div>
     </form>
+    <PracticeReminder key={`${plan.id}:${stage}`} title={stage === 3 ? 'Take my planned action' : stage === 4 ? 'Review my goal progress' : 'Return to my goal practice'} action={stage === 3 ? day.action || 'Take one small planned action.' : stage === 4 ? day.next || 'Review progress, record evidence and choose the next step.' : 'Continue preparing and rehearsing the next step toward my goal.'} prompt={stage === 4 ? 'Review what happened, what you learned and your next step.' : 'Return to your goal plan and take one manageable next step.'} location="Manifest → My goal plan" label={stage === 3 ? 'Remind me to take action' : stage === 4 ? 'Set my next review reminder' : 'Remind me to continue'} />
     <p role="status">{status}</p>
     <p className="journey-muted">{dirty ? 'You have unsaved changes. ' : ''}Save before changing tabs. Your plan and writing stay in this browser.</p>
     {date !== localDay() && <button className="journey-button" onClick={() => { if (dirty) { setStatus('Save your current writing before opening today.'); return; } const today = localDay(); const next = readDay(data.answers[dailyKey(plan.id, today)]); setDate(today); setDay(next); setStage(nextStage(plan, next)); }}>Open today’s practice</button>}
