@@ -186,3 +186,9 @@ iPhone instructions: https://support.apple.com/en-us/102638
 - Manifest keeps the next foundation action visible, with full day lists, goal workflow, Water workshop and vision board in expandable sections. Native disclosures retain mounted drafts while closed.
 - Added a self-guided orientation: goal examples, preparation, process visualization, action, review, course selection, saving and returning. All 21 written Water lessons and original storage keys remain intact.
 - Validation: TypeScript, production build and all 12 tests pass. Live anonymous/mobile verification remains outstanding because of deployment access limitations.
+
+## Foundation practice reminders
+- Added Set reminder under Carry it into life for every foundation lesson: local date/time, once or daily for seven occurrences, opt-in inclusion of personal action text.
+- Exports RFC 5545 calendar event with display alarm, floating local time, finite recurrence, escaped text and UTF-8 line folding. Calendar import confirmation is required; no claim that downloading schedules notifications.
+- Edit/cancel/snooze in the calendar. Reminders do not advance lessons or cancel on completion. No push service or new backend added.
+- TypeScript and production build pass; 14 tests pass including recurrence, past-time rejection, text injection and Unicode folding. Actual phone calendar import/alert delivery remains unverified.

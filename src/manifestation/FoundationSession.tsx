@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PracticeReminder from './PracticeReminder';
 import { foundationDays } from './foundationDays';
 import { useJourney } from './journeyStore';
 
@@ -26,7 +27,7 @@ export default function FoundationSession({ day, onClose }: { day: number; onClo
     <section className="journey-card"><div className="eyebrow">Affirmation</div><p className="serif journey-quote">{lesson.affirmation}</p></section>
     <form onSubmit={e => { e.preventDefault(); persist(true); }}>
       <section className="journey-card"><h2 className="serif">Reflect</h2><label className="journey-label">{lesson.prompt}<textarea maxLength={8000} value={reflection} onChange={e => setReflection(e.target.value)} /></label></section>
-      <section className="journey-card"><h2 className="serif">Carry it into life</h2><p>{lesson.action}</p><label className="journey-label">My next action<textarea maxLength={4000} value={action} onChange={e => setAction(e.target.value)} /></label></section>
+      <section className="journey-card"><h2 className="serif">Carry it into life</h2><p>{lesson.action}</p><label className="journey-label">My next action<textarea maxLength={4000} value={action} onChange={e => setAction(e.target.value)} /></label><PracticeReminder day={day} title={lesson.title} action={action.trim() || lesson.action} /></section>
       <section className="journey-card"><h2 className="serif">Return this evening</h2><label className="journey-label">{lesson.evening}<textarea maxLength={8000} value={evening} onChange={e => setEvening(e.target.value)} /></label></section>
       <p>Writing is optional. Mark complete when you have finished the practice, not when you have achieved an outcome.</p>
       <button className="journey-button" type="button" onClick={() => persist(false)}>Save draft</button>
