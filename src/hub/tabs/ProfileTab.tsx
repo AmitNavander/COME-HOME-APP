@@ -1,3 +1,4 @@
+import JourneyExport from '../JourneyExport';
 import { useEffect, useState } from 'react';
 import { Heart, PenLine } from 'lucide-react';
 import Reveal from '../../ui/Reveal';
@@ -110,6 +111,7 @@ export default function ProfileTab() {
         <button className="journey-button" onClick={() => app.setView('onboarding')}>Change my starting path</button>
         <Plans />
         <JourneyProgress />
+        <JourneyExport />
         {/* Gentle journeys — a static 2×2 grid, all in view; missing content shows a calm shell. */}
         <Reveal delay={0.12}>
           <div className="eyebrow" style={{ marginBottom: 12 }}>

@@ -65,3 +65,7 @@
 .reminder-button svg { flex-shrink: 0; }
 .reminder-button span:last-child { margin-left: auto; }
 .reminder-settings { padding: 16px 4px; }
+
+.daily-affirmation { background: linear-gradient(135deg, rgba(181,143,82,.14), rgba(40,86,97,.22)); border-color: rgba(232,201,155,.48); }
+.journey-page .daily-affirmation h2 { font-size: 12px; line-height: 1.5; margin: 0 0 14px; color: var(--gold); }
+.journey-page .daily-affirmation-text { font-size: clamp(23px, 5vw, 30px); line-height: 1.4; margin: 0 0 16px; text-wrap: pretty; }

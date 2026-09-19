@@ -1,4 +1,4 @@
-import { get, set } from 'idb-keyval';
+import { get, set, update } from 'idb-keyval';
 import type { Checkin, Emotion } from '../store/session';
 
 /**
@@ -302,21 +302,11 @@ export async function saveJournalEntry(
     prompt: draft.prompt,
     text: draft.text,
   };
-  try {
-    const list = (await get<JournalEntry[]>(JOURNAL_KEY)) ?? [];
-    const rest = list.filter((e) => e.id !== entry.id);
-    await set(JOURNAL_KEY, [entry, ...rest].slice(0, 300)); // ponytail: cap 300 entries
-  } catch {
-    /* ignore — a failed write never blocks the writer */
-  }
+  // Let the writer keep its draft and report failures instead of claiming success.
+  await update<JournalEntry[]>(JOURNAL_KEY, current => [entry, ...(current ?? []).filter(e => e.id !== entry.id)]);
   return entry;
 }
 
 export async function deleteJournalEntry(id: string): Promise<void> {
-  try {
-    const list = (await get<JournalEntry[]>(JOURNAL_KEY)) ?? [];
-    await set(JOURNAL_KEY, list.filter((e) => e.id !== id));
-  } catch {
-    /* ignore */
-  }
+  await update<JournalEntry[]>(JOURNAL_KEY, current => (current ?? []).filter(e => e.id !== id));
 }

@@ -42,6 +42,9 @@ type Draft = { id?: string; prompt?: string; text: string };
 export default function Journal() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [draft, setDraft] = useState<Draft | null>(null); // non-null = writing
+  const [saveError, setSaveError] = useState('');
+  const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
   const [confirmDel, setConfirmDel] = useState<string | null>(null);
 
   const refresh = () => getJournal().then(setEntries);
@@ -58,11 +61,16 @@ export default function Journal() {
 
   // Leaving the page keeps whatever was written — an empty draft is simply let go.
   const closeDraft = async () => {
-    if (draft && draft.text.trim()) {
-      await saveJournalEntry({ id: draft.id, prompt: draft.prompt, text: draft.text.trim() });
-    }
-    setDraft(null);
-    await refresh();
+    if (savingRef.current) return;
+    savingRef.current = true;
+    setSaving(true);
+    setSaveError('');
+    try {
+      if (draft && draft.text.trim()) await saveJournalEntry({ id: draft.id, prompt: draft.prompt, text: draft.text.trim() });
+      setDraft(null);
+      await refresh();
+    } catch { setSaveError('Your writing could not be saved. Keep this page open, copy your text somewhere safe, then try again.'); }
+    finally { savingRef.current = false; setSaving(false); }
   };
 
   const remove = async (id: string) => {
@@ -70,12 +78,11 @@ export default function Journal() {
       setConfirmDel(id);
       return;
     }
-    await deleteJournalEntry(id);
-    setConfirmDel(null);
-    await refresh();
+    try { await deleteJournalEntry(id); setConfirmDel(null); setSaveError(''); await refresh(); }
+    catch { setSaveError('Could not delete this entry. Please try again.'); }
   };
 
-  if (writing) return <Writer draft={draft!} setDraft={setDraft} onDone={closeDraft} />;
+  if (writing) return <Writer draft={draft!} setDraft={setDraft} onDone={closeDraft} error={saveError} saving={saving} />;
 
   return (
     <div className="screen">
@@ -92,6 +99,7 @@ export default function Journal() {
           </p>
         </Reveal>
 
+        {saveError && <p role="alert">{saveError}</p>}
         {/* Gentle prompts — invitations, never assignments. */}
         <Reveal delay={0.14}>
           <div className="eyebrow" style={{ marginTop: 26, marginBottom: 12 }}>
@@ -195,10 +203,14 @@ function Writer({
   draft,
   setDraft,
   onDone,
+  error,
+  saving,
 }: {
   draft: Draft;
   setDraft: (d: Draft) => void;
   onDone: () => void;
+  error: string;
+  saving: boolean;
 }) {
   const ref = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
@@ -212,6 +224,7 @@ function Writer({
       {/* Back to the journal (keeps whatever was written). One clear way out. */}
       <button
         onClick={onDone}
+        disabled={saving}
         aria-label="Back to journal"
         className="glass grid place-items-center transition-transform duration-200 active:scale-[0.96]"
         style={{
@@ -243,6 +256,8 @@ function Writer({
         <Reveal delay={0.1} className="mt-4 flex-1 flex flex-col">
           <textarea
             ref={ref}
+            aria-label="Journal entry"
+            readOnly={saving}
             value={draft.text}
             onChange={(e) => setDraft({ ...draft, text: e.target.value })}
             placeholder="Whatever wants to be said…"
@@ -261,7 +276,7 @@ function Writer({
         </Reveal>
 
         <Reveal delay={0.16} className="mt-4">
-          <Button onClick={onDone}>{draft.text.trim() ? 'Keep this' : 'Done'}</Button>
+          {error && <p role="alert">{error}</p>}<Button disabled={saving} onClick={onDone}>{saving ? 'Saving…' : draft.text.trim() ? 'Keep this' : 'Done'}</Button>
         </Reveal>
       </div>
     </div>

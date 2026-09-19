@@ -203,3 +203,22 @@ iPhone instructions: https://support.apple.com/en-us/102638
 - Replaced the small disclosure text with a full-width, gold-bordered bell button at every existing practice reminder location. It expands accessible inline time/repeat controls, preserving the current draft when collapsed.
 - Per Amit's direction, no reminder entry or tab was added to Today. Reminders remain beside workshop actions, evening reflections, goal work, vision board, programmes and journal.
 - TypeScript and build pass; reminder tests previously passed unchanged. Phone rendering remains unverified.
+
+## Launch-hardening update — current readiness
+
+Completed:
+- 365 distinct, prewritten chant-style affirmations in Amit's approved style, rotating by local calendar date. Tests cover uniqueness, same-day stability, leap-day progression and the 365-day cycle. Midnight/focus/visibility refresh keeps Today current without network generation.
+- Journal now propagates write/delete failures, keeps the writer open on failed save and prevents duplicate save taps. Atomic IndexedDB updates preserve concurrent entries and remove the prior silent 300-entry truncation.
+- You → Keep a copy of my journey exports saved workshop answers, goals, journal, progress and vision board images. Explicit allowlist excludes auth tokens. Export errors do not produce a knowingly partial file. This is an export, not automatic restore or cloud sync.
+- App-level render error recovery offers a reload instead of an unhandled blank screen; it never clears saved data.
+- Repeatable `npm run check` gate: type checking, 19 automated tests, production build.
+
+Not yet production-ready:
+- Connected Supabase list exposes abode and Triply Antigravity, not the configured fallback COME HOME project ydyklmqkddcxrcdzvjrs. No unrelated project was changed. Correct deployment environment/backend access must be confirmed before cloud schema or account data migrations.
+- New workshop/board data remains browser-local and shared within that browser profile. No account-isolation or cross-device sync claim.
+- Billing prices, payment setup, server-enforced entitlements and protected premium content remain unimplemented. Free preview labels retained.
+- Public anonymous access and authenticated/mobile flows still require verification. Earlier Vercel project access was denied; no bypass attempted.
+- Phone calendar import/delivery, wallpaper sharing, audio quality, password recovery/account lifecycle, unsaved-draft navigation and full content approval remain release gates.
+- Existing auth event callback awaits profile requests; review and authenticated regression tests are required before launch. No unverified auth refactor shipped here.
+
+No main-branch modification or production promotion performed. This is a tested development release, not a certification of a finished paid product.
