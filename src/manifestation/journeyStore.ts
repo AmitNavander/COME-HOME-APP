@@ -1,5 +1,9 @@
 import { useSyncExternalStore } from 'react';
 
+const notifyCloudDataChanged = () => {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('come-home:cloud-data-changed'));
+};
+
 const KEY = 'come-home:manifest-journey:v1';
 export type JourneyData = { goal: string; why: string; answers: Record<string, string>; completed: number[] };
 const empty: JourneyData = { goal: '', why: '', answers: {}, completed: [] };
@@ -15,6 +19,13 @@ const listeners = new Set<() => void>();
 const subscribe = (listener: () => void) => { listeners.add(listener); return () => { listeners.delete(listener); }; };
 export function saveJourney(next: JourneyData) {
   // Do not report success or discard the draft if device storage is unavailable.
+  localStorage.setItem(KEY, JSON.stringify(next));
+  data = next;
+  listeners.forEach(listener => listener());
+  notifyCloudDataChanged();
+}
+export function getJourneySnapshot(): JourneyData { return data; }
+export function hydrateJourney(next: JourneyData): void {
   localStorage.setItem(KEY, JSON.stringify(next));
   data = next;
   listeners.forEach(listener => listener());

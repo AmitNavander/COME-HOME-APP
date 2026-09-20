@@ -1,10 +1,9 @@
 import PracticeReminder from './PracticeReminder';
 import { useEffect, useState } from 'react';
-import { get, update } from 'idb-keyval';
 import VisionWallpaper from './VisionWallpaper';
-
-type Vision = { id: string; caption: string; image?: Blob };
-const KEY = 'come-home:vision-board:v1';
+import { addVisionBoardItem, listVisionBoard, removeVisionBoardItem } from './visionBoardStore';
+import { useAccountCloud } from '../lib/accountCloud';
+import type { Vision } from './wallpaper';
 
 export default function VisionBoard() {
   const [items, setItems] = useState<Vision[]>([]);
@@ -14,11 +13,12 @@ export default function VisionBoard() {
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [inputKey, setInputKey] = useState(0);
+  const cloud = useAccountCloud();
   useEffect(() => {
     let active = true;
-    get<Vision[]>(KEY).then(value => { if (active) { setItems(value || []); setReady(true); } }).catch(() => { if (active) setStatus('Could not open device storage. Try another browser.'); });
+    listVisionBoard().then(value => { if (active) { setItems(value); setReady(true); } }).catch(() => { if (active) setStatus('Could not open your vision board. Try again.'); });
     return () => { active = false; };
-  }, []);
+  }, [cloud.enabled, cloud.updatedAt]);
   async function add() {
     if (!caption.trim() || busy || !ready) return;
     if (file && (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024)) {
@@ -27,23 +27,21 @@ export default function VisionBoard() {
     setBusy(true);
     try {
       const item: Vision = { id: crypto.randomUUID(), caption: caption.trim(), ...(file ? { image: file } : {}) };
-      await update<Vision[]>(KEY, current => [...(current || []), item]);
-      setItems(await get<Vision[]>(KEY) || []);
-      setCaption(''); setFile(null); setInputKey(value => value + 1); setStatus('Added to your board on this device.');
+      setItems(await addVisionBoardItem(item));
+      setCaption(''); setFile(null); setInputKey(value => value + 1); setStatus(cloud.enabled ? 'Added to your private account.' : 'Added to your board on this device.');
     } catch { setStatus('Could not save. Your draft is still here; try a smaller image.'); }
     finally { setBusy(false); }
   }
   async function remove(id: string) {
     setBusy(true);
     try {
-      await update<Vision[]>(KEY, current => (current || []).filter(item => item.id !== id));
-      setItems(await get<Vision[]>(KEY) || []); setStatus('Card removed.');
+      setItems(await removeVisionBoardItem(id)); setStatus('Card removed.');
     } catch { setStatus('Could not remove the card. Please try again.'); }
     finally { setBusy(false); }
   }
   return <section className="journey-card">
     <div className="eyebrow">My vision board</div><h2 className="serif">Make space for what matters.</h2>
-    <p>Add an intention with an optional image. This board stays in this browser and is visible to others who use this browser profile.</p>
+    <p>Add an intention with an optional image. {cloud.enabled ? 'Your board is saved privately to your signed-in account.' : 'Until cloud saving is enabled, it stays in this browser and is visible to others using this browser profile.'}</p>
     <form onSubmit={e => { e.preventDefault(); void add(); }}>
       <label className="journey-label">Your vision or image caption<input required maxLength={300} value={caption} onChange={e => setCaption(e.target.value)} /></label>
       <label className="journey-label">Add an image (optional)<input key={inputKey} type="file" accept="image/jpeg,image/png,image/webp" onChange={e => setFile(e.target.files?.[0] || null)} /></label>

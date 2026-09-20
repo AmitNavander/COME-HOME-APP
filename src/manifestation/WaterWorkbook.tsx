@@ -45,6 +45,6 @@ function WaterEntry({ day, title, onClose }: { day: number; title: string; onClo
     {scales.map((label, i) => <label className="journey-label" key={label}>{label}<select value={values[`scale:${i}`]} onChange={e => setValues(old => ({ ...old, [`scale:${i}`]: e.target.value }))}><option value="">Not recorded</option>{Array.from({ length: 10 }, (_, index) => <option key={index} value={String(index + 1)}>{index + 1}</option>)}</select></label>)}
     <button className="journey-button" type="submit">Save Water journal</button>
     <button className="journey-button" type="button" onClick={() => persist(true)}>Save and return to days</button>
-    <p role="status">{status}</p><p className="journey-muted">Use Save before leaving. Entries stay in this browser, including on shared devices.</p>
+    <p role="status">{status}</p><p className="journey-muted">Use Save before leaving. Entries stay in this browser unless Private account saving is enabled in Profile.</p>
   </form>;
 }

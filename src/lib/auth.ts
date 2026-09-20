@@ -103,12 +103,19 @@ function start() {
     routeInIfSignedIn();
     recompute(false);
   });
-  supabase.auth.onAuthStateChange(async (_event, s) => {
+  supabase.auth.onAuthStateChange((_event, s) => {
     session = s;
     profile = s ? profile : null;
-    if (s) await loadProfile(s.user.id);
-    routeInIfSignedIn();
-    recompute(false);
+    // Supabase advises keeping this callback synchronous. Defer profile queries so
+    // they cannot contend with the auth client's internal session lock.
+    window.setTimeout(() => {
+      void (async () => {
+        if (s && session?.user.id === s.user.id) await loadProfile(s.user.id);
+        if (session !== s) return;
+        routeInIfSignedIn();
+        recompute(false);
+      })();
+    }, 0);
   });
 }
 start();
@@ -174,10 +181,15 @@ export async function signInWithEmail(email: string, password: string): Promise<
 
 export function useAuth(): AuthState {
   return useSyncExternalStore(
-    (l) => (listeners.add(l), () => listeners.delete(l)),
+    subscribeAuth,
     () => snapshot,
     () => snapshot,
   );
+}
+
+export function subscribeAuth(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
 }
 
 /** Non-reactive snapshot (for the documented authSeam). */

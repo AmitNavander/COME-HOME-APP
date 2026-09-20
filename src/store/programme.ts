@@ -85,3 +85,10 @@ export function useProgrammeProgress(): ProgrammeProgress {
     () => progress,
   );
 }
+
+export function getProgrammeProgress(): ProgrammeProgress { return progress; }
+export function hydrateProgrammeProgress(next: ProgrammeProgress): void {
+  progress = next;
+  saveProgrammeProgress(progress);
+  notify();
+}

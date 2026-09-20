@@ -1,6 +1,10 @@
 import { get, set, update } from 'idb-keyval';
 import type { Checkin, Emotion } from '../store/session';
 
+const notifyCloudDataChanged = () => {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('come-home:cloud-data-changed'));
+};
+
 /**
  * On-device storage seam (§8). localStorage for prefs + first-run flag; IndexedDB
  * (idb-keyval) for check-in history. No Supabase writes yet — swap the impls here
@@ -117,6 +121,7 @@ export function loadFavorites(): string[] {
 }
 export function saveFavorites(list: string[]): void {
   local()?.setItem(FAVS_KEY, JSON.stringify(list));
+  notifyCloudDataChanged();
 }
 
 /** Last-used Library filter (§Phase3), persisted so it's calm across visits. */
@@ -149,6 +154,7 @@ export function loadProgrammeProgress(): ProgrammeProgress {
 }
 export function saveProgrammeProgress(p: ProgrammeProgress): void {
   local()?.setItem(PROGRAMME_KEY, JSON.stringify(p));
+  notifyCloudDataChanged();
 }
 
 /**
@@ -304,9 +310,15 @@ export async function saveJournalEntry(
   };
   // Let the writer keep its draft and report failures instead of claiming success.
   await update<JournalEntry[]>(JOURNAL_KEY, current => [entry, ...(current ?? []).filter(e => e.id !== entry.id)]);
+  notifyCloudDataChanged();
   return entry;
 }
 
 export async function deleteJournalEntry(id: string): Promise<void> {
   await update<JournalEntry[]>(JOURNAL_KEY, current => (current ?? []).filter(e => e.id !== id));
+  notifyCloudDataChanged();
+}
+
+export async function replaceJournal(entries: JournalEntry[]): Promise<void> {
+  await set(JOURNAL_KEY, entries);
 }

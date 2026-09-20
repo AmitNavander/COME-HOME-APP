@@ -28,3 +28,10 @@ export function useFavorites(): ReadonlySet<string> {
     () => favs,
   );
 }
+
+export function getFavorites(): string[] { return [...favs]; }
+export function hydrateFavorites(next: string[]): void {
+  favs = new Set(next);
+  saveFavorites([...favs]);
+  listeners.forEach((l) => l());
+}

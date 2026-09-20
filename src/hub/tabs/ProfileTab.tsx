@@ -28,6 +28,7 @@ import { PROGRAMMES, type Programme } from '../../data/programmes';
 import JourneyProgress from '../../manifestation/JourneyProgress';
 import Plans from '../../membership/Plans';
 import { app } from '../../store/app';
+import { disableAccountCloud, enableAccountCloud, refreshAccountCloud, useAccountCloud } from '../../lib/accountCloud';
 
 const CHECKIN_PHRASE: Record<Checkin, string> = {
   calmer: 'felt calmer',
@@ -235,7 +236,7 @@ export default function ProfileTab() {
         </div>
 
         <p style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-xs)', marginTop: 12 }}>
-          Sets the mood of the water — Still water’s teal calm, or a warmer amber. Everything you share stays on this device.
+          Sets the mood of the water — Still water’s teal calm, or a warmer amber. Your private writing is only cloud-saved when you turn account saving on below.
         </p>
 
         <AccountSection />
@@ -252,6 +253,8 @@ export default function ProfileTab() {
 function AccountSection() {
   const { user, loading } = useAuth();
   const [confirming, setConfirming] = useState(false);
+  const [movingDevice, setMovingDevice] = useState(false);
+  const cloud = useAccountCloud();
 
   if (!isSupabaseConfigured || loading) return null;
 
@@ -261,7 +264,7 @@ function AccountSection() {
       <div className="mt-6">
         <GoogleButton onClick={signInWithGoogle} />
         <p style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-xs)', marginTop: 8, lineHeight: 1.5 }}>
-          Optional — sign in to keep your name across devices. Your check-ins stay on this device.
+          Optional — sign in to enable private account saving across your devices.
         </p>
       </div>
     );
@@ -294,6 +297,41 @@ function AccountSection() {
         >
           Sign out
         </button>
+      </div>
+
+      <div className="glass mt-3 px-5 py-4" style={{ borderRadius: 'var(--radius-card)' }}>
+        <div className="eyebrow">Private account saving</div>
+        <div style={{ color: 'var(--ink)', fontSize: 'var(--t-md)', marginTop: 5 }}>
+          {cloud.enabled ? 'Your journey follows your account' : 'Keep your journey across devices'}
+        </div>
+        <p style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-sm)', marginTop: 7, lineHeight: 1.5 }}>
+          {cloud.message} This includes manifestation answers, programme progress, saved practices, journal pages and vision-board cards.
+        </p>
+        {cloud.updatedAt && <div className="eyebrow">Last saved {new Date(cloud.updatedAt).toLocaleString()}</div>}
+        {!cloud.enabled ? (
+          <>
+            <button className="journey-button" disabled={cloud.phase === 'syncing'} onClick={() => void enableAccountCloud('cloud')}>
+              {cloud.phase === 'syncing' ? 'Connecting…' : 'Turn on cloud saving'}
+            </button>
+            <details className="journey-disclosure" style={{ marginTop: 10 }}>
+              <summary>Already used this browser?</summary>
+              <p>Choose this only when you want this browser’s current journey to replace the account copy and add its vision-board cards.</p>
+              {!movingDevice ? (
+                <button className="journey-button" onClick={() => setMovingDevice(true)}>Move this device’s journey</button>
+              ) : (
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button className="journey-button" onClick={() => void enableAccountCloud('device')}>Confirm and save</button>
+                  <button className="journey-button" onClick={() => setMovingDevice(false)}>Cancel</button>
+                </div>
+              )}
+            </details>
+          </>
+        ) : (
+          <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+            <button className="journey-button" disabled={cloud.phase === 'syncing'} onClick={() => void refreshAccountCloud()}>{cloud.phase === 'syncing' ? 'Syncing…' : 'Refresh from cloud'}</button>
+            <button className="journey-button" onClick={() => void disableAccountCloud()}>Stop and return to device copy</button>
+          </div>
+        )}
       </div>
 
       {confirming && (

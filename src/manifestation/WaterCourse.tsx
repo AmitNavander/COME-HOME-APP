@@ -89,6 +89,6 @@ function WaterLesson({ day, onClose }: { day: number; onClose: () => void }) {
     <button className="journey-button" type="button" onClick={() => persist(true)}>{done ? 'Save completed day' : 'Save and mark day complete'}</button>
     {done && <button className="journey-button" type="button" onClick={() => persist(false)}>Mark as in progress</button>}
     <button className="journey-button" type="button" onClick={() => persist(done, true)}>Save and return to Water days</button>
-    <p role="status">{status}</p><p className="journey-muted">Your writing stays in this browser, including on shared devices. It is not synced to your account.</p>
+    <p role="status">{status}</p><p className="journey-muted">Your writing stays in this browser unless you turn on Private account saving in Profile. On shared devices, sign out when you finish.</p>
   </form>;
 }
