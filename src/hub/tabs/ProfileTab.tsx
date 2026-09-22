@@ -1,77 +1,33 @@
-import JourneyExport from '../JourneyExport';
 import { useEffect, useState } from 'react';
-import { Heart, PenLine } from 'lucide-react';
+import { Heart, PenLine, ShieldCheck, SlidersHorizontal } from 'lucide-react';
 import Reveal from '../../ui/Reveal';
 import ReflectionTrail from '../../journey/ReflectionTrail';
 import { openSanctuary } from '../../sanctuary/Sanctuary';
 import { openJournal } from '../../journal/Journal';
 import { usePrefs, prefsStore } from '../../store/prefs';
-import { useAuth, signInWithGoogle, signOut } from '../../lib/auth';
+import { deleteAccount, requestPasswordReset, signInWithGoogle, signOut, useAuth } from '../../lib/auth';
 import { isSupabaseConfigured } from '../../lib/supabase';
 import GoogleButton from '../../ui/GoogleButton';
 import { reminders } from '../../lib/reminders';
-import {
-  getHistory,
-  getReflections,
-  getJournal,
-  getPresence,
-  type HistoryEntry,
-  type FlowVisit,
-  type Reflection,
-  type JournalEntry,
-  type Theme,
-} from '../../lib/storage';
-import { feelingLabel } from '../../data/feelings';
-import type { Checkin } from '../../store/session';
+import { getHistory, getReflections, getJournal, getPresence, type HistoryEntry, type Reflection, type JournalEntry, type Theme } from '../../lib/storage';
 import { programme, useProgrammeProgress } from '../../store/programme';
 import { PROGRAMMES, type Programme } from '../../data/programmes';
 import JourneyProgress from '../../manifestation/JourneyProgress';
 import Plans from '../../membership/Plans';
+import JourneyExport from '../JourneyExport';
 import { app } from '../../store/app';
 import { disableAccountCloud, enableAccountCloud, refreshAccountCloud, useAccountCloud } from '../../lib/accountCloud';
 
-const CHECKIN_PHRASE: Record<Checkin, string> = {
-  calmer: 'felt calmer',
-  better: 'felt a little better',
-  same: 'stayed with it',
-  struggling: 'were still struggling',
-  'prefer-not': 'kept it private',
-};
-
-// How a Support-flow visit reads back in the trail (§Phase C). None reads as failure.
-const FLOW_LEFT: Record<FlowVisit['left'], string> = {
-  lighter: 'left a little lighter',
-  'a-little': 'felt a little ease',
-  'still-heavy': 'stayed with what was heavy',
-};
-
-/** §6 Profile — "Your journey" (§Phase F). A gentle, guilt-free reflection space:
- *  resumable programmes, a soft mood picture + practice calendar, private
- *  journaling, and the moments you've gathered. No streaks, no counts, no pressure. */
+/** A calm overview first. Detail stays one tap away in clearly named sections. */
 export default function ProfileTab() {
   const prefs = usePrefs();
+  const { user } = useAuth();
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [journal, setJournal] = useState<JournalEntry[]>([]);
   const [presence, setPresence] = useState<string[]>([]);
   const [reminderDenied, setReminderDenied] = useState(false);
   useProgrammeProgress();
-
-  // Opt-in reminder — ask for permission only when turning it on (a user gesture).
-  const toggleReminder = async () => {
-    if (!prefs.reminder.enabled) {
-      const ok = await reminders.requestPermission();
-      if (!ok) {
-        setReminderDenied(true);
-        return;
-      }
-      setReminderDenied(false);
-      prefsStore.setReminder({ enabled: true, time: prefs.reminder.time });
-    } else {
-      prefsStore.setReminder({ enabled: false, time: prefs.reminder.time });
-    }
-  };
-  const setReminderTime = (time: string) => prefsStore.setReminder({ enabled: prefs.reminder.enabled, time });
 
   useEffect(() => {
     getHistory().then(setHistory);
@@ -80,423 +36,151 @@ export default function ProfileTab() {
     getPresence().then(setPresence);
   }, []);
 
-  // The trail = check-ins + reflections, gathered into one gentle time-line.
-  type Moment = { ts: number; text: string };
-  const moments: Moment[] = [
-    ...history.map((h): Moment => {
-      if (h.flow) {
-        const opener = h.flow.kind === 'feeling' ? `You arrived ${h.flow.title}` : `You made space for ${h.flow.title}`;
-        return { ts: h.ts, text: `${opener}, and ${FLOW_LEFT[h.flow.left]}.` };
-      }
-      const last = h.checkins[h.checkins.length - 1];
-      return {
-        ts: h.ts,
-        text: `You arrived ${feelingLabel(h.emotion)}${last && last !== 'prefer-not' ? `, and ${CHECKIN_PHRASE[last]}.` : '.'}`,
-      };
-    }),
-    ...reflections.map((r): Moment => ({ ts: r.ts, text: `You felt ${r.word.toLowerCase()}.` })),
-  ].sort((a, b) => b.ts - a.ts);
-
-  const lastWritten = journal[0] ? new Date(journal[0].ts).toLocaleDateString() : null;
+  const toggleReminder = async () => {
+    if (!prefs.reminder.enabled) {
+      const ok = await reminders.requestPermission();
+      if (!ok) return setReminderDenied(true);
+      setReminderDenied(false);
+    }
+    prefsStore.setReminder({ enabled: !prefs.reminder.enabled, time: prefs.reminder.time });
+  };
 
   return (
     <div className="screen">
       <div className="mx-auto w-full max-w-md pt-6 pb-10">
-        <Reveal delay={0.05}>
-          <div className="eyebrow">Profile</div>
-          <h1 className="serif" style={{ fontSize: 'var(--t-2xl)', marginTop: 8, marginBottom: 20 }}>
-            Your journey
-          </h1>
-        </Reveal>
-
-        <button className="journey-button" onClick={() => app.setView('onboarding')}>Change my starting path</button>
-        <Plans />
-        <JourneyProgress />
-        <JourneyExport />
-        {/* Gentle journeys — a static 2×2 grid, all in view; missing content shows a calm shell. */}
-        <Reveal delay={0.12}>
-          <div className="eyebrow" style={{ marginBottom: 12 }}>
-            Gentle journeys
-          </div>
-        </Reveal>
-        <Reveal delay={0.16}>
-          <div className="grid grid-cols-2 gap-3">
-            {PROGRAMMES.map((p) => (
-              <ProgrammeCard key={p.id} p={p} />
-            ))}
-          </div>
-        </Reveal>
-
-        {/* A soft mood picture + practice calendar, from what's already on-device. */}
-        <div className="mt-8">
-          <ReflectionTrail history={history} reflections={reflections} journal={journal} presence={presence} />
-        </div>
-
-        {/* Private journaling — prompts + a blank page, kept just here. */}
-        <Reveal delay={0.05}>
-          <button
-            onClick={openJournal}
-            className="glass mt-6 flex w-full items-center gap-3 px-5 py-4 text-left transition-transform duration-300 active:scale-[0.99]"
-            style={{ borderRadius: 'var(--radius-card)', transitionTimingFunction: 'var(--ease-calm)' }}
-          >
-            <span className="grid shrink-0 place-items-center" style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(232,201,155,0.14)' }}>
-              <PenLine size={18} strokeWidth={1.6} color="var(--gold)" />
-            </span>
-            <span className="flex-1">
-              <span style={{ display: 'block', color: 'var(--ink)', fontSize: 'var(--t-md)' }}>Journal</span>
-              <span className="eyebrow" style={{ display: 'block', marginTop: 2, textTransform: 'none', letterSpacing: 0 }}>
-                {lastWritten ? `A private page · last written ${lastWritten}` : 'A private page — write freely, kept just for you'}
-              </span>
-            </span>
-            <span aria-hidden style={{ color: 'var(--ink-muted)' }}>→</span>
-          </button>
-        </Reveal>
-
-        {/* Sanctuary — the saved collection, also reachable here (§Phase D). */}
-        <Reveal delay={0.08}>
-          <button
-            onClick={openSanctuary}
-            className="glass mt-3 flex w-full items-center gap-3 px-5 py-4 text-left transition-transform duration-300 active:scale-[0.99]"
-            style={{ borderRadius: 'var(--radius-card)', transitionTimingFunction: 'var(--ease-calm)' }}
-          >
-            <span className="grid shrink-0 place-items-center" style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(232,201,155,0.14)' }}>
-              <Heart size={18} strokeWidth={1.6} color="var(--gold)" fill="var(--gold)" />
-            </span>
-            <span className="flex-1">
-              <span style={{ display: 'block', color: 'var(--ink)', fontSize: 'var(--t-md)' }}>Sanctuary</span>
-              <span className="eyebrow" style={{ display: 'block', marginTop: 2 }}>What you’ve kept close</span>
-            </span>
-            <span aria-hidden style={{ color: 'var(--ink-muted)' }}>→</span>
-          </button>
-        </Reveal>
-
-        {moments.length === 0 ? (
-          <p style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-md)', marginTop: 28 }}>
-            When you come home, your moments will gather here — just for you.
+        <Reveal delay={0.04}>
+          <div className="eyebrow">You</div>
+          <h1 className="serif" style={{ fontSize: 'var(--t-2xl)', marginTop: 8 }}>Your space</h1>
+          <p style={{ color: 'var(--ink-muted)', marginTop: 8, lineHeight: 1.55 }}>
+            {user.isGuest ? 'Your practice is saved on this device.' : `Welcome, ${user.name?.split(' ')[0] || 'back'}. Your account and journey are here.`}
           </p>
-        ) : (
-          <>
-            <div className="eyebrow" style={{ marginTop: 34, marginBottom: 10 }}>
-              The moments you’ve gathered
+        </Reveal>
+
+        <Reveal delay={0.1}>
+          <div className="grid grid-cols-2 gap-3 mt-6">
+            <QuickAction icon={<PenLine size={19} />} title="Journal" detail={journal[0] ? `Last written ${new Date(journal[0].ts).toLocaleDateString()}` : 'Write freely'} onClick={openJournal} />
+            <QuickAction icon={<Heart size={19} fill="currentColor" />} title="Sanctuary" detail="Saved practices" onClick={openSanctuary} />
+          </div>
+        </Reveal>
+
+        <div className="mt-6 flex flex-col gap-3">
+          <ProfileSection title="My progress" subtitle="Manifestation and monthly reflection">
+            <JourneyProgress />
+            <div className="mt-5"><ReflectionTrail history={history} reflections={reflections} journal={journal} presence={presence} /></div>
+          </ProfileSection>
+
+          <ProfileSection title="My journeys" subtitle="Meditation programmes at your pace">
+            <div className="grid grid-cols-2 gap-3">{PROGRAMMES.map(p => <ProgrammeCard key={p.id} p={p} />)}</div>
+          </ProfileSection>
+
+          <ProfileSection title="Preferences" subtitle="Reminder, atmosphere and starting path" icon={<SlidersHorizontal size={17} />}>
+            <div className="glass" style={{ borderRadius: 'var(--radius-card)', overflow: 'hidden' }}>
+              <Row label="Gentle daily reminder" last={!prefs.reminder.enabled}><Switch on={prefs.reminder.enabled} label="Daily reminder" onToggle={toggleReminder} /></Row>
+              {prefs.reminder.enabled && <Row label="Around"><input type="time" aria-label="Reminder time" value={prefs.reminder.time} onChange={e => prefsStore.setReminder({ enabled: true, time: e.target.value })} className="glass px-3 py-2" style={{ color: 'var(--ink)', colorScheme: 'dark', borderRadius: 10 }} /></Row>}
+              <Row label="Atmosphere" last><ThemeChoice value={prefs.theme} onChange={prefsStore.setTheme} /></Row>
             </div>
-            <div className="flex flex-col gap-3">
-              {moments.map((m) => (
-                <div key={m.ts} className="glass px-5 py-4" style={{ borderRadius: 'var(--radius-card)' }}>
-                  <div className="eyebrow">{new Date(m.ts).toLocaleDateString()}</div>
-                  <div style={{ color: 'var(--ink)', fontSize: 'var(--t-md)', marginTop: 4 }}>{m.text}</div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
+            <p className="journey-muted">{reminderDenied ? 'Notifications are off in your device settings.' : 'A gentle invitation, never a streak or pressure.'}</p>
+            <button className="journey-button" onClick={() => app.setView('onboarding')}>Change my starting path</button>
+          </ProfileSection>
 
-        {/* A gentle, opt-in reminder — supportive, never a streak to keep (§Phase G). */}
-        <div className="eyebrow" style={{ marginTop: 34 }}>
-          A moment for you
-        </div>
-        <div className="glass mt-3" style={{ borderRadius: 'var(--radius-card)', overflow: 'hidden' }}>
-          <Row label="A gentle daily reminder" last={!prefs.reminder.enabled}>
-            <Switch on={prefs.reminder.enabled} label="Daily reminder" onToggle={toggleReminder} />
-          </Row>
-          {prefs.reminder.enabled && (
-            <Row label="Around" last>
-              <input
-                type="time"
-                aria-label="Reminder time"
-                value={prefs.reminder.time}
-                onChange={(e) => setReminderTime(e.target.value)}
-                style={{
-                  background: 'transparent',
-                  color: 'var(--ink)',
-                  border: '1px solid var(--hairline)',
-                  borderRadius: 10,
-                  padding: '6px 10px',
-                  fontSize: 'var(--t-sm)',
-                  colorScheme: 'dark',
-                  minHeight: 36,
-                }}
-              />
-            </Row>
-          )}
-        </div>
-        <p style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-xs)', marginTop: 10, lineHeight: 1.5 }}>
-          {reminderDenied
-            ? 'Notifications are off in your device settings — no pressure. It’s here whenever you’d like it.'
-            : 'A soft nudge to pause, never a streak to keep. Turn it off any time.'}
-        </p>
+          <ProfileSection title="Plans and access" subtitle="What is included in Free and COME HOME+"><Plans /></ProfileSection>
 
-        {/* Settings */}
-        <div className="eyebrow" style={{ marginTop: 34 }}>
-          Settings
+          <ProfileSection title="Privacy and account" subtitle="Cloud saving, export and account controls" icon={<ShieldCheck size={17} />}>
+            <JourneyExport />
+            <AccountSection />
+          </ProfileSection>
         </div>
-        <div className="glass mt-3" style={{ borderRadius: 'var(--radius-card)', overflow: 'hidden' }}>
-          <Row label="Theme" last>
-            <ThemeChoice value={prefs.theme} onChange={(t) => prefsStore.setTheme(t)} />
-          </Row>
-        </div>
-
-        <p style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-xs)', marginTop: 12 }}>
-          Sets the mood of the water — Still water’s teal calm, or a warmer amber. Your private writing is only cloud-saved when you turn account saving on below.
-        </p>
-
-        <AccountSection />
       </div>
     </div>
   );
 }
 
-/**
- * Optional Google account (§0). Come Home stays local-first — signing in only adds
- * an identity + server-side profile; check-ins, journal and reflections stay on the
- * device. Hidden entirely when no backend is configured.
- */
+function QuickAction({ icon, title, detail, onClick }: { icon: React.ReactNode; title: string; detail: string; onClick: () => void }) {
+  return <button onClick={onClick} className="glass px-4 py-4 text-left" style={{ borderRadius: 'var(--radius-card)', minHeight: 118 }}>
+    <span style={{ color: 'var(--gold)' }}>{icon}</span>
+    <span className="serif" style={{ display: 'block', fontSize: 'var(--t-lg)', marginTop: 12 }}>{title}</span>
+    <span style={{ display: 'block', color: 'var(--ink-muted)', fontSize: 'var(--t-xs)', marginTop: 4 }}>{detail}</span>
+  </button>;
+}
+
+function ProfileSection({ title, subtitle, icon, children }: { title: string; subtitle: string; icon?: React.ReactNode; children: React.ReactNode }) {
+  return <details className="journey-disclosure">
+    <summary>{icon && <span style={{ color: 'var(--gold)', marginRight: 8 }}>{icon}</span>}{title}<small>{subtitle}</small></summary>
+    <div style={{ marginTop: 14 }}>{children}</div>
+  </details>;
+}
+
 function AccountSection() {
   const { user, loading } = useAuth();
-  const [confirming, setConfirming] = useState(false);
-  const [movingDevice, setMovingDevice] = useState(false);
   const cloud = useAccountCloud();
+  const [signingOut, setSigningOut] = useState(false);
+  const [movingDevice, setMovingDevice] = useState(false);
+  const [deleteStep, setDeleteStep] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState('');
 
   if (!isSupabaseConfigured || loading) return null;
+  if (user.isGuest) return <div className="mt-4"><GoogleButton onClick={signInWithGoogle} /><p className="journey-muted">Sign in to keep a private account copy across your devices.</p></div>;
 
-  // Signed out → offer sign-in.
-  if (user.isGuest) {
-    return (
-      <div className="mt-6">
-        <GoogleButton onClick={signInWithGoogle} />
-        <p style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-xs)', marginTop: 8, lineHeight: 1.5 }}>
-          Optional — sign in to enable private account saving across your devices.
-        </p>
-      </div>
-    );
-  }
+  const sendReset = async () => {
+    if (!user.email) return;
+    setBusy(true); setStatus('');
+    try { await requestPasswordReset(user.email); setStatus('Password-reset email sent.'); }
+    catch { setStatus('Could not send the email right now. Please try again.'); }
+    finally { setBusy(false); }
+  };
 
-  // Signed in → account card + sign out. (Name is collected on the login screen.)
-  // Sign out asks first: a gentle confirm slides out from below the tile.
-  return (
-    <div className="mt-6">
-      <div className="glass flex items-center gap-3 px-5 py-4" style={{ borderRadius: 'var(--radius-card)' }}>
-        {user.avatarUrl ? (
-          <img src={user.avatarUrl} alt="" width={40} height={40} style={{ borderRadius: 999 }} referrerPolicy="no-referrer" />
-        ) : (
-          <span className="grid shrink-0 place-items-center" style={{ width: 40, height: 40, borderRadius: 999, background: 'rgba(232,201,155,0.14)', color: 'var(--gold)' }}>
-            {(user.name || 'You').slice(0, 1).toUpperCase()}
-          </span>
-        )}
-        <span className="flex-1 overflow-hidden">
-          <span style={{ display: 'block', color: 'var(--ink)', fontSize: 'var(--t-md)' }}>{user.name || 'Signed in'}</span>
-          {user.email && (
-            <span className="eyebrow" style={{ display: 'block', marginTop: 2, textTransform: 'none', letterSpacing: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {user.email}
-            </span>
-          )}
-        </span>
-        <button
-          onClick={() => setConfirming((v) => !v)}
-          aria-expanded={confirming}
-          style={{ color: confirming ? 'var(--gold)' : 'var(--ink-muted)', fontSize: 'var(--t-sm)' }}
-        >
-          Sign out
-        </button>
-      </div>
+  const remove = async () => {
+    setBusy(true); setStatus('');
+    try { await deleteAccount(); app.setView('first-run'); }
+    catch { setStatus('Your account was not deleted. Please try again or contact support.'); setBusy(false); }
+  };
 
-      <div className="glass mt-3 px-5 py-4" style={{ borderRadius: 'var(--radius-card)' }}>
-        <div className="eyebrow">Private account saving</div>
-        <div style={{ color: 'var(--ink)', fontSize: 'var(--t-md)', marginTop: 5 }}>
-          {cloud.enabled ? 'Your journey follows your account' : 'Keep your journey across devices'}
-        </div>
-        <p style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-sm)', marginTop: 7, lineHeight: 1.5 }}>
-          {cloud.message} This includes manifestation answers, programme progress, saved practices, journal pages and vision-board cards.
-        </p>
-        {cloud.updatedAt && <div className="eyebrow">Last saved {new Date(cloud.updatedAt).toLocaleString()}</div>}
-        {!cloud.enabled ? (
-          <>
-            <button className="journey-button" disabled={cloud.phase === 'syncing'} onClick={() => void enableAccountCloud('cloud')}>
-              {cloud.phase === 'syncing' ? 'Connecting…' : 'Turn on cloud saving'}
-            </button>
-            <details className="journey-disclosure" style={{ marginTop: 10 }}>
-              <summary>Already used this browser?</summary>
-              <p>Choose this only when you want this browser’s current journey to replace the account copy and add its vision-board cards.</p>
-              {!movingDevice ? (
-                <button className="journey-button" onClick={() => setMovingDevice(true)}>Move this device’s journey</button>
-              ) : (
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <button className="journey-button" onClick={() => void enableAccountCloud('device')}>Confirm and save</button>
-                  <button className="journey-button" onClick={() => setMovingDevice(false)}>Cancel</button>
-                </div>
-              )}
-            </details>
-          </>
-        ) : (
-          <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-            <button className="journey-button" disabled={cloud.phase === 'syncing'} onClick={() => void refreshAccountCloud()}>{cloud.phase === 'syncing' ? 'Syncing…' : 'Refresh from cloud'}</button>
-            <button className="journey-button" onClick={() => void disableAccountCloud()}>Stop and return to device copy</button>
-          </div>
-        )}
-      </div>
-
-      {confirming && (
-        <Reveal>
-          <div className="glass mt-2 px-5 py-4" style={{ borderRadius: 'var(--radius-card)' }}>
-            <div style={{ color: 'var(--ink)', fontSize: 'var(--t-sm)' }}>Sign out of this device?</div>
-            <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-              <button
-                onClick={() => signOut()}
-                style={{ flex: 1, padding: '9px 0', borderRadius: 999, color: 'var(--gold)', background: 'rgba(232,201,155,0.14)', border: '1px solid rgba(232,201,155,0.4)', fontSize: 'var(--t-sm)' }}
-              >
-                Sign out
-              </button>
-              <button
-                onClick={() => setConfirming(false)}
-                style={{ flex: 1, padding: '9px 0', borderRadius: 999, color: 'var(--ink-muted)', background: 'transparent', border: '1px solid var(--hairline)', fontSize: 'var(--t-sm)' }}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </Reveal>
-      )}
+  return <div className="mt-4">
+    <div className="glass flex items-center gap-3 px-5 py-4" style={{ borderRadius: 'var(--radius-card)' }}>
+      {user.avatarUrl ? <img src={user.avatarUrl} alt="" width={40} height={40} style={{ borderRadius: 999 }} referrerPolicy="no-referrer" /> : <span className="grid place-items-center" style={{ width: 40, height: 40, borderRadius: 999, background: 'rgba(232,201,155,.14)', color: 'var(--gold)' }}>{(user.name || 'Y')[0].toUpperCase()}</span>}
+      <span className="flex-1 overflow-hidden"><strong style={{ display: 'block', color: 'var(--ink)' }}>{user.name || 'Signed in'}</strong><small style={{ color: 'var(--ink-muted)' }}>{user.email}</small></span>
+      <button onClick={() => setSigningOut(!signingOut)} style={{ color: 'var(--gold)', fontSize: 'var(--t-sm)' }}>Sign out</button>
     </div>
-  );
+    {signingOut && <div className="glass mt-2 px-5 py-4" style={{ borderRadius: 'var(--radius-card)' }}><p>Sign out of this device?</p><div className="flex gap-2"><button className="journey-button" onClick={() => void signOut()}>Sign out</button><button className="journey-button" onClick={() => setSigningOut(false)}>Cancel</button></div></div>}
+
+    <div className="glass mt-3 px-5 py-4" style={{ borderRadius: 'var(--radius-card)' }}>
+      <div className="eyebrow">Private account saving</div>
+      <h3 className="serif" style={{ fontSize: 'var(--t-lg)', marginTop: 5 }}>{cloud.enabled ? 'Your journey follows your account' : 'Keep your journey across devices'}</h3>
+      <p className="journey-muted">{cloud.message} Includes manifestation answers, progress, saved practices, journal pages and vision-board cards.</p>
+      {cloud.updatedAt && <p className="eyebrow">Last saved {new Date(cloud.updatedAt).toLocaleString()}</p>}
+      {!cloud.enabled ? <>
+        <button className="journey-button journey-primary" disabled={cloud.phase === 'syncing'} onClick={() => void enableAccountCloud('cloud')}>{cloud.phase === 'syncing' ? 'Connecting…' : 'Turn on cloud saving'}</button>
+        <details className="journey-disclosure" style={{ marginTop: 10 }}><summary>Use this device’s current journey</summary><p>This replaces the account copy with the journey currently on this device.</p>{movingDevice ? <div className="flex gap-2"><button className="journey-button" onClick={() => void enableAccountCloud('device')}>Confirm and save</button><button className="journey-button" onClick={() => setMovingDevice(false)}>Cancel</button></div> : <button className="journey-button" onClick={() => setMovingDevice(true)}>Choose device copy</button>}</details>
+      </> : <div className="flex flex-col gap-2"><button className="journey-button" disabled={cloud.phase === 'syncing'} onClick={() => void refreshAccountCloud()}>{cloud.phase === 'syncing' ? 'Syncing…' : 'Refresh from cloud'}</button><button className="journey-button" onClick={() => void disableAccountCloud()}>Use only this device</button></div>}
+    </div>
+
+    <div className="glass mt-3 px-5 py-4" style={{ borderRadius: 'var(--radius-card)' }}>
+      <div className="eyebrow">Account security</div>
+      {user.email && <button className="journey-button" disabled={busy} onClick={sendReset}>Email me a password-reset link</button>}
+      {!deleteStep ? <button className="journey-button" disabled={busy} onClick={() => setDeleteStep(true)} style={{ color: '#e7b3a0' }}>Delete my account</button> : <div><p className="journey-muted">This permanently deletes your account and cloud-saved journey. Data already saved in this browser remains on this device.</p><div className="flex gap-2"><button className="journey-button" disabled={busy} onClick={remove} style={{ color: '#e7b3a0' }}>{busy ? 'Deleting…' : 'Delete permanently'}</button><button className="journey-button" disabled={busy} onClick={() => setDeleteStep(false)}>Cancel</button></div></div>}
+      {status && <p role="status" className="journey-muted">{status}</p>}
+    </div>
+  </div>;
 }
 
-/**
- * A single programme in the carousel. Real journeys show a soft dot path and a
- * gentle resume; journeys still being made show a calm "in the making" state.
- * Never a streak, never a percentage, never a demand.
- */
 function ProgrammeCard({ p }: { p: Programme }) {
   const done = new Set(programme.completed(p.id));
   const complete = programme.isComplete(p);
-  const started = done.size > 0;
   const next = programme.nextDayIndex(p);
   const soon = !!p.comingSoon;
-
-  const tag = soon
-    ? 'In the making'
-    : complete
-      ? 'Complete · return any time'
-      : started
-        ? `Continue · day ${next + 1}`
-        : `${p.days.length} gentle days`;
-
-  return (
-    <button
-      onClick={() => programme.open(p.id)}
-      className={`glass ${started && !soon ? 'glass-gold' : ''} w-full px-4 py-4 text-left transition-transform duration-300 active:scale-[0.98]`}
-      style={{
-        minHeight: 132,
-        borderRadius: 'var(--radius-card)',
-        transitionTimingFunction: 'var(--ease-calm)',
-        opacity: soon ? 0.82 : 1,
-      }}
-    >
-      <div className="eyebrow" style={{ color: soon ? 'var(--ink-muted)' : started || complete ? 'var(--gold)' : 'var(--ink-muted)' }}>
-        {tag}
-      </div>
-      <div className="serif" style={{ fontSize: 'var(--t-lg)', marginTop: 6, lineHeight: 1.15 }}>
-        {p.title}
-      </div>
-      <div style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-sm)', marginTop: 6, lineHeight: 1.4 }}>
-        {p.blurb}
-      </div>
-      {!soon && (
-        <div className="mt-4 flex items-center gap-1.5" aria-hidden>
-          {p.days.map((_, i) => {
-            const isDone = done.has(i);
-            const isNext = i === next && !complete;
-            return (
-              <span
-                key={i}
-                style={{
-                  width: isNext ? 9 : 7,
-                  height: isNext ? 9 : 7,
-                  borderRadius: 999,
-                  background: isDone ? 'var(--gold)' : 'transparent',
-                  border: `1px solid ${isDone || isNext ? 'var(--gold)' : 'var(--hairline)'}`,
-                }}
-              />
-            );
-          })}
-        </div>
-      )}
-    </button>
-  );
+  const tag = soon ? 'Preparing' : complete ? 'Complete' : done.size ? `Continue · day ${next + 1}` : `${p.days.length} gentle days`;
+  return <button onClick={() => programme.open(p.id)} className="glass w-full px-4 py-4 text-left" style={{ minHeight: 126, borderRadius: 'var(--radius-card)', opacity: soon ? .78 : 1 }}><div className="eyebrow" style={{ color: done.size ? 'var(--gold)' : 'var(--ink-muted)' }}>{tag}</div><div className="serif" style={{ fontSize: 'var(--t-lg)', marginTop: 6 }}>{p.title}</div><div style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-sm)', marginTop: 6 }}>{p.blurb}</div></button>;
 }
 
 function Switch({ on, label, onToggle }: { on: boolean; label: string; onToggle: () => void }) {
-  return (
-    <button
-      role="switch"
-      aria-checked={on}
-      aria-label={label}
-      onClick={onToggle}
-      style={{
-        width: 46,
-        height: 28,
-        borderRadius: 999,
-        background: on ? 'var(--gold)' : 'var(--hairline)',
-        position: 'relative',
-        transition: 'background-color .3s var(--ease-calm)',
-      }}
-    >
-      <span
-        style={{
-          position: 'absolute',
-          top: 3,
-          left: on ? 21 : 3,
-          width: 22,
-          height: 22,
-          borderRadius: 999,
-          background: '#10222b',
-          transition: 'left .3s var(--ease-calm)',
-        }}
-      />
-    </button>
-  );
+  return <button role="switch" aria-checked={on} aria-label={label} onClick={onToggle} style={{ width: 46, height: 28, borderRadius: 999, background: on ? 'var(--gold)' : 'var(--hairline)', position: 'relative' }}><span style={{ position: 'absolute', top: 3, left: on ? 21 : 3, width: 22, height: 22, borderRadius: 999, background: '#10222b', transition: 'left .3s var(--ease-calm)' }} /></button>;
 }
 
 function Row({ label, children, last = false }: { label: string; children: React.ReactNode; last?: boolean }) {
-  return (
-    <div
-      className="flex items-center justify-between px-5 py-4"
-      style={{ borderBottom: last ? 'none' : '1px solid var(--hairline)', minHeight: 56 }}
-    >
-      <span style={{ color: 'var(--ink)', fontSize: 'var(--t-md)' }}>{label}</span>
-      {children}
-    </div>
-  );
+  return <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: last ? 'none' : '1px solid var(--hairline)', minHeight: 56 }}><span style={{ color: 'var(--ink)', fontSize: 'var(--t-md)' }}>{label}</span>{children}</div>;
 }
 
-/** Two-way atmosphere picker — the whole app (water + bg) re-tints on tap. */
-function ThemeChoice({ value, onChange }: { value: Theme; onChange: (t: Theme) => void }) {
-  const opts: { id: Theme; label: string }[] = [
-    { id: 'still', label: 'Still water' },
-    { id: 'warm', label: 'Warm' },
-  ];
-  return (
-    <div style={{ display: 'flex', gap: 6 }}>
-      {opts.map((o) => {
-        const on = value === o.id;
-        return (
-          <button
-            key={o.id}
-            onClick={() => onChange(o.id)}
-            aria-pressed={on}
-            className="transition-transform duration-300 active:scale-[0.97]"
-            style={{
-              padding: '6px 12px',
-              borderRadius: 999,
-              fontSize: 'var(--t-xs)',
-              color: on ? 'var(--gold)' : 'var(--ink-muted)',
-              background: on ? 'rgba(232,201,155,0.14)' : 'transparent',
-              border: `1px solid ${on ? 'rgba(232,201,155,0.4)' : 'var(--hairline)'}`,
-              transitionTimingFunction: 'var(--ease-calm)',
-            }}
-          >
-            {o.label}
-          </button>
-        );
-      })}
-    </div>
-  );
+function ThemeChoice({ value, onChange }: { value: Theme; onChange: (theme: Theme) => void }) {
+  return <div className="flex gap-1">{(['still', 'warm'] as Theme[]).map(theme => <button key={theme} onClick={() => onChange(theme)} aria-pressed={value === theme} style={{ padding: '6px 10px', borderRadius: 999, fontSize: 'var(--t-xs)', color: value === theme ? 'var(--gold)' : 'var(--ink-muted)', border: `1px solid ${value === theme ? 'var(--gold)' : 'var(--hairline)'}` }}>{theme === 'still' ? 'Still' : 'Warm'}</button>)}</div>;
 }

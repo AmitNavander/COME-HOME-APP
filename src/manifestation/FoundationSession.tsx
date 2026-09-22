@@ -2,9 +2,13 @@ import { useState } from 'react';
 import PracticeReminder from './PracticeReminder';
 import { foundationDays } from './foundationDays';
 import { useJourney } from './journeyStore';
+import { useAuth } from '../lib/auth';
+import { useAccountCloud } from '../lib/accountCloud';
 
 export default function FoundationSession({ day, onClose }: { day: number; onClose: () => void }) {
   const { data, save } = useJourney();
+  const { user } = useAuth();
+  const cloud = useAccountCloud();
   const lesson = foundationDays[day];
   const [reflection, setReflection] = useState(data.answers[String(day)] || '');
   const [evening, setEvening] = useState(data.answers[`evening:${day}`] || '');
@@ -13,7 +17,7 @@ export default function FoundationSession({ day, onClose }: { day: number; onClo
   function persist(complete: boolean, close = false) {
     try {
       save({ ...data, answers: { ...data.answers, [day]: reflection, [`evening:${day}`]: evening, [`action:${day}`]: action }, completed: complete ? [...new Set([...data.completed, day])] : data.completed });
-      setMessage(complete ? 'Day completed. You can return and edit any time.' : 'Draft saved on this device.');
+      setMessage(complete ? 'Day completed. You can return and edit any time.' : `Draft saved ${!user.isGuest && cloud.enabled ? 'to your account' : 'on this device'}.`);
       if (close) onClose();
     } catch { setMessage('Could not save. Keep this page open and copy your writing before leaving.'); }
   }
@@ -21,7 +25,7 @@ export default function FoundationSession({ day, onClose }: { day: number; onClo
     <button className="journey-button" onClick={() => persist(false, true)}>← Save and return to Manifest</button>
     <div className="eyebrow">Free foundation · Day {day + 1} of 7 · About {lesson.minutes} minutes</div>
     <h1 className="serif">{lesson.title}</h1>
-    <p className="journey-muted">Development edition · new written content for review. No guided audio yet.</p>
+    <p className="journey-muted">A self-guided written practice. Move gently and adapt any step that does not feel right for you.</p>
     <section className="journey-card"><h2 className="serif">Begin here</h2><p>{lesson.teaching}</p></section>
     <section className="journey-card journey-hero"><h2 className="serif">Your practice</h2><ol>{lesson.practice.map((step, i) => <li className="journey-row" key={step}><span className="journey-number">{i + 1}</span><span>{step}</span></li>)}</ol><p>You can pause or stop at any time.</p></section>
     <section className="journey-card"><div className="eyebrow">Affirmation</div><p className="serif journey-quote">{lesson.affirmation}</p></section>
@@ -35,6 +39,6 @@ export default function FoundationSession({ day, onClose }: { day: number; onClo
       <button className="journey-button" type="submit">{data.completed.includes(day) ? 'Save completed day' : 'Mark day complete'}</button>
       <p role="status">{message}</p>
     </form>
-    <p className="journey-muted">Stored in this browser only. Use Save before switching tabs or closing the page.</p>
+    <p className="journey-muted">{!user.isGuest && cloud.enabled ? 'Your saved writing follows your private account.' : 'Your saved writing stays on this device. Turn on account saving from You if you want it across devices.'}</p>
   </main></div>;
 }

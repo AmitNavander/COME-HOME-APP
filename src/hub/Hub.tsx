@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Home, Sparkles, PenLine, Library, User } from 'lucide-react';
 import TabBar, { type TabItem } from '../ui/TabBar';
@@ -28,9 +28,12 @@ export default function Hub() {
   const tab = useHubTab();
   const reduce = useReducedMotion();
   const { active, collapsed } = usePlayer();
+  const [immersive, setImmersive] = useState(false);
+  const setManifestImmersive = useCallback((value: boolean) => setImmersive(value), []);
+  useEffect(() => { if (tab !== 'manifest') setImmersive(false); }, [tab]);
   // Base clears the floating nav (Phase 7); add room when the mini-player is
   // docked above it (Phase A).
-  const padBottom = active && collapsed ? 168 : 104;
+  const padBottom = immersive ? 24 : active && collapsed ? 168 : 104;
   return (
     <div style={{ minHeight: '100%', paddingBottom: padBottom }}>
       <Suspense fallback={<div className="screen" />}>
@@ -42,7 +45,7 @@ export default function Hub() {
           transition={{ duration: reduce ? 0.001 : 0.42, ease: [0.22, 0.61, 0.36, 1] }}
         >
           {tab === 'home' && <HomeTab />}
-          {tab === 'manifest' && <ManifestTab />}
+          {tab === 'manifest' && <ManifestTab onImmersiveChange={setManifestImmersive} />}
           {tab === 'journal' && <JournalTab />}
           {tab === 'support' && <SupportTab />}
           {tab === 'sleep' && <SleepTab />}
@@ -50,7 +53,7 @@ export default function Hub() {
           {tab === 'profile' && <ProfileTab />}
         </motion.div>
       </Suspense>
-      <TabBar items={TABS} active={tab} onChange={(id) => hub.setTab(id as TabId)} />
+      {!immersive && <TabBar items={TABS} active={tab} onChange={(id) => hub.setTab(id as TabId)} />}
     </div>
   );
 }

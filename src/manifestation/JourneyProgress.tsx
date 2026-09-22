@@ -13,7 +13,7 @@ export default function JourneyProgress() {
     {data.goal && <p>{data.goal}</p>}
     <progress max={7} value={data.completed.length} aria-label="Foundation days completed" />
     <p>{data.completed.length} of 7 foundation days complete · {waterCompleted} of 21 Water days complete</p>
-    {waterDays > 0 && <p>{waterDays} earlier prototype journal days preserved</p>}
+    {waterDays > 0 && <p>{waterDays} previous workbook days preserved</p>}
     <ul>{foundationDays.map((day, i) => <li key={day.title}>Day {i + 1} · {day.title} — {data.completed.includes(i) ? 'Complete' : data.answers[String(i)] ? 'Draft saved' : 'Not started'}</li>)}</ul>
     <button className="journey-button" onClick={() => hub.setTab('manifest')}>Return to my manifestation →</button>
   </section>;

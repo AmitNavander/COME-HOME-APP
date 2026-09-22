@@ -37,12 +37,13 @@ export type AuthUser = {
 
 const GUEST: AuthUser = { id: 'local-guest', name: '', email: null, avatarUrl: null, onboarded: true, isGuest: true };
 
-type AuthState = { user: AuthUser; loading: boolean };
+type AuthState = { user: AuthUser; loading: boolean; recoveringPassword: boolean };
 
 let session: Session | null = null;
 let profile: Profile | null = null;
+let recoveringPassword = false;
 // Stable snapshot for useSyncExternalStore — recomputed only on real changes.
-let snapshot: AuthState = { user: GUEST, loading: isSupabaseConfigured };
+let snapshot: AuthState = { user: GUEST, loading: isSupabaseConfigured, recoveringPassword };
 
 const listeners = new Set<() => void>();
 
@@ -57,7 +58,7 @@ function recompute(loading: boolean) {
         isGuest: false,
       }
     : GUEST;
-  snapshot = { user, loading };
+  snapshot = { user, loading, recoveringPassword };
   // Bridge the signed-in name into local prefs so existing screens show it.
   if (user.name && user.name !== prefsStore.get().name) prefsStore.setName(user.name);
   listeners.forEach((l) => l());
@@ -103,8 +104,9 @@ function start() {
     routeInIfSignedIn();
     recompute(false);
   });
-  supabase.auth.onAuthStateChange((_event, s) => {
+  supabase.auth.onAuthStateChange((event, s) => {
     session = s;
+    if (event === 'PASSWORD_RECOVERY') recoveringPassword = true;
     profile = s ? profile : null;
     // Supabase advises keeping this callback synchronous. Defer profile queries so
     // they cannot contend with the auth client's internal session lock.
@@ -112,7 +114,7 @@ function start() {
       void (async () => {
         if (s && session?.user.id === s.user.id) await loadProfile(s.user.id);
         if (session !== s) return;
-        routeInIfSignedIn();
+        if (!recoveringPassword) routeInIfSignedIn();
         recompute(false);
       })();
     }, 0);
@@ -175,6 +177,34 @@ export async function signUpWithEmail(input: {
 export async function signInWithEmail(email: string, password: string): Promise<void> {
   const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
   if (error) throw error;
+}
+
+/** Send a recovery link back to this exact deployment (preview or production). */
+export async function requestPasswordReset(email: string): Promise<void> {
+  const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+    redirectTo: window.location.origin,
+  });
+  if (error) throw error;
+}
+
+/** Complete a recovery session created by the emailed Supabase link. */
+export async function updateRecoveredPassword(password: string): Promise<void> {
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) throw error;
+  recoveringPassword = false;
+  routeInIfSignedIn();
+  recompute(false);
+}
+
+/** Permanently remove the signed-in account through the authenticated Edge Function. */
+export async function deleteAccount(): Promise<void> {
+  const { error } = await supabase.functions.invoke('delete-account', { body: {} });
+  if (error) throw error;
+  recoveringPassword = false;
+  session = null;
+  profile = null;
+  await supabase.auth.signOut({ scope: 'local' });
+  recompute(false);
 }
 
 // ---- reactive read ----

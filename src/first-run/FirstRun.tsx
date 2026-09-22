@@ -6,7 +6,7 @@ import GoogleButton from '../ui/GoogleButton';
 import { app } from '../store/app';
 import { prefsStore } from '../store/prefs';
 import { markFirstRunDone } from '../lib/storage';
-import { signInWithGoogle, signUpWithEmail, signInWithEmail } from '../lib/auth';
+import { requestPasswordReset, signInWithGoogle, signUpWithEmail, signInWithEmail } from '../lib/auth';
 import { isSupabaseConfigured } from '../lib/supabase';
 
 /**
@@ -77,6 +77,22 @@ export default function FirstRun() {
     }
   };
 
+  const forgot = async () => {
+    setErr(null);
+    setNotice(null);
+    const e = email.trim();
+    if (!/^\S+@\S+\.\S+$/.test(e)) return setErr('Enter your email first, then tap Forgot password.');
+    setBusy(true);
+    try {
+      await requestPasswordReset(e);
+      setNotice('Check your email for a secure password-reset link.');
+    } catch (ex) {
+      setErr(friendly(ex));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div className="screen">
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-8">
@@ -125,6 +141,11 @@ export default function FirstRun() {
             <Button className="mt-4 w-full" onClick={submit} disabled={busy}>
               {busy ? 'One moment…' : isSignup ? 'Create account' : 'Log in'}
             </Button>
+            {!isSignup && (
+              <button type="button" disabled={busy} onClick={forgot} style={{ display: 'block', margin: '14px auto 0', color: 'var(--gold)', fontSize: 'var(--t-sm)' }}>
+                Forgot password?
+              </button>
+            )}
           </div>
         </Reveal>
 

@@ -26,6 +26,7 @@ import { reminders } from './lib/reminders';
 import { notifications } from './lib/notifications';
 import { useAuth } from './lib/auth';
 import { useAppHistory } from './nav/history';
+import PasswordRecovery from './first-run/PasswordRecovery';
 
 /**
  * App shell (§4, §11): Living Water + atmosphere mounted ONCE behind everything;
@@ -33,7 +34,7 @@ import { useAppHistory } from './nav/history';
  */
 export default function App() {
   const view = useView();
-  const { user, loading } = useAuth();
+  const { user, loading, recoveringPassword } = useAuth();
   const routedUser = useRef<string | null>(null);
   const { reduceMotion, ambientMuted, theme, reminder } = usePrefs();
 
@@ -102,7 +103,9 @@ export default function App() {
       <Scene />
       <Atmosphere />
       <div className="app-layer">
-        {view === 'first-run' ? (
+        {recoveringPassword ? (
+          <PasswordRecovery />
+        ) : view === 'first-run' ? (
           <FirstRun />
         ) : view === 'onboarding' ? (
           <Onboarding key={user.id} />

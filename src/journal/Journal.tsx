@@ -7,6 +7,8 @@ import ExitButton from '../ui/ExitButton';
 import { app } from '../store/app';
 import { nav } from '../nav/history';
 import { setDepth } from '../store/water';
+import { useAuth } from '../lib/auth';
+import { useAccountCloud } from '../lib/accountCloud';
 import {
   getJournal,
   saveJournalEntry,
@@ -36,10 +38,12 @@ type Draft = { id?: string; prompt?: string; text: string };
 
 /**
  * Private journal (§Phase F). Guided prompt cards + a blank page. Entries live on
- * this device only — never shared, never uploaded. Editing and deleting are gentle
+ * private storage. Editing and deleting are gentle
  * (a soft two-tap to remove). No counter, no streak, no obligation to write.
  */
 export default function Journal() {
+  const { user } = useAuth();
+  const cloud = useAccountCloud();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [draft, setDraft] = useState<Draft | null>(null); // non-null = writing
   const [saveError, setSaveError] = useState('');
@@ -95,7 +99,7 @@ export default function Journal() {
             A page, just for you
           </h1>
           <p style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-md)', lineHeight: 1.55 }}>
-            Write as much or as little as you like. It stays on this device — nothing is shared.
+            Write as much or as little as you like. {!user.isGuest && cloud.enabled ? 'It is saved privately to your account and available across your devices.' : 'It stays on this device and is never shared with other users.'}
           </p>
         </Reveal>
 
