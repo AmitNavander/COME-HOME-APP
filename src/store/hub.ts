@@ -4,7 +4,7 @@ import { useSyncExternalStore } from 'react';
  * Hub tab, lifted out of <Hub> local state so the back-stack (store/nav) can read
  * and restore it. Tab switches are forward navigations; back returns to Home.
  */
-export type TabId = 'home' | 'manifest' | 'journal' | 'support' | 'sleep' | 'library' | 'profile';
+export type TabId = 'home' | 'manifest' | 'journal' | 'affirmations' | 'support' | 'sleep' | 'library' | 'profile';
 
 let tab: TabId = 'home';
 const listeners = new Set<() => void>();

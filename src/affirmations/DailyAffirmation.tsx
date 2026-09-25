@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { affirmationForDate } from './affirmations';
+import { hub } from '../store/hub';
 
 export default function DailyAffirmation() {
   const [daily, setDaily] = useState(() => affirmationForDate());
@@ -23,5 +24,6 @@ export default function DailyAffirmation() {
     <h2 id="daily-affirmation-heading" className="eyebrow">Today’s affirmation</h2>
     <p className="serif daily-affirmation-text">{daily.text}</p>
     <p className="journey-muted">{daily.theme} · Repeat slowly, aloud or within. Let the words guide your day.</p>
+    <button className="journey-button" onClick={() => hub.setTab('affirmations')}>Practise this affirmation</button>
   </section>;
 }

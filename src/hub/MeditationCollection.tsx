@@ -16,7 +16,7 @@ export function beginMeditation() {
 
 export default function MeditationCollection() {
   const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('All');
+  const [category, setCategory] = useState('Meditation');
   const entries = [
     ...PATHS.map(path => ({ id: `path:${path.id}`, title: path.title, group: 'Meditation', detail: `${path.duration} suggested sitting · on-screen prompts and music`, open: () => { programme.clearActiveDay(); session.reset(); session.pickPath(path.id); app.setView('session'); } })),
     ...PROGRAMMES.filter(p => !p.comingSoon).map(p => ({ id: `programme:${p.id}`, title: p.title, group: 'Programmes', detail: `${p.days.length} days · ${p.blurb}`, open: () => programme.open(p.id) })),
@@ -30,7 +30,7 @@ export default function MeditationCollection() {
     <label className="journey-label">Find a practice<input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Grounding, rest, fear…" /></label>
     <label className="journey-label">Browse collection<select value={category} onChange={e => setCategory(e.target.value)}>{['All', 'Meditation', 'Programmes', 'Sleep & sound', 'Emotional support'].map(label => <option key={label}>{label}</option>)}</select></label>
     <p role="status">{visible.length} {visible.length === 1 ? 'practice' : 'practices'} to explore</p>
-    <p className="journey-muted">These are the existing practices. Some share audio; programme days reuse existing sessions. On-screen guidance is labelled separately from recorded narration.</p>
+    <p className="journey-muted">Choose a collection, then a session. Each session indicates its guidance and sound.</p>
     {visible.map(entry => <button className="journey-row" key={entry.id} onClick={entry.open}><span>{entry.title}<small>{entry.detail}</small></span><span aria-hidden="true">→</span></button>)}
     {!visible.length && <p>No matching practice. Try a different word or collection.</p>}
   </section>;

@@ -7,6 +7,7 @@ import { useFavorites } from '../../store/favorites';
 import { LIBRARY_ITEMS } from '../../data/library';
 import { PATHS } from '../../data/paths';
 import MeditationCollection, { beginMeditation } from '../MeditationCollection';
+import { openGuidedJournal } from '../../journal/context';
 
 // The full catalogue remains available behind a single browse entry.
 export default function LibraryTab() {
@@ -24,8 +25,9 @@ export default function LibraryTab() {
           </h1>
         </Reveal>
 
-        <section className="journey-card"><h2 className="serif">Take a moment for yourself.</h2><p>A simple practice with on-screen prompts and music.</p><button className="journey-button journey-primary" onClick={beginMeditation}>Begin meditation</button></section>
-        <details className="journey-disclosure"><summary>Browse all practices <small>Meditation · sleep · emotional support · programmes</small></summary><MeditationCollection /></details>
+        <section className="journey-card"><div className="eyebrow">Arrive → Meditate → Reflect</div><h2 className="serif">Take a moment for yourself.</h2><p>Check in with how you feel, choose a meditation, then follow its on-screen prompts with music. Finish with a brief reflection.</p><button className="journey-button journey-primary" onClick={beginMeditation}>Begin meditation</button></section>
+        <details className="journey-disclosure"><summary>Choose a meditation or rest session <small>Browse one collection at a time</small></summary><MeditationCollection /></details>
+        <button className="journey-button" onClick={() => openGuidedJournal('meditation')}>Reflect on my meditation</button>
 
         {/* Sanctuary — the saved collection lives in its own calm view. */}
         <Reveal delay={0.1}>

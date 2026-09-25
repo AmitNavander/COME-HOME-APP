@@ -9,6 +9,8 @@ import { nav } from '../nav/history';
 import { setDepth } from '../store/water';
 import { useAuth } from '../lib/auth';
 import { useAccountCloud } from '../lib/accountCloud';
+import { journalGuides, type JournalPath } from './guidance';
+import { takeJournalContext, clearJournalContext } from './context';
 import {
   getJournal,
   saveJournalEntry,
@@ -26,15 +28,7 @@ export function openJournal() {
  * clinical. Each is an invitation, easy to ignore. A blank page is always offered
  * alongside them so nothing is required.
  */
-const PROMPTS = [
-  'What’s here right now?',
-  'What would feel kind today?',
-  'What helped, even a little?',
-  'What are you grateful for, however small?',
-  'What do you want to set down tonight?',
-];
-
-type Draft = { id?: string; prompt?: string; text: string };
+type Draft = { id?: string; prompt?: string; text: string; example?: string };
 
 /**
  * Private journal (§Phase F). Guided prompt cards + a blank page. Entries live on
@@ -44,6 +38,9 @@ type Draft = { id?: string; prompt?: string; text: string };
 export default function Journal() {
   const { user } = useAuth();
   const cloud = useAccountCloud();
+  const [context] = useState(takeJournalContext);
+  const [path, setPath] = useState<JournalPath>(context?.path ?? 'personal');
+  const guide = journalGuides[path];
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [draft, setDraft] = useState<Draft | null>(null); // non-null = writing
   const [saveError, setSaveError] = useState('');
@@ -53,6 +50,7 @@ export default function Journal() {
 
   const refresh = () => getJournal().then(setEntries);
   useEffect(() => {
+    clearJournalContext();
     setDepth('checkin'); // a calm, settled water depth for the page
     refresh();
   }, []);
@@ -60,7 +58,7 @@ export default function Journal() {
   const writing = draft !== null;
 
   const openBlank = () => setDraft({ text: '' });
-  const openPrompt = (p: string) => setDraft({ prompt: p, text: '' });
+  const openPrompt = (p: string) => setDraft({ prompt: `${guide.label}${path === 'affirmation' && context?.affirmation ? ` · ${context.affirmation}` : ''}\n${p}`, text: '', example: guide.example });
   const openEdit = (e: JournalEntry) => setDraft({ id: e.id, prompt: e.prompt, text: e.text });
 
   // Leaving the page keeps whatever was written — an empty draft is simply let go.
@@ -92,14 +90,13 @@ export default function Journal() {
     <div className="screen">
       <ExitButton onExit={() => nav.back()} />
       <div className="mx-auto w-full max-w-md py-10">
-        <PracticeReminder title="Return to my journal" action="Pause, reflect and write a few honest lines in my journal." prompt="Make room for a short reflection. What have you noticed today?" location="Journal" label="Remind me to write" />
         <Reveal delay={0.05}>
           <div className="eyebrow">Journal</div>
           <h1 className="serif" style={{ fontSize: 'var(--t-2xl)', marginTop: 8, marginBottom: 8 }}>
             A page, just for you
           </h1>
           <p style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-md)', lineHeight: 1.55 }}>
-            Write as much or as little as you like. {!user.isGuest && cloud.enabled ? 'It is saved privately to your account and available across your devices.' : 'It stays on this device and is never shared with other users.'}
+            Get to know your feelings, needs and next steps. {!user.isGuest && cloud.enabled ? 'Entries save on this device, with private account sync enabled.' : 'Entries stay on this device and are never shared with other users.'}
           </p>
         </Reveal>
 
@@ -107,10 +104,13 @@ export default function Journal() {
         {/* Gentle prompts — invitations, never assignments. */}
         <Reveal delay={0.14}>
           <div className="eyebrow" style={{ marginTop: 26, marginBottom: 12 }}>
-            If you’d like a place to start
+            What would you like to reflect on?
           </div>
+          <label className="journey-label">Your reflection<select value={path} onChange={e => setPath(e.target.value as JournalPath)}>{Object.entries(journalGuides).map(([key, value]) => <option key={key} value={key}>{value.label}</option>)}</select></label>
+          <p style={{ marginBottom: 16, lineHeight: 1.6 }}>{guide.instruction}</p>
+          {path === 'affirmation' && context?.affirmation && <blockquote className="serif" style={{ color: 'var(--gold)', marginBottom: 16 }}>{context.affirmation}</blockquote>}
           <div className="flex flex-col gap-2">
-            {PROMPTS.map((p) => (
+            {guide.questions.map((p) => (
               <button
                 key={p}
                 onClick={() => openPrompt(p)}
@@ -125,6 +125,8 @@ export default function Journal() {
             ))}
           </div>
         </Reveal>
+
+        <PracticeReminder title="Return to my journal" action="Pause, reflect and write a few honest lines in my journal." prompt="Make room for a short reflection. What have you noticed today?" location="Journal" label="Remind me to write" />
 
         {/* The one clear primary — a blank page, no prompt at all. */}
         <Reveal delay={0.24}>
@@ -258,13 +260,14 @@ function Writer({
         </Reveal>
 
         <Reveal delay={0.1} className="mt-4 flex-1 flex flex-col">
+          <p style={{ color: 'var(--ink-muted)', marginBottom: 16 }}>Write a few sentences in your own words. You can leave any question unanswered. Tap Save reflection before leaving.</p>
           <textarea
             ref={ref}
             aria-label="Journal entry"
             readOnly={saving}
             value={draft.text}
             onChange={(e) => setDraft({ ...draft, text: e.target.value })}
-            placeholder="Whatever wants to be said…"
+            placeholder={draft.example ?? 'Today I notice… What matters to me is… What I need now is…'}
             className="flex-1 w-full resize-none bg-transparent"
             style={{
               color: 'var(--ink)',
@@ -280,7 +283,7 @@ function Writer({
         </Reveal>
 
         <Reveal delay={0.16} className="mt-4">
-          {error && <p role="alert">{error}</p>}<Button disabled={saving} onClick={onDone}>{saving ? 'Saving…' : draft.text.trim() ? 'Keep this' : 'Done'}</Button>
+          {error && <p role="alert">{error}</p>}<Button disabled={saving} onClick={onDone}>{saving ? 'Saving…' : draft.text.trim() ? 'Save reflection' : 'Back to journal'}</Button>
         </Reveal>
       </div>
     </div>

@@ -14,6 +14,7 @@ const SupportTab = lazy(() => import('./tabs/SupportTab'));
 const SleepTab = lazy(() => import('./tabs/SleepTab'));
 const LibraryTab = lazy(() => import('./tabs/LibraryTab'));
 const ProfileTab = lazy(() => import('./tabs/ProfileTab'));
+const AffirmationPractice = lazy(() => import('../affirmations/AffirmationPractice'));
 
 const TABS: TabItem[] = [
   { id: 'home', label: 'Today', Icon: Home },
@@ -47,6 +48,7 @@ export default function Hub() {
           {tab === 'home' && <HomeTab />}
           {tab === 'manifest' && <ManifestTab onImmersiveChange={setManifestImmersive} />}
           {tab === 'journal' && <JournalTab />}
+          {tab === 'affirmations' && <AffirmationPractice />}
           {tab === 'support' && <SupportTab />}
           {tab === 'sleep' && <SleepTab />}
           {tab === 'library' && <LibraryTab />}

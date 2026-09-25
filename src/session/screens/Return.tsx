@@ -26,7 +26,7 @@ export default function Return({ onExit }: { onExit: () => void }) {
           <ReflectionPrompt />
         </Reveal>
         <Reveal delay={0.95} className="mt-8">
-          <Button onClick={onExit}>Return Home</Button>
+          <Button onClick={onExit}>Finish meditation</Button>
         </Reveal>
       </div>
     </div>
