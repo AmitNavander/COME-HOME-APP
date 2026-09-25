@@ -27,6 +27,7 @@ const TABS: TabItem[] = [
 /** Returning-user hub (§6). Bottom tab bar; content scrolls above it. */
 export default function Hub() {
   const tab = useHubTab();
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [tab]);
   const reduce = useReducedMotion();
   const { active, collapsed } = usePlayer();
   const [immersive, setImmersive] = useState(false);

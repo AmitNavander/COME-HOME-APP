@@ -23,6 +23,7 @@ export default function ManifestWorkspace({ onImmersiveChange }: { onImmersiveCh
   const [section, setSection] = useState<'goal' | 'water' | 'vision' | null>(null);
   const nextDay = nextFoundationDay(data.completed);
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
     onImmersiveChange?.(selected !== null || section !== null);
     return () => onImmersiveChange?.(false);
   }, [selected, section, onImmersiveChange]);

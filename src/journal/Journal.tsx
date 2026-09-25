@@ -56,6 +56,7 @@ export default function Journal() {
   }, []);
 
   const writing = draft !== null;
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [writing]);
 
   const openBlank = () => setDraft({ text: '' });
   const openPrompt = (p: string) => setDraft({ prompt: `${guide.label}${path === 'affirmation' && context?.affirmation ? ` · ${context.affirmation}` : ''}\n${p}`, text: '', example: guide.example });

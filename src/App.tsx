@@ -93,6 +93,7 @@ export default function App() {
 
   // Hub / first-run / onboarding sit at their own water depth (§4); the session flow manages its own.
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
     if (view === 'hub') setDepth('hub');
     else if (view === 'first-run' || view === 'onboarding') setDepth('opening');
   }, [view]);
