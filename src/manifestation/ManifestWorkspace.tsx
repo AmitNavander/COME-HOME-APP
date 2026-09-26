@@ -8,7 +8,7 @@ import WaterWorkbook from './WaterWorkbook';
 import VisionBoard from './VisionBoard';
 import WaterCourse from './WaterCourse';
 import GoalWorkflow from './GoalWorkflow';
-import Plans, { PremiumPreview } from '../membership/Plans';
+import Plans, { PlusBadge, PremiumPreview } from '../membership/Plans';
 import { useAuth } from '../lib/auth';
 import { useAccountCloud } from '../lib/accountCloud';
 import { openGuidedJournal } from '../journal/context';
@@ -49,9 +49,9 @@ export default function ManifestWorkspace({ onImmersiveChange }: { onImmersiveCh
       <details className="journey-disclosure"><summary>View all 7 foundation days</summary>{foundationDays.map(({title, minutes}, i) => <button className="journey-row" key={title} onClick={() => setSelected(i)}><span className="journey-number">{i + 1}</span><span>Day {i + 1} · {title}<small>{minutes} min · {data.completed.includes(i) ? 'Completed' : data.answers[String(i)] ? 'Draft saved' : 'Ready when you are'}</small></span><span aria-hidden>{data.completed.includes(i) ? '✓' : '→'}</span></button>)}</details>
     </section>
     <h2 className="serif">Choose your next journey</h2>
-    <button className="journey-row" onClick={() => setSection('goal')}><span>My goal plan<small>Define → Visualize → Act → Review</small></span></button>
-    <button className="journey-row" onClick={() => setSection('water')}><span>Manifesting Through Water™<small>A guided written workshop · 21 days</small></span></button>
-    <button className="journey-row" onClick={() => setSection('vision')}><span>My vision board<small>Create images of the direction you choose</small></span></button>
+    <button className="journey-row" onClick={() => setSection('goal')}><span>My goal plan <PlusBadge /><small>Define → Visualize → Act → Review</small></span></button>
+    <button className="journey-row" onClick={() => setSection('water')}><span>Manifesting Through Water™ <PlusBadge /><small>A guided written workshop · 21 days</small></span></button>
+    <button className="journey-row" onClick={() => setSection('vision')}><span>My vision board <PlusBadge /><small>Create images of the direction you choose</small></span></button>
     <button className="journey-button" onClick={() => openGuidedJournal('manifestation')}>Reflect on my manifestation practice</button>
     <details className="journey-disclosure"><summary>More resources and plans</summary><button className="journey-button" onClick={() => app.setView('manifestation')}>Open foundation practice library</button><Plans /></details>
     <p className="journey-muted">{!user.isGuest && cloud.enabled ? 'Your saved journey follows your private account.' : 'Your saved journey stays on this device, including on shared devices. Turn on private account saving from You to use it across devices.'} Practices support reflection and action, not guaranteed outcomes.</p>

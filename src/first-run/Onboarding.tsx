@@ -5,12 +5,11 @@ import { useAuth } from '../lib/auth';
 import { markOnboardingDone } from '../lib/storage';
 import { entryTab, readEntryChoice, saveEntryChoice } from './entryChoice';
 import type { EntryChoice } from './entryChoice';
-import Plans from '../membership/Plans';
 import '../manifestation/journey.css';
 
 const options: { id: EntryChoice; title: string; text: string }[] = [
-  { id: 'meditate', title: 'I want to meditate', text: 'Find calm, breathe, rest and explore the meditation library. Begin with free practices.' },
-  { id: 'manifest', title: 'I want to manifest', text: 'Begin with the free seven-day foundation. Explore guided goal planning and the Water workshop with COME HOME+.' },
+  { id: 'meditate', title: 'I want to meditate', text: 'Find calm, breathe, rest and explore the meditation library.' },
+  { id: 'manifest', title: 'I want to manifest', text: 'Build clarity through intention, visualization and practical action. Begin with a guided foundation.' },
   { id: 'both', title: 'I want to explore both', text: 'See two clearly separated paths on Today and choose what you need each day.' },
 ];
 export default function Onboarding() {
@@ -27,6 +26,6 @@ export default function Onboarding() {
     <p>Choose where you want to start. You can change this later under You, and both paths remain available.</p>
     <fieldset><legend className="eyebrow">Choose your starting path</legend>{options.map(option => <label key={option.id} className={`entry-option ${choice === option.id ? 'selected' : ''}`}><input type="radio" name="entry-path" value={option.id} checked={choice === option.id} onChange={() => setChoice(option.id)} /><span><strong>{option.title}</strong><span>{option.text}</span></span></label>)}</fieldset>
     <button className="journey-button" disabled={!choice || loading} onClick={finish}>{choice === 'meditate' ? 'Enter Meditate' : choice === 'manifest' ? 'Enter Manifest' : choice === 'both' ? 'Explore both paths' : 'Choose a path to continue'}</button>
-    <p role="alert">{error}</p><details><summary>What is free and what is paid?</summary><Plans /></details>
+    <p role="alert">{error}</p>
   </main></div>;
 }
