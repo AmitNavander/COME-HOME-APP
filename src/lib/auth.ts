@@ -148,7 +148,8 @@ export async function signInWithGoogle(): Promise<void> {
 }
 
 export async function signOut(): Promise<void> {
-  await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut({ scope: 'local' });
+  if (error) throw error;
 }
 
 /**
@@ -167,7 +168,10 @@ export async function signUpWithEmail(input: {
   const { data, error } = await supabase.auth.signUp({
     email: input.email.trim(),
     password: input.password,
-    options: { data: { full_name: fullName, first_name: input.firstName.trim(), last_name: input.lastName.trim() } },
+    options: {
+      emailRedirectTo: window.location.origin,
+      data: { full_name: fullName, first_name: input.firstName.trim(), last_name: input.lastName.trim() },
+    },
   });
   if (error) throw error;
   return { needsConfirmation: !data.session };
@@ -225,6 +229,10 @@ export function subscribeAuth(listener: () => void): () => void {
 /** Non-reactive snapshot (for the documented authSeam). */
 export function getAuthUser(): AuthUser {
   return snapshot.user;
+}
+
+export function getAuthState(): AuthState {
+  return snapshot;
 }
 
 /**

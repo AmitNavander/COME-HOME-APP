@@ -132,10 +132,24 @@ function AccountSection() {
     finally { setBusy(false); }
   };
 
+  const leaveAccount = async () => {
+    setBusy(true); setStatus('');
+    try { await signOut(); setSigningOut(false); }
+    catch { setStatus('Sign-out could not finish. Please check your connection and try again.'); }
+    finally { setBusy(false); }
+  };
+
+  const runCloudAction = async (action: () => Promise<void>) => {
+    setBusy(true); setStatus('');
+    try { await action(); }
+    catch { setStatus('That cloud action could not finish. Check the saving status above before continuing.'); }
+    finally { setBusy(false); }
+  };
+
   const remove = async () => {
     setBusy(true); setStatus('');
     try { await deleteAccount(); app.setView('first-run'); }
-    catch { setStatus('Your account was not deleted. Please try again or contact support.'); setBusy(false); }
+    catch { setStatus('Your account was not deleted. Please check your connection and try again.'); setBusy(false); }
   };
 
   return <div className="mt-4">
@@ -144,7 +158,7 @@ function AccountSection() {
       <span className="flex-1 overflow-hidden"><strong style={{ display: 'block', color: 'var(--ink)' }}>{user.name || 'Signed in'}</strong><small style={{ color: 'var(--ink-muted)' }}>{user.email}</small></span>
       <button onClick={() => setSigningOut(!signingOut)} style={{ color: 'var(--gold)', fontSize: 'var(--t-sm)' }}>Sign out</button>
     </div>
-    {signingOut && <div className="glass mt-2 px-5 py-4" style={{ borderRadius: 'var(--radius-card)' }}><p>Sign out of this device?</p><div className="flex gap-2"><button className="journey-button" onClick={() => void signOut()}>Sign out</button><button className="journey-button" onClick={() => setSigningOut(false)}>Cancel</button></div></div>}
+    {signingOut && <div className="glass mt-2 px-5 py-4" style={{ borderRadius: 'var(--radius-card)' }}><p>Sign out of this device? Your other devices will stay signed in.</p><div className="flex gap-2"><button className="journey-button" disabled={busy || cloud.phase === 'syncing'} onClick={leaveAccount}>{busy ? 'Please wait…' : 'Sign out'}</button><button className="journey-button" disabled={busy} onClick={() => setSigningOut(false)}>Cancel</button></div></div>}
 
     <div className="glass mt-3 px-5 py-4" style={{ borderRadius: 'var(--radius-card)' }}>
       <div className="eyebrow">Private account saving</div>
@@ -152,9 +166,9 @@ function AccountSection() {
       <p className="journey-muted">{cloud.message} Includes manifestation answers, progress, saved practices, journal pages and vision-board cards.</p>
       {cloud.updatedAt && <p className="eyebrow">Last saved {new Date(cloud.updatedAt).toLocaleString()}</p>}
       {!cloud.enabled ? <>
-        <button className="journey-button journey-primary" disabled={cloud.phase === 'syncing'} onClick={() => void enableAccountCloud('cloud')}>{cloud.phase === 'syncing' ? 'Connecting…' : 'Turn on cloud saving'}</button>
-        <details className="journey-disclosure" style={{ marginTop: 10 }}><summary>Use this device’s current journey</summary><p>This replaces the account copy with the journey currently on this device.</p>{movingDevice ? <div className="flex gap-2"><button className="journey-button" onClick={() => void enableAccountCloud('device')}>Confirm and save</button><button className="journey-button" onClick={() => setMovingDevice(false)}>Cancel</button></div> : <button className="journey-button" onClick={() => setMovingDevice(true)}>Choose device copy</button>}</details>
-      </> : <div className="flex flex-col gap-2"><button className="journey-button" disabled={cloud.phase === 'syncing'} onClick={() => void refreshAccountCloud()}>{cloud.phase === 'syncing' ? 'Syncing…' : 'Refresh from cloud'}</button><button className="journey-button" onClick={() => void disableAccountCloud()}>Use only this device</button></div>}
+        <button className="journey-button journey-primary" disabled={busy || cloud.phase === 'syncing'} onClick={() => void runCloudAction(() => enableAccountCloud('cloud'))}>{cloud.phase === 'syncing' ? 'Connecting…' : 'Turn on cloud saving'}</button>
+        <details className="journey-disclosure" style={{ marginTop: 10 }}><summary>Use this device’s current journey</summary><p>This replaces the account copy with the journey currently on this device.</p>{movingDevice ? <div className="flex gap-2"><button className="journey-button" disabled={busy} onClick={() => void runCloudAction(() => enableAccountCloud('device'))}>Confirm and save</button><button className="journey-button" disabled={busy} onClick={() => setMovingDevice(false)}>Cancel</button></div> : <button className="journey-button" disabled={busy} onClick={() => setMovingDevice(true)}>Choose device copy</button>}</details>
+      </> : <div className="flex flex-col gap-2"><button className="journey-button" disabled={busy || cloud.phase === 'syncing'} onClick={() => void runCloudAction(refreshAccountCloud)}>{cloud.phase === 'syncing' ? 'Syncing…' : 'Refresh from cloud'}</button><button className="journey-button" disabled={busy || cloud.phase === 'syncing'} onClick={() => void runCloudAction(disableAccountCloud)}>Use only this device</button></div>}
     </div>
 
     <div className="glass mt-3 px-5 py-4" style={{ borderRadius: 'var(--radius-card)' }}>

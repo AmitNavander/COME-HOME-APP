@@ -1,7 +1,8 @@
 import { useSyncExternalStore } from 'react';
 import { get, set } from 'idb-keyval';
 import { supabase } from './supabase';
-import { getAuthUser, subscribeAuth } from './auth';
+import { getAuthState, getAuthUser, subscribeAuth } from './auth';
+import { createAccountIdentityTracker } from './accountIdentity';
 import { getJournal, replaceJournal, type JournalEntry, type ProgrammeProgress } from './storage';
 import { getJourneySnapshot, hydrateJourney, type JourneyData } from '../manifestation/journeyStore';
 import { getProgrammeProgress, hydrateProgrammeProgress } from '../store/programme';
@@ -162,9 +163,13 @@ async function handleAuth(): Promise<void> {
 export function startAccountCloud(): void {
   if (started) return;
   started = true;
-  subscribeAuth(() => { void handleAuth(); });
+  const identityChanged = createAccountIdentityTracker();
+  const onAuth = () => {
+    if (identityChanged(getAuthState())) void handleAuth();
+  };
+  subscribeAuth(onAuth);
   window.addEventListener('come-home:cloud-data-changed', queueAccountCloudSave);
-  void handleAuth();
+  onAuth();
 }
 
 export async function enableAccountCloud(mode: 'cloud' | 'device'): Promise<void> {
