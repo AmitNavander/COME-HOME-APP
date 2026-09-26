@@ -8,6 +8,7 @@ import { prefsStore } from '../store/prefs';
 import { markFirstRunDone } from '../lib/storage';
 import { requestPasswordReset, signInWithGoogle, signUpWithEmail, signInWithEmail } from '../lib/auth';
 import { isSupabaseConfigured } from '../lib/supabase';
+import InformationLinks from '../information/InformationLinks';
 
 /**
  * First run (§6) — now a single login screen. New users create an account (name +
@@ -176,6 +177,7 @@ export default function FirstRun() {
           </div>
         </Reveal>
       </div>
+      <InformationLinks compact />
     </div>
   );
 }

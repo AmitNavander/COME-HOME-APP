@@ -16,6 +16,7 @@ import JourneyProgress from '../../manifestation/JourneyProgress';
 import Plans from '../../membership/Plans';
 import JourneyExport from '../JourneyExport';
 import { app } from '../../store/app';
+import InformationLinks from '../../information/InformationLinks';
 import { disableAccountCloud, enableAccountCloud, refreshAccountCloud, useAccountCloud } from '../../lib/accountCloud';
 
 /** A calm overview first. Detail stays one tap away in clearly named sections. */
@@ -84,6 +85,7 @@ export default function ProfileTab() {
           </ProfileSection>
 
           <ProfileSection title="Plans and access" subtitle="What is included in Free and COME HOME+"><Plans /></ProfileSection>
+          <ProfileSection title="Help & information" subtitle="Help, privacy and terms"><InformationLinks /></ProfileSection>
 
           <ProfileSection title="Privacy and account" subtitle="Cloud saving, export and account controls" icon={<ShieldCheck size={17} />}>
             <JourneyExport />

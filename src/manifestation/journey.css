@@ -48,6 +48,19 @@
 .plans-grid li { margin: 10px 0; }
 .access-badge { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--gold); }
 .plus-badge { display: inline-block; border: 1px solid var(--gold); background: rgba(232,201,155,.12); color: var(--gold); border-radius: 999px; padding: 4px 10px; font-size: 11px; font-weight: 600; letter-spacing: .06em; white-space: nowrap; }
+.information-links { display: flex; flex-direction: column; gap: 8px; }
+.information-links button { padding: 12px; text-align: left; color: var(--gold); min-height: 44px; border-radius: 12px; }
+.information-links.compact { flex-direction: row; justify-content: center; flex-wrap: wrap; font-size: 13px; padding-bottom: 16px; }
+.information-dialog { margin: auto; width: min(92vw, 680px); max-height: 88dvh; padding: 0; border: 1px solid var(--gold); border-radius: 20px; background: #10232c; color: #edf0ec; overflow: auto; }
+.information-dialog::backdrop { background: rgba(3,12,18,.78); }
+.information-toolbar { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 20px; background: #10232c; border-bottom: 1px solid rgba(232,201,155,.2); z-index: 1; }
+.information-body { padding: 8px 24px 28px; line-height: 1.7; }
+.information-body h1 { font-size: clamp(28px, 6vw, 38px); margin: 18px 0 8px; }
+.information-body h2 { font-size: 20px; margin: 26px 0 10px; color: var(--gold); }
+.information-body p { margin: 14px 0; }
+.information-body ul { list-style: disc; padding-left: 22px; }
+.information-body li { margin: 12px 0; }
+.information-links button:focus-visible, .information-dialog button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .premium-preview { margin-top: 32px; }
 .premium-preview > .journey-card { margin-top: 8px; }
 .wallpaper-preview { display: block; width: min(100%, 270px); height: auto; margin: 20px auto; border: 1px solid var(--gold); border-radius: 20px; }
