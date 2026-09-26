@@ -64,7 +64,7 @@ function validJournal(value: unknown): JournalEntry[] {
     const entry = item as Record<string, unknown>;
     if (typeof entry.id !== 'string' || typeof entry.ts !== 'number' || typeof entry.text !== 'string') return [];
     return [{ id: entry.id, ts: entry.ts, text: entry.text, ...(typeof entry.prompt === 'string' ? { prompt: entry.prompt } : {}) }];
-  }).sort((a, b) => b.ts - a.ts).slice(0, 500);
+  }).sort((a, b) => b.ts - a.ts);
 }
 
 async function localPayload(userId: string) {

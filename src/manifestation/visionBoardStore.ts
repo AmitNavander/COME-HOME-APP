@@ -18,7 +18,10 @@ async function fetchCloud(userId: string): Promise<Vision[]> {
   const items = await Promise.all((data ?? []).map(async row => {
     if (!row.image_path) return { id: row.id as string, caption: row.caption as string };
     const { data: image, error: imageError } = await supabase.storage.from('vision-board').download(row.image_path as string);
-    return { id: row.id as string, caption: row.caption as string, ...(!imageError && image ? { image } : {}) };
+    // Keep the previous complete cache if even one image cannot be fetched.
+    if (imageError) throw imageError;
+    if (!image) throw new Error('A vision-board image could not be downloaded.');
+    return { id: row.id as string, caption: row.caption as string, image };
   }));
   await set(accountKey(userId), items);
   return items;
@@ -48,7 +51,11 @@ export async function listVisionBoard(): Promise<Vision[]> {
   const user = getAuthUser();
   if (!user.isGuest && isAccountCloudEnabled(user.id)) {
     try { return await fetchCloud(user.id); }
-    catch { return (await get<Vision[]>(accountKey(user.id))) ?? []; }
+    catch (error) {
+      const cached = await get<Vision[]>(accountKey(user.id));
+      if (cached !== undefined) return cached;
+      throw error;
+    }
   }
   return (await get<Vision[]>(GUEST_KEY)) ?? [];
 }

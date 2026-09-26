@@ -11,14 +11,21 @@ export default function VisionBoard() {
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState('');
   const [ready, setReady] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [busy, setBusy] = useState(false);
   const [inputKey, setInputKey] = useState(0);
   const cloud = useAccountCloud();
   useEffect(() => {
     let active = true;
-    listVisionBoard().then(value => { if (active) { setItems(value); setReady(true); } }).catch(() => { if (active) setStatus('Could not open your vision board. Try again.'); });
+    setReady(false); setLoadFailed(false);
+    listVisionBoard().then(value => {
+      if (active) { setItems(value); setReady(true); setStatus(''); }
+    }).catch(() => {
+      if (active) { setLoadFailed(true); setStatus('Could not open your complete vision board. Check your connection and try again.'); }
+    });
     return () => { active = false; };
-  }, [cloud.enabled, cloud.updatedAt]);
+  }, [cloud.enabled, cloud.updatedAt, loadAttempt]);
   async function add() {
     if (!caption.trim() || busy || !ready) return;
     if (file && (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024)) {
@@ -48,6 +55,7 @@ export default function VisionBoard() {
       <button className="journey-button" disabled={!ready || busy} type="submit">{busy ? 'Saving…' : 'Add to vision board'}</button>
     </form>
     <p role="status">{status}</p>
+    {loadFailed && <button className="journey-button" onClick={() => setLoadAttempt(attempt => attempt + 1)}>Try loading again</button>}
     {!items.length && ready && <p>Your first card can be a small intention for today.</p>}
     <div className="vision-grid">{items.map(item => <VisionCard key={item.id} item={item} busy={busy} onRemove={() => void remove(item.id)} />)}</div>
     <PracticeReminder title="Review my vision board" action="Look at my vision board, notice what still matters, update a card and choose one practical action. Refresh my wallpaper if useful." prompt="Revisit your vision board. What still matters, and what would you like to update?" location="Manifest → My vision board" label="Remind me to review my vision board" />
