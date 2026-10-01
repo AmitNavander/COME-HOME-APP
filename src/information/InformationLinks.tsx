@@ -20,7 +20,7 @@ export default function InformationLinks({ compact = false }: { compact?: boolea
       <div className="information-toolbar"><span className="eyebrow">COME HOME</span><button type="button" autoFocus className="journey-button" onClick={() => setPage(null)} aria-label="Close information">Close ✕</button></div>
       <article className="information-body">
         <h1 id={headingId} className="serif">{page ? titles[page] : ''}</h1>
-        <p className="journey-muted">Updated 26 September 2026 · Early access</p>
+        <p className="journey-muted">Updated 1 October 2026 · Early access</p>
         {page === 'privacy' && <Privacy />}
         {page === 'terms' && <Terms />}
         {page === 'help' && <Help />}
@@ -53,7 +53,7 @@ function Privacy() {
     <h2>Reminders and downloads</h2>
     <p>Reminders are optional. Calendar reminders include the practice text in the calendar you import them into, which may sync to your calendar provider or appear on a shared calendar. Wallpaper and data exports become files you control; sharing them may reveal your images, goals or writing.</p>
     <h2>Privacy questions</h2>
-    <p>A dedicated privacy and support email is being prepared and is not yet available in the app. Account controls and the self-service guidance in Help are available now. This notice will be updated when the contact channel and any material data-handling changes are introduced.</p>
+    <p>For privacy questions or help with your data, email <a href="mailto:comehomealways@gmail.com">comehomealways@gmail.com</a>. Account controls and the self-service guidance in Help are also available. Never email your password or login and reset codes.</p>
   </>;
 }
 
@@ -74,13 +74,13 @@ function Terms() {
     <h2>Leaving the service</h2>
     <p>You may stop using the app at any time. Account deletion and export are under You → Privacy and account. Deleting an account is separate from clearing browser data, removing calendar events and deleting downloaded files.</p>
     <h2>Updates and help</h2>
-    <p>These terms will be updated as the service develops. Help & Support contains current troubleshooting guidance. A dedicated support contact will be published when available. Nothing here is intended to exclude rights that apply to you under applicable law.</p>
+    <p>These terms will be updated as the service develops. Help & Support contains current troubleshooting guidance. For help, email <a href="mailto:comehomealways@gmail.com">comehomealways@gmail.com</a>. Nothing here is intended to exclude rights that apply to you under applicable law.</p>
   </>;
 }
 
 const questions = [
   ['Where should I begin?', 'Choose Meditate for a session, breathing or rest. Choose Manifest for the foundation, goal plan or Water workshop. On Today, “Practise this affirmation” opens a short repetition practice. Change your starting path under You → Preferences.'],
-  ['Google login opens an older app', 'Start a fresh login from the current COME HOME link you were given. If the address changes to an older deployment after login, that is a redirect configuration issue; clearing your journal or creating another account will not fix it. Save the destination address without any text after ? or # for reporting when support is available.'],
+  ['Google login opens an older app', 'Start a fresh login from the current COME HOME link you were given. If the address changes to an older deployment after login, that is a redirect configuration issue; clearing your journal or creating another account will not fix it. Save the destination address without any text after ? or # and email it to comehomealways@gmail.com.'],
   ['I cannot log in or reset my password', 'Use the same sign-in method you used when creating your account. For email sign-in, choose Log in, enter your email and tap Forgot password. Check spam folders and use the newest reset email. Never share your password or the full reset link.'],
   ['Where is my saved work?', 'Guest work stays in the browser where you wrote it. For account saving, sign in and open You → Privacy and account. Check whether cloud saving is enabled and whether it reports a successful save. Save open drafts before changing screens.'],
   ['How do I continue on another device?', 'On the original device, sign in, enable cloud saving and wait for a successful save. On the other device, sign into the same account and turn on cloud saving to load the account copy. “Use this device’s current journey” replaces the account copy, so only choose it when that is what you intend.'],
@@ -94,10 +94,10 @@ const questions = [
 
 function Help() {
   return <>
-    <p>Find a clear next step below. A dedicated support email is being prepared; direct-contact support is not available here yet.</p>
+    <p>Find a clear next step below, or email <a href="mailto:comehomealways@gmail.com">comehomealways@gmail.com</a> for support.</p>
     {questions.map(([title, answer]) => <details className="journey-disclosure" key={title}><summary>{title}</summary><p>{answer}</p></details>)}
     <h2>If you need to report a problem</h2>
-    <p>Keep a note of the screen, what you tapped, what happened, your device/browser and the approximate time. A screenshot can help; hide personal writing, email addresses and any login or reset codes. You can send these details once the dedicated support channel is available.</p>
+    <p>Keep a note of the screen, what you tapped, what happened, your device/browser and the approximate time. A screenshot can help; hide personal writing, email addresses and any login or reset codes. Send these details to <a href="mailto:comehomealways@gmail.com">comehomealways@gmail.com</a>.</p>
     <p>COME HOME is not an emergency or crisis service. If you need urgent help, contact local emergency services or an appropriate healthcare professional.</p>
   </>;
 }
