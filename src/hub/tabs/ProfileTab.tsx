@@ -17,6 +17,7 @@ import Plans from '../../membership/Plans';
 import JourneyExport from '../JourneyExport';
 import { app } from '../../store/app';
 import InformationLinks from '../../information/InformationLinks';
+import InstallApp from '../../pwa/InstallApp';
 import { disableAccountCloud, enableAccountCloud, refreshAccountCloud, useAccountCloud } from '../../lib/accountCloud';
 
 /** A calm overview first. Detail stays one tap away in clearly named sections. */
@@ -65,6 +66,7 @@ export default function ProfileTab() {
         </Reveal>
 
         <div className="mt-6 flex flex-col gap-3">
+          <InstallApp />
           <ProfileSection title="My progress" subtitle="Manifestation and monthly reflection">
             <JourneyProgress />
             <div className="mt-5"><ReflectionTrail history={history} reflections={reflections} journal={journal} presence={presence} /></div>

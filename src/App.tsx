@@ -27,6 +27,7 @@ import { notifications } from './lib/notifications';
 import { useAuth } from './lib/auth';
 import { useAppHistory } from './nav/history';
 import PasswordRecovery from './first-run/PasswordRecovery';
+import AppUpdate from './pwa/AppUpdate';
 
 /**
  * App shell (§4, §11): Living Water + atmosphere mounted ONCE behind everything;
@@ -132,6 +133,7 @@ export default function App() {
       </div>
       {/* Docked mini-player + natural-close handler — global, outlives every view. */}
       <PlayerHost />
+      <AppUpdate />
     </>
   );
 }

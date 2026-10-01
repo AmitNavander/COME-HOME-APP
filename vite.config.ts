@@ -8,12 +8,14 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['favicon.svg', 'pwa-192x192.png', 'pwa-512x512.png'],
       manifest: {
         name: 'Come Home',
         short_name: 'Come Home',
-        description: 'A calm place to come home to yourself.',
+        description: 'Meditation, affirmations and guided manifestation. A calm place to come home to yourself.',
+        id: '/',
+        scope: '/',
         theme_color: '#0A1A24',
         background_color: '#0A1A24',
         display: 'standalone',
@@ -27,10 +29,8 @@ export default defineConfig({
       },
       workbox: {
         cleanupOutdatedCaches: true,
-        // §12 — explicit so a returning user gets the new build, never a stale
-        // cached bundle (autoUpdate sets these implicitly; pinning them here keeps
-        // the guarantee even if injectRegister ever changes).
-        skipWaiting: true,
+        // Activate only after consent; never interrupt a practice or an unsaved draft.
+        skipWaiting: false,
         clientsClaim: true,
         navigateFallback: '/index.html', // app shell serves every route offline (§9)
         // avif added so all four backdrops precache → offline + no stale backdrop (§4).
