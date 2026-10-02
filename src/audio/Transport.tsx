@@ -64,7 +64,7 @@ export default function Transport({
         </div>
       )}
 
-      <div className="flex items-center gap-8">
+      <div className="flex items-center gap-5 sm:gap-8">
         {!playOnly && <SkipButton dir="back" secs={skip} onClick={() => audioControls.skip(-skip)} disabled={unavailable} />}
 
         <button

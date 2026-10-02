@@ -1,3 +1,4 @@
+import { readResume } from './practiceProgress';
 import { useEffect, useState } from 'react';
 import { app } from '../store/app';
 import { useJourney } from './journeyStore';
@@ -20,6 +21,8 @@ export default function ManifestWorkspace({ onImmersiveChange }: { onImmersiveCh
   const { user } = useAuth();
   const cloud = useAccountCloud();
   const [selected, setSelected] = useState<number | null>(null);
+  const [resumeWaterDay, setResumeWaterDay] = useState<number | null>(null);
+  const resume = readResume(data);
   const [section, setSection] = useState<'goal' | 'water' | 'vision' | null>(null);
   const nextDay = nextFoundationDay(data.completed);
   useEffect(() => {
@@ -34,13 +37,14 @@ export default function ManifestWorkspace({ onImmersiveChange }: { onImmersiveCh
     <p className="journey-muted">Save your exercise before returning to Manifest.</p>
     <PremiumPreview>
       {section === 'goal' && <GoalWorkflow />}
-      {section === 'water' && <><WaterCourse /><details className="journey-disclosure"><summary>Previous workbook entries</summary><WaterWorkbook titles={waterDays} /></details></>}
+      {section === 'water' && <><WaterCourse initialDay={resumeWaterDay} /><details className="journey-disclosure"><summary>Previous workbook entries</summary><WaterWorkbook titles={waterDays} /></details></>}
       {section === 'vision' && <VisionBoard />}
     </PremiumPreview>
   </main></div>;
   return <div className="screen"><main className="journey-page">
     <div className="eyebrow">Manifest</div><h1 className="serif">What are you ready to create?</h1>
     <p>Choose one goal, practise visualization and take a real step. Start with the foundation below; open one deeper journey when you are ready.</p>
+    {resume && <section className="journey-card journey-hero"><div className="eyebrow">Continue where you left off</div><h2 className="serif">{resume.kind === 'water' ? 'Water workshop' : 'Foundation'} · Day {resume.day + 1}</h2><p>Your saved writing is ready. Continue at your own pace.</p><button className="journey-button journey-primary" onClick={() => { if (resume.kind === 'foundation') setSelected(resume.day); else { setResumeWaterDay(resume.day); setSection('water'); } }}>Continue my practice →</button></section>}
     <details className="journey-disclosure"><summary>New here? Your manifestation guide</summary><ManifestGuide /></details>
     <section className="journey-card"><div className="eyebrow">Free · seven-day reflection journey</div><h2 className="serif">Your next practice</h2>
       <p>A teaching, practice, affirmation, action and evening reflection each day. Begin at your pace; there is no missed-day penalty.</p>
@@ -50,7 +54,7 @@ export default function ManifestWorkspace({ onImmersiveChange }: { onImmersiveCh
     </section>
     <h2 className="serif">Choose your next journey</h2>
     <button className="journey-row" onClick={() => setSection('goal')}><span>My goal plan <PlusBadge /><small>Define → Visualize → Act → Review</small></span></button>
-    <button className="journey-row" onClick={() => setSection('water')}><span>Manifesting Through Water™ <PlusBadge /><small>A guided written workshop · 21 days</small></span></button>
+    <button className="journey-row" onClick={() => { setResumeWaterDay(null); setSection('water'); }}><span>Manifesting Through Water™ <PlusBadge /><small>A guided written workshop · 21 days</small></span></button>
     <button className="journey-row" onClick={() => setSection('vision')}><span>My vision board <PlusBadge /><small>Create images of the direction you choose</small></span></button>
     <button className="journey-button" onClick={() => openGuidedJournal('manifestation')}>Reflect on my manifestation practice</button>
     <details className="journey-disclosure"><summary>More resources and plans</summary><button className="journey-button" onClick={() => app.setView('manifestation')}>Open foundation practice library</button><Plans /></details>

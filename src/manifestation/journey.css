@@ -83,3 +83,21 @@
 .daily-affirmation { background: linear-gradient(135deg, rgba(181,143,82,.14), rgba(40,86,97,.22)); border-color: rgba(232,201,155,.48); }
 .journey-page .daily-affirmation h2 { font-size: 12px; line-height: 1.5; margin: 0 0 14px; color: var(--gold); }
 .journey-page .daily-affirmation-text { font-size: clamp(23px, 5vw, 30px); line-height: 1.4; margin: 0 0 16px; text-wrap: pretty; }
+
+/* Practice guidance stays inside the selected journey, away from Today. */
+.practice-next { border-left: 3px solid var(--gold); padding: 12px 18px; margin: 24px 0; background: rgba(232,201,155,.06); border-radius: 12px; }
+.practice-feedback { padding: 14px 16px; margin: 16px 0; border: 1px solid var(--gold); border-radius: 12px; overflow-wrap: anywhere; }
+.practice-feedback p { margin: 0; }
+.practice-feedback small { display: block; margin-top: 6px; color: var(--ink-muted); }
+.water-lesson h4[id] { scroll-margin-top: 32px; }
+.water-lesson h4:focus { outline: 2px solid var(--gold); outline-offset: 6px; }
+.journey-label input, .journey-label textarea, .journey-label select { font-size: 16px; }
+.journey-button, .goal-stages button { min-height: 44px; overflow-wrap: anywhere; }
+@media (max-width: 420px) {
+  .journey-card { padding: 18px; }
+  .journey-page { padding-top: 20px; }
+  .goal-actions { flex-direction: column; }
+  .goal-actions .journey-button { width: 100%; }
+  .journey-row { gap: 10px; }
+  .journey-row small { letter-spacing: .04em; }
+}

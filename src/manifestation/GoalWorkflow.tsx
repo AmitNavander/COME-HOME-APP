@@ -1,3 +1,4 @@
+import SaveFeedback from './SaveFeedback';
 import PracticeReminder from './PracticeReminder';
 import { useEffect, useRef, useState } from 'react';
 import { useJourney } from './journeyStore';
@@ -31,8 +32,8 @@ export default function GoalWorkflow() {
     window.addEventListener('beforeunload', guard);
     return () => window.removeEventListener('beforeunload', guard);
   }, [dirty]);
-  function updatePlan(key: keyof GoalPlan, value: string) { setPlan(old => ({ ...old, [key]: value })); setDirty(true); }
-  function updateDay(key: keyof DailyPractice, value: string | boolean) { setDay(old => ({ ...old, [key]: value })); setDirty(true); }
+  function updatePlan(key: keyof GoalPlan, value: string) { setPlan(old => ({ ...old, [key]: value })); setDirty(true); setStatus(''); }
+  function updateDay(key: keyof DailyPractice, value: string | boolean) { setDay(old => ({ ...old, [key]: value })); setDirty(true); setStatus(''); }
   function persist(next?: number, review = false) {
     if (review && !reviewReady(day)) { setStatus('Record the action result, progress, evidence, learning and next step before saving a review.'); return; }
     try {
@@ -123,7 +124,7 @@ export default function GoalWorkflow() {
       <div className="goal-actions"><button type="button" className="journey-button" onClick={() => persist()}>Save draft</button><button className="journey-button" type="submit">{stage === 4 ? 'Save my review' : `Save and continue to ${stages[stage + 1]}`}</button></div>
     </form>
     <PracticeReminder key={`${plan.id}:${stage}`} title={stage === 3 ? 'Take my planned action' : stage === 4 ? 'Review my goal progress' : 'Return to my goal practice'} action={stage === 3 ? day.action || 'Take one small planned action.' : stage === 4 ? day.next || 'Review progress, record evidence and choose the next step.' : 'Continue preparing and rehearsing the next step toward my goal.'} prompt={stage === 4 ? 'Review what happened, what you learned and your next step.' : 'Return to your goal plan and take one manageable next step.'} location="Manifest → My goal plan" label={stage === 3 ? 'Remind me to take action' : stage === 4 ? 'Set my next review reminder' : 'Remind me to continue'} />
-    <p role="status">{status}</p>
+    <SaveFeedback message={status} />
     <p className="journey-muted">{dirty ? 'You have unsaved changes. ' : ''}Save before changing tabs. Your plan and writing stay in this browser.</p>
     {date !== localDay() && <button className="journey-button" onClick={() => { if (dirty) { setStatus('Save your current writing before opening today.'); return; } const today = localDay(); const next = readDay(data.answers[dailyKey(plan.id, today)]); setDate(today); setDay(next); setStage(nextStage(plan, next)); }}>Open today’s practice</button>}
     <details><summary>Review history · {reviews.length} saved {reviews.length === 1 ? 'day' : 'days'}</summary>{reviews.length === 0 ? <p>Your reviews will appear here after you record an action and its result.</p> : reviews.map(review => <article className="water-pause" key={review.id}><h4>{review.plan.goal}</h4><p>{new Date(review.at).toLocaleDateString()} · {review.day.outcome === 'achieved' ? 'Goal achieved · self-reported' : review.day.outcome === 'revise' ? 'Plan needs adjustment' : 'In progress'}</p><p>Action: {review.day.action} ({review.day.status})</p><p>Progress: {review.day.actual}</p><p>Evidence: {review.day.evidence}</p><p>Learning: {review.day.learning}</p><p>Next: {review.day.next}</p></article>)}</details>

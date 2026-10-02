@@ -1,3 +1,5 @@
+import SaveFeedback from '../manifestation/SaveFeedback';
+import { hub } from '../store/hub';
 import PracticeReminder from '../manifestation/PracticeReminder';
 import { useEffect, useRef, useState } from 'react';
 import { PenLine, Trash2, ArrowLeft } from 'lucide-react';
@@ -44,6 +46,7 @@ export default function Journal() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [draft, setDraft] = useState<Draft | null>(null); // non-null = writing
   const [saveError, setSaveError] = useState('');
+  const [savedMessage, setSavedMessage] = useState('');
   const [saving, setSaving] = useState(false);
   const savingRef = useRef(false);
   const [confirmDel, setConfirmDel] = useState<string | null>(null);
@@ -69,7 +72,10 @@ export default function Journal() {
     setSaving(true);
     setSaveError('');
     try {
-      if (draft && draft.text.trim()) await saveJournalEntry({ id: draft.id, prompt: draft.prompt, text: draft.text.trim() });
+      if (draft && draft.text.trim()) {
+        await saveJournalEntry({ id: draft.id, prompt: draft.prompt, text: draft.text.trim() });
+        setSavedMessage('Reflection saved on this device. You can reopen it below whenever you need.');
+      }
       setDraft(null);
       await refresh();
     } catch { setSaveError('Your writing could not be saved. Keep this page open, copy your text somewhere safe, then try again.'); }
@@ -102,6 +108,7 @@ export default function Journal() {
         </Reveal>
 
         {saveError && <p role="alert">{saveError}</p>}
+        {savedMessage && <section className="journey-card"><SaveFeedback message={savedMessage} /><p>Let your reflection settle. Your next step can be one small action—or simply rest.</p><button className="journey-button" onClick={() => { hub.setTab(path === 'meditation' ? 'library' : path === 'manifestation' ? 'manifest' : path === 'affirmation' ? 'affirmations' : 'home'); app.setView('hub'); }}>Return to {path === 'meditation' ? 'Meditate' : path === 'manifestation' ? 'Manifest' : path === 'affirmation' ? 'Affirmations' : 'Today'}</button></section>}
         {/* Gentle prompts — invitations, never assignments. */}
         <Reveal delay={0.14}>
           <div className="eyebrow" style={{ marginTop: 26, marginBottom: 12 }}>
@@ -220,6 +227,12 @@ function Writer({
   saving: boolean;
 }) {
   const ref = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    if (!draft.text.trim() || saving) return;
+    const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [draft.text, saving]);
   useEffect(() => {
     // Soft focus into the page, but never on the very first paint (feels abrupt).
     const t = setTimeout(() => ref.current?.focus(), 260);
