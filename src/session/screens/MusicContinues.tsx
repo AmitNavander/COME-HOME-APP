@@ -1,3 +1,4 @@
+import PracticeClock from '../PracticeClock';
 import { useEffect } from 'react';
 import { ChevronDown, Check, AudioLines } from 'lucide-react';
 import { session, useSessionState } from '../../store/session';
@@ -21,7 +22,7 @@ export default function MusicContinues() {
   const { path } = useSessionState();
   const meta = PATHS.find((p) => p.id === path);
   const title = meta?.title ?? pathTitle(path);
-  const tag = `Guided · ${meta?.duration ?? 'session'}`;
+  const tag = `Music · ${meta?.duration ?? '2 min'} suggested sitting`;
 
   useEffect(() => {
     audioControls.ensureLoaded(SESSION_AUDIO.musicTrack);
@@ -35,6 +36,7 @@ export default function MusicContinues() {
   };
   // Complete → the gentle close (how do you feel now?). No streak, no score.
   const complete = () => {
+    audioControls.pause();
     player.end();
     session.go('checkin');
   };
@@ -68,6 +70,7 @@ export default function MusicContinues() {
         </Reveal>
 
         <Reveal delay={0.28} className="mt-10 w-full">
+          <PracticeClock />
           <Transport skip={15} remaining />
         </Reveal>
 

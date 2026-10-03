@@ -12,7 +12,7 @@ import { audioControls, SESSION_AUDIO } from '../../audio/audioStore';
 export default function Arrival({ onExit }: { onExit: () => void }) {
   const [selected, setSelected] = useState<Emotion[]>([]);
   const toggle = (id: Emotion) =>
-    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+    setSelected((s) => (s.includes(id) ? [] : [id]));
 
   // Begin: record the first chosen feeling (history's "last arrival" is one),
   // start the default track on this tap (a user gesture — mobile autoplay), then
@@ -33,7 +33,7 @@ export default function Arrival({ onExit }: { onExit: () => void }) {
             How are you arriving today?
           </h2>
           <p style={{ color: 'var(--ink-muted)', marginTop: 6, fontSize: 'var(--t-md)' }}>
-            There's no right answer.
+            Choose one feeling, or begin without a check-in.
           </p>
         </Reveal>
 
@@ -59,9 +59,9 @@ export default function Arrival({ onExit }: { onExit: () => void }) {
         </Reveal>
 
         <Reveal delay={0.5} className="mt-8 flex flex-col items-center gap-4">
-          <Button onClick={begin}>Begin</Button>
+          <Button onClick={begin}>{selected.length ? "Begin a gentle meditation" : "Begin without a check-in"}</Button>
           <Button variant="ghost" onClick={onExit}>
-            I'm okay, just exploring
+            Browse meditations
           </Button>
         </Reveal>
       </div>

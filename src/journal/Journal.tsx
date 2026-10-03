@@ -1,3 +1,4 @@
+import { draftKey, readDraft, writeDraft } from '../lib/practiceDraft';
 import SaveFeedback from '../manifestation/SaveFeedback';
 import { hub } from '../store/hub';
 import PracticeReminder from '../manifestation/PracticeReminder';
@@ -37,14 +38,22 @@ type Draft = { id?: string; prompt?: string; text: string; example?: string };
  * private storage. Editing and deleting are gentle
  * (a soft two-tap to remove). No counter, no streak, no obligation to write.
  */
-export default function Journal() {
+export default function Journal() { const { user } = useAuth(); return <AccountJournal key={user.id} />; }
+function AccountJournal() {
   const { user } = useAuth();
   const cloud = useAccountCloud();
   const [context] = useState(takeJournalContext);
   const [path, setPath] = useState<JournalPath>(context?.path ?? 'personal');
   const guide = journalGuides[path];
   const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [draft, setDraft] = useState<Draft | null>(null); // non-null = writing
+  const key = draftKey(user.id, 'journal');
+  const [draft, updateDraft] = useState<Draft | null>(() => readDraft(key, null, v => !!v && typeof v === 'object' && typeof (v as Draft).text === 'string' && ['id', 'prompt', 'example'].every(k => (v as Record<string, unknown>)[k] === undefined || typeof (v as Record<string, unknown>)[k] === 'string')));
+  const [draftStatus, setDraftStatus] = useState('Unfinished writing is restored automatically on this device.');
+  function setDraft(next: Draft | null) {
+    updateDraft(next);
+    try { writeDraft(key, next); setDraftStatus('Draft saved on this device.'); setSaveError(''); }
+    catch { setDraftStatus(''); setSaveError('Draft could not be saved. Keep this page open and copy your writing before leaving.'); }
+  } // non-null = writing
   const [saveError, setSaveError] = useState('');
   const [savedMessage, setSavedMessage] = useState('');
   const [saving, setSaving] = useState(false);
@@ -55,14 +64,14 @@ export default function Journal() {
   useEffect(() => {
     clearJournalContext();
     setDepth('checkin'); // a calm, settled water depth for the page
-    refresh();
+    void refresh().catch(() => setSaveError("Could not load your journal. Please reopen it to try again."));
   }, []);
 
   const writing = draft !== null;
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [writing]);
 
-  const openBlank = () => setDraft({ text: '' });
-  const openPrompt = (p: string) => setDraft({ prompt: `${guide.label}${path === 'affirmation' && context?.affirmation ? ` · ${context.affirmation}` : ''}\n${p}`, text: '', example: guide.example });
+  const openBlank = () => setDraft({ id: crypto.randomUUID(), text: '' });
+  const openPrompt = (p: string) => setDraft({ id: crypto.randomUUID(), prompt: `${guide.label}${path === 'affirmation' && context?.affirmation ? ` · ${context.affirmation}` : ''}\n${p}`, text: '', example: guide.example });
   const openEdit = (e: JournalEntry) => setDraft({ id: e.id, prompt: e.prompt, text: e.text });
 
   // Leaving the page keeps whatever was written — an empty draft is simply let go.
@@ -76,8 +85,8 @@ export default function Journal() {
         await saveJournalEntry({ id: draft.id, prompt: draft.prompt, text: draft.text.trim() });
         setSavedMessage('Reflection saved on this device. You can reopen it below whenever you need.');
       }
-      setDraft(null);
       await refresh();
+      setDraft(null);
     } catch { setSaveError('Your writing could not be saved. Keep this page open, copy your text somewhere safe, then try again.'); }
     finally { savingRef.current = false; setSaving(false); }
   };
@@ -91,7 +100,7 @@ export default function Journal() {
     catch { setSaveError('Could not delete this entry. Please try again.'); }
   };
 
-  if (writing) return <Writer draft={draft!} setDraft={setDraft} onDone={closeDraft} error={saveError} saving={saving} />;
+  if (writing) return <Writer draft={draft!} setDraft={setDraft} onDone={closeDraft} error={saveError} saving={saving} status={draftStatus} />;
 
   return (
     <div className="screen">
@@ -188,8 +197,8 @@ export default function Journal() {
                       aria-label={confirmDel === e.id ? 'Tap again to remove' : 'Remove entry'}
                       className="shrink-0 grid place-items-center transition-transform duration-200 active:scale-[0.94]"
                       style={{
-                        width: 34,
-                        height: 34,
+                        width: 44,
+                        height: 44,
                         borderRadius: 999,
                         color: confirmDel === e.id ? 'var(--gold)' : 'var(--ink-muted)',
                       }}
@@ -219,12 +228,14 @@ function Writer({
   onDone,
   error,
   saving,
+  status,
 }: {
   draft: Draft;
   setDraft: (d: Draft) => void;
   onDone: () => void;
   error: string;
   saving: boolean;
+  status: string;
 }) {
   const ref = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
@@ -274,7 +285,7 @@ function Writer({
         </Reveal>
 
         <Reveal delay={0.1} className="mt-4 flex-1 flex flex-col">
-          <p style={{ color: 'var(--ink-muted)', marginBottom: 16 }}>Write a few sentences in your own words. You can leave any question unanswered. Tap Save reflection before leaving.</p>
+          <p style={{ color: 'var(--ink-muted)', marginBottom: 16 }}>Write a few sentences in your own words. You can leave any question unanswered. Your draft is saved on this device as you write. Tap Save reflection to add it to your journal.</p>
           <textarea
             ref={ref}
             aria-label="Journal entry"
@@ -297,9 +308,10 @@ function Writer({
         </Reveal>
 
         <Reveal delay={0.16} className="mt-4">
-          {error && <p role="alert">{error}</p>}<Button disabled={saving} onClick={onDone}>{saving ? 'Saving…' : draft.text.trim() ? 'Save reflection' : 'Back to journal'}</Button>
+          <p role="status">{status}</p>{error && <p role="alert">{error}</p>}<Button disabled={saving} onClick={onDone}>{saving ? 'Saving…' : draft.text.trim() ? 'Save reflection' : 'Back to journal'}</Button>
         </Reveal>
       </div>
     </div>
   );
 }
+

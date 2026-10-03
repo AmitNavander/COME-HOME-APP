@@ -23,9 +23,10 @@ export type SessionState = {
   emotion: Emotion | null;
   path: PathId | null;
   checkins: Checkin[];
+  practiceSeconds: number;
 };
 
-const FRESH: SessionState = { step: 'opening', emotion: null, path: null, checkins: [] };
+const FRESH: SessionState = { step: 'opening', emotion: null, path: null, checkins: [], practiceSeconds: 0 };
 let state: SessionState = FRESH;
 const listeners = new Set<() => void>();
 
@@ -35,13 +36,14 @@ function set(patch: Partial<SessionState>) {
 }
 
 export const session = {
+  advancePractice: (seconds: number) => set({ practiceSeconds: state.practiceSeconds + seconds }),
   reset: () => set(FRESH),
   go: (step: Step) => set({ step }),
   pickEmotion: (emotion: Emotion) => set({ emotion, step: 'response' }),
   /** Meditate flow (§task2): record the arrival (if any) and go straight to the
    *  player — no duration/support detour. */
-  beginMeditation: (emotion: Emotion | null) => set({ emotion, step: 'music' }),
-  pickPath: (path: PathId) => set({ path, step: 'support' }),
+  beginMeditation: (emotion: Emotion | null) => set({ emotion, path: 'grounding-2', step: 'support', practiceSeconds: 0 }),
+  pickPath: (path: PathId) => set({ path, step: 'support', practiceSeconds: 0 }),
   /** Record a check-in privately. Does NOT advance — the screen may reveal the
    *  soft crisis row first (§6.6), then the user chooses to continue. */
   recordCheckin: (c: Checkin) => set({ checkins: [...state.checkins, c] }),

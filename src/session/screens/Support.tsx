@@ -1,3 +1,4 @@
+import PracticeClock from '../PracticeClock';
 import { useEffect } from 'react';
 import { session, useSessionState } from '../../store/session';
 import { pathTitle } from '../../data/paths';
@@ -39,6 +40,7 @@ export default function Support() {
         </div>
 
         <Reveal delay={0.3}>
+          <PracticeClock />
           <Transport favKey={path ? `path:${path}` : undefined} />
           <p style={{ color: 'var(--ink-muted)', textAlign: 'center', fontSize: 'var(--t-sm)', marginTop: 16 }}>
             Read the prompts at your pace. The music can continue while you rest.

@@ -44,7 +44,7 @@ export default function ManifestWorkspace({ onImmersiveChange }: { onImmersiveCh
   return <div className="screen"><main className="journey-page">
     <div className="eyebrow">Manifest</div><h1 className="serif">What are you ready to create?</h1>
     <p>Choose one goal, practise visualization and take a real step. Start with the foundation below; open one deeper journey when you are ready.</p>
-    {resume && <section className="journey-card journey-hero"><div className="eyebrow">Continue where you left off</div><h2 className="serif">{resume.kind === 'water' ? 'Water workshop' : 'Foundation'} · Day {resume.day + 1}</h2><p>Your saved writing is ready. Continue at your own pace.</p><button className="journey-button journey-primary" onClick={() => { if (resume.kind === 'foundation') setSelected(resume.day); else { setResumeWaterDay(resume.day); setSection('water'); } }}>Continue my practice →</button></section>}
+    {resume && <section className="journey-card journey-hero"><div className="eyebrow">Continue where you left off</div><h2 className="serif">{resume.kind === 'water' ? 'Water workshop' : 'Foundation'} · Day {resume.day + 1}</h2><p>Continue your practice at your own pace.</p><button className="journey-button journey-primary" onClick={() => { if (resume.kind === 'foundation') setSelected(resume.day); else { setResumeWaterDay(resume.day); setSection('water'); } }}>Continue my practice →</button></section>}
     <details className="journey-disclosure"><summary>New here? Your manifestation guide</summary><ManifestGuide /></details>
     <section className="journey-card"><div className="eyebrow">Free · seven-day reflection journey</div><h2 className="serif">Your next practice</h2>
       <p>A teaching, practice, affirmation, action and evening reflection each day. Begin at your pace; there is no missed-day penalty.</p>
@@ -82,3 +82,4 @@ function ManifestGuide() {
     <p>Stuck? Make the action smaller, write one honest sentence or revisit a day. You can adapt or skip an uncomfortable exercise. Progress means noticing, learning and acting, not forcing a result.</p>
   </div>;
 }
+
