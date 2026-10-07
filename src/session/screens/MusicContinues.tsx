@@ -8,7 +8,6 @@ import { player } from '../../store/player';
 import { nav } from '../../nav/history';
 import Transport from '../../audio/Transport';
 import BreathRing from '../../audio/BreathRing';
-import SessionSleepTimer from '../../audio/SessionSleepTimer';
 import HeartButton from '../../ui/HeartButton';
 import Reveal from '../../ui/Reveal';
 
@@ -71,13 +70,12 @@ export default function MusicContinues() {
 
         <Reveal delay={0.28} className="mt-10 w-full">
           <PracticeClock />
-          <Transport skip={15} remaining />
+          <Transport playOnly />
         </Reveal>
 
         <Reveal delay={0.44} className="mt-9">
           <div className="flex items-center justify-center" style={{ gap: 22 }}>
             <HeartButton favKey={`path:${path ?? 'session'}`} label="this session" />
-            <SessionSleepTimer />
             <AmbientToggle />
             <button
               onClick={complete}
