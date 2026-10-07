@@ -34,7 +34,7 @@ export default function ManifestWorkspace({ onImmersiveChange }: { onImmersiveCh
   if (section !== null) return <div className="screen"><main className="journey-page">
     <button className="journey-button" onClick={() => setSection(null)}>← Back to Manifest</button>
     <div className="eyebrow">Manifest · {section === 'goal' ? 'My goal plan' : section === 'water' ? 'Water workshop' : 'Vision board'}</div>
-    <p className="journey-muted">Save your exercise before returning to Manifest.</p>
+    {section !== 'water' && <p className="journey-muted">Save before leaving this exercise.</p>}
     <PremiumPreview>
       {section === 'goal' && <GoalWorkflow />}
       {section === 'water' && <><WaterCourse initialDay={resumeWaterDay} /><details className="journey-disclosure"><summary>Previous workbook entries</summary><WaterWorkbook titles={waterDays} /></details></>}
@@ -43,11 +43,11 @@ export default function ManifestWorkspace({ onImmersiveChange }: { onImmersiveCh
   </main></div>;
   return <div className="screen"><main className="journey-page">
     <div className="eyebrow">Manifest</div><h1 className="serif">What are you ready to create?</h1>
-    <p>Choose one goal, practise visualization and take a real step. Start with the foundation below; open one deeper journey when you are ready.</p>
-    {resume && <section className="journey-card journey-hero"><div className="eyebrow">Continue where you left off</div><h2 className="serif">{resume.kind === 'water' ? 'Water workshop' : 'Foundation'} · Day {resume.day + 1}</h2><p>Continue your practice at your own pace.</p><button className="journey-button journey-primary" onClick={() => { if (resume.kind === 'foundation') setSelected(resume.day); else { setResumeWaterDay(resume.day); setSection('water'); } }}>Continue my practice →</button></section>}
+    <p>Choose one goal. Take one small step.</p>
+    {resume && <section className="journey-card journey-hero"><div className="eyebrow">Continue where you left off</div><h2 className="serif">{resume.kind === 'water' ? 'Water workshop' : 'Foundation'} · Day {resume.day + 1}</h2><button className="journey-button journey-primary" onClick={() => { if (resume.kind === 'foundation') setSelected(resume.day); else { setResumeWaterDay(resume.day); setSection('water'); } }}>Continue my practice →</button></section>}
     <details className="journey-disclosure"><summary>New here? Your manifestation guide</summary><ManifestGuide /></details>
     <section className="journey-card"><div className="eyebrow">Free · seven-day reflection journey</div><h2 className="serif">Your next practice</h2>
-      <p>A teaching, practice, affirmation, action and evening reflection each day. Begin at your pace; there is no missed-day penalty.</p>
+      <p>Seven days of reflection and practical action, at your pace.</p>
       <progress aria-label="Foundation progress" max={7} value={data.completed.length} /><p>{data.completed.length} of 7 completed</p>
       {nextDay !== null ? <button className="journey-button journey-primary" onClick={() => setSelected(nextDay)}>Continue day {nextDay + 1} · {foundationDays[nextDay].title}</button> : <p role="status">Your foundation week is complete. Revisit any day below.</p>}
       <details className="journey-disclosure"><summary>View all 7 foundation days</summary>{foundationDays.map(({title, minutes}, i) => <button className="journey-row" key={title} onClick={() => setSelected(i)}><span className="journey-number">{i + 1}</span><span>Day {i + 1} · {title}<small>{minutes} min · {data.completed.includes(i) ? 'Completed' : data.answers[String(i)] ? 'Draft saved' : 'Ready when you are'}</small></span><span aria-hidden>{data.completed.includes(i) ? '✓' : '→'}</span></button>)}</details>

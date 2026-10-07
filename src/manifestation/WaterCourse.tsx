@@ -14,10 +14,12 @@ export default function WaterCourse({ initialDay = null }: { initialDay?: number
   if (selected !== null) return <WaterLesson key={selected} day={selected} onClose={() => setSelected(null)} />;
   return <section>
     <p>A 21-Day Sacred Transformation Journey</p>
-    <p>Master Facilitator: Amit C. Navander<br />Reiki Grandmaster · Family Constellation · Master of Rescripting Astropsychology</p>
+    <p>With Amit C. Navander · 21 days</p>
+    <details className="journey-disclosure"><summary>About this workshop</summary><p>Master Facilitator: Amit C. Navander<br />Reiki Grandmaster · Family Constellation · Master of Rescripting Astropsychology</p>
     <p>Read, pause and practice—one day at a time. Each day contains the teaching and instructions you need to work through the exercises without audio or a facilitator.</p>
     <p className="journey-muted">Expanded self-guided edition based on Amit’s curriculum, with safety and factual edits. This is an adapted edition, not the original manuscript word for word.</p>
     <p>Allow about 25–35 minutes for reading, practice, writing and action, plus a brief evening return. These are flexible planning estimates; split a day into smaller sittings whenever you need.</p>
+    </details>
     <details><summary>Before you begin</summary>
       <p>Water is used as a spiritual symbol and reminder for reflection and action. These practices do not establish that water stores intentions, rewrites DNA, treats trauma or guarantees health or financial outcomes.</p>
       <p>Use a clean food-safe glass and fresh drinking water. A simple quiet space is enough; special vessels, crystals and purchases are not required. Keep ink, oils, decorative objects and used ritual water separate from drinking water.</p>
@@ -49,6 +51,15 @@ function WaterLesson({ day, onClose }: { day: number; onClose: () => void }) {
   ));
   const [step, setStep] = useState(() => Math.max(0, Math.min(7, data.answers[prefix + 'place'] !== undefined && Number.isInteger(Number(data.answers[prefix + 'place'])) ? Number(data.answers[prefix + 'place']) : nextWaterStep(values))));
   const [full, setFull] = useState(false);
+  const [ceremony, setCeremony] = useState(() => {
+    const saved = Number(data.answers[prefix + 'ceremony-place']);
+    return Number.isInteger(saved) && saved >= 0 && saved < guide.practice.length ? saved : 0;
+  });
+  function moveCeremony(next: number) {
+    setCeremony(next);
+    try { const latest = getJourneySnapshot(); save({ ...latest, answers: { ...latest.answers, [prefix + 'ceremony-place']: String(next) } }); }
+    catch { setStatus('Could not save your place.'); }
+  }
   const [status, setStatus] = useState('');
   useEffect(() => { heading.current?.focus(); heading.current?.scrollIntoView({ block: 'start' }); }, [step]);
   const done = data.answers[prefix + 'completed'] === '1';
@@ -64,7 +75,7 @@ function WaterLesson({ day, onClose }: { day: number; onClose: () => void }) {
     try {
       save({ ...data, answers: { ...waterAnswers(data.answers, day, nextValues, done), [RESUME_KEY]: JSON.stringify({ kind: 'water', day }) } });
       setValues(nextValues);
-      setStatus('Step saved on this device. Continue below, or return when you are ready.');
+      setStatus('Step saved.');
       goToStep(Math.min(step + 1, waterSteps.length - 1));
     } catch { setStatus('Could not save. Keep this page open and copy your writing before leaving.'); }
   }
@@ -90,28 +101,35 @@ function WaterLesson({ day, onClose }: { day: number; onClose: () => void }) {
     <h3 className="serif" ref={heading} tabIndex={-1}>Day {day + 1} · {lesson.title}</h3>
     <p>{waterWeeks[Math.floor(day / 7)].title} · Self-guided daily workshop</p>
     <section className="practice-next"><p aria-live="polite">Step {step + 1} of 8 · {waterSteps[step][1]}</p><progress aria-label="Current workshop step" max={8} value={step + 1} /><button type="button" className="journey-button" onClick={() => setFull(!full)}>{full ? 'Show one step at a time' : 'Read the full day'}</button><button type="button" className="journey-button" disabled={step === 0} onClick={() => goToStep(step - 1)}>← Previous step</button><SaveFeedback message={status} /></section>
-    <aside className="water-pause" hidden={!full && step !== 0}><h4>Before you start</h4><p>{guide.prepare}</p><p>Read one section, then pause to do it. You do not need to memorize the page or finish in one sitting. Keep your breathing natural. Any sipping is optional, with no extra quantity required; follow any prescribed fluid limits. You can shorten, adapt or skip an exercise.</p><p>Use Save whenever you stop. Come back to this same day for the evening practice; your notes will be here in this browser.</p></aside>
+    <aside className="water-pause" hidden={!full && step !== 0}><h4>Before you start</h4><p>{guide.prepare}</p><p>Breathe naturally. Sipping is optional; follow any prescribed fluid limits. Adapt or skip any exercise.</p></aside>
     <section hidden={!full && step !== 0}>
-    <h4 id="water-step-0" tabIndex={-1}>1. Today’s Wisdom From Water</h4><p className="journey-muted">Allow 5–10 minutes to read slowly and reflect.</p><blockquote>{lesson.wisdom}</blockquote><p>{lesson.teaching}</p>
-    {guide.teaching.map(paragraph => <p key={paragraph}>{paragraph}</p>)}
-    <p className="water-pause">Pause here. Which sentence feels relevant to your life today? Read it once more before moving to the practice.</p>
+    <h4 id="water-step-0" tabIndex={-1}>1. Today’s Wisdom From Water</h4><p className="journey-muted">Allow 5–10 minutes to read slowly and reflect.</p><blockquote>{lesson.wisdom}</blockquote><details key={`teaching-${full}`} open={full || undefined} className="journey-disclosure"><summary>Read today’s teaching</summary><p>{lesson.teaching}</p>
+    {guide.teaching.map(paragraph => <p key={paragraph}>{paragraph}</p>)}</details>
+    <p className="water-pause">What feels relevant to you today?</p>
     {nextButton(0)}
     </section>
     <section hidden={!full && step !== 1}>
     <h4 id="water-step-1" tabIndex={-1}>2. Sacred Water Ceremony</h4><p className="journey-muted">Allow 5–10 minutes. Follow one step at a time.</p>
-    <ol className="water-steps">{guide.practice.map(step => <li key={step}>{step}</li>)}</ol>
+    {full ? <ol className="water-steps">{guide.practice.map(instruction => <li key={instruction}>{instruction}</li>)}</ol> : <section aria-label="Ceremony instruction">
+      <p className="journey-muted">Instruction {ceremony + 1} of {guide.practice.length}</p>
+      <p aria-live="polite">{guide.practice[ceremony]}</p>
+      <button className="journey-button" type="button" disabled={ceremony === 0} onClick={() => moveCeremony(ceremony - 1)}>← Back</button>
+      {ceremony < guide.practice.length - 1 && <button className="journey-button journey-primary" type="button" onClick={() => moveCeremony(ceremony + 1)}>Next instruction →</button>}
+    </section>}
+    <div hidden={!full && ceremony < guide.practice.length - 1}>
     <p>Read these words aloud or silently, using a normal, comfortable voice:</p><blockquote>{lesson.declaration}</blockquote>
     <p>To close, set the glass down safely. If you wish, take a comfortable sip of fresh drinking water from a clean glass. Do not drink water used for hand immersion, reflection bowls or offerings. Notice your surroundings before turning to your writing. No special sensation is required.</p>
     {field('practice', 'My practice notes, statements or commitments')}
     {nextButton(1)}
+    </div>
     </section>
     <section hidden={!full && step !== 2}>
-    <h4 id="water-step-2" tabIndex={-1}>3. Water Reflection Journal</h4><p className="journey-muted">Allow about 5 minutes, or longer if useful.</p><p>{guide.journal}</p><p>Use the practice-notes space in the ceremony step for any lists or statements, and the fields below for the questions. A few honest sentences are enough. If you feel stuck, begin with “Right now I notice…” You may keep any response private in a paper notebook or leave it blank.</p>
+    <h4 id="water-step-2" tabIndex={-1}>3. Water Reflection Journal</h4><p className="journey-muted">Allow about 5 minutes, or longer if useful.</p><p>A few honest words are enough. You may skip a question.</p><details key={`journal-${full}`} open={full || undefined} className="journey-disclosure"><summary>Help me reflect</summary><p>{guide.journal}</p><p>Begin with “Right now I notice…” if you feel stuck. You can also write privately in a notebook.</p></details>
     {lesson.prompts.map((prompt, i) => field(`reflection:${i}`, prompt))}
     {nextButton(2)}
     </section>
     <section hidden={!full && step !== 3}>
-    <h4 id="water-step-3" tabIndex={-1}>4. Aligned Action Challenge</h4><p>{lesson.action}</p><p>{guide.action}</p><p>Before leaving this page, decide what you will do and when. Afterward, return to record what happened. If the action was not possible, write the adjustment you want to try.</p>{field('action', 'My action, when I will do it, and what happened')}
+    <h4 id="water-step-3" tabIndex={-1}>4. Aligned Action Challenge</h4><p>{lesson.action}</p><details key={`action-${full}`} open={full || undefined} className="journey-disclosure"><summary>How to take this action</summary><p>{guide.action}</p><p>Choose when to act. Return to note what happened, or what you need to adjust.</p></details>{field('action', 'My action, when I will do it, and what happened')}
     <PracticeReminder day={day} title="Water · Aligned action" action={values.action || lesson.action} location={`Manifest → Manifesting Through Water → Day ${day + 1}`} label="Remind me to take my action" />
     {day === 20 && field('plan', 'My 90-day plan: priorities, weekly actions and review dates')}
     {nextButton(3)}
@@ -121,17 +139,17 @@ function WaterLesson({ day, onClose }: { day: number; onClose: () => void }) {
     {nextButton(4)}
     </section>
     <section hidden={!full && step !== 5}>
-    <h4 id="water-step-5" tabIndex={-1}>6. Evening Water Integration</h4><p className="journey-muted">Return for 2–5 minutes before resting.</p><p>{lesson.evening}</p><p>{guide.evening}</p>{field('evening', 'My evening reflection')}
+    <h4 id="water-step-5" tabIndex={-1}>6. Evening Water Integration</h4><p className="journey-muted">Return for 2–5 minutes before resting.</p><p>{lesson.evening}</p><details key={`evening-${full}`} open={full || undefined} className="journey-disclosure"><summary>Guide my evening reflection</summary><p>{guide.evening}</p></details>{field('evening', 'My evening reflection')}
     <PracticeReminder day={day} title="Water · Evening reflection" action={lesson.evening} prompt="Return for your evening reflection and record what you noticed today." location={`Manifest → Manifesting Through Water → Day ${day + 1}`} label="Remind me to return this evening" />
     {nextButton(5)}
     </section>
     <section hidden={!full && step !== 6}>
-    <h4 id="water-step-6" tabIndex={-1}>7. Daily Milestone</h4><p>{lesson.milestone}</p><p>Use this optional checklist to remember where you stopped. It records your participation, not a guaranteed transformation. Adapted or skipped practices can be noted in your journal.</p>
+    <h4 id="water-step-6" tabIndex={-1}>7. Daily Milestone</h4><p>{lesson.milestone}</p><p>Optional: note what you tried or adapted today.</p>
     <fieldset><legend>My daily practice</legend>{[['reading', 'I read and reflected on the teaching'], ['practice', 'I tried or adapted the ceremony'], ['journal', 'I took time for the reflection'], ['action', 'I took or planned my action'], ['evening', 'I returned for the evening review']].map(([key, label]) => <label className="water-check" key={key}><input type="checkbox" checked={values[`check:${key}`] === '1'} onChange={e => changeValue(`check:${key}`, e.target.checked ? '1' : '0')} />{label}</label>)}</fieldset>
     {nextButton(6)}
     </section>
     <section hidden={!full && step !== 7}>
-    <h4 id="water-step-7" tabIndex={-1}>8. Manifestation Evidence Tracker</h4><p>Write one concrete observation, the action you took and what happened afterward. Then add your interpretation separately. For example: “I sent a message and received a reply. I felt encouraged.” Include things that did not change. Coincidences do not establish cause and effect.</p>{field('evidence', 'What happened, what I noticed, and what I learned')}
+    <h4 id="water-step-7" tabIndex={-1}>8. Manifestation Evidence Tracker</h4><p>Record your action and what actually happened. Keep your interpretation separate; coincidences do not establish cause and effect.</p>{field('evidence', 'What happened, what I noticed, and what I learned')}
     <p>Save a draft if you are returning later. When you have finished your chosen practices and review, mark the day complete. You can revisit any day; there is no penalty for taking longer.</p>
     <button className="journey-button" type="submit">{done ? 'Save writing' : 'Save draft'}</button>
     <button className="journey-button" type="button" onClick={() => persist(true)}>{done ? 'Save completed day' : 'Save and mark day complete'}</button>
@@ -139,7 +157,7 @@ function WaterLesson({ day, onClose }: { day: number; onClose: () => void }) {
     {done && <button className="journey-button" type="button" onClick={() => persist(false)}>Mark as in progress</button>}
     <button className="journey-button" type="button" onClick={() => persist(done, true)}>Save and return to Water days</button>
     </section>
-    <SaveFeedback message={status} /><p className="journey-muted">Your writing stays in this browser unless you turn on Private account saving in Profile. On shared devices, sign out when you finish.</p>
+    <p className="journey-muted">Your writing stays in this browser unless you turn on Private account saving in Profile. On shared devices, sign out when you finish.</p>
   </form>;
 }
 
