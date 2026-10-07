@@ -12,7 +12,7 @@ import type { Checkin } from '../store/session';
 import { toolPrefsStore, useToolPrefs } from '../store/toolPrefs';
 import { tones, unlockTones } from '../audio/tones';
 
-const PRESETS = [3, 5, 10, 15, 20];
+const PRESETS = [3, 5, 10, 15];
 const INTERVALS = [0, 2, 5, 10]; // minutes; 0 = off
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
