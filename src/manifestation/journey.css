@@ -86,7 +86,7 @@
 
 /* Practice guidance stays inside the selected journey, away from Today. */
 .practice-next { border-left: 3px solid var(--gold); padding: 12px 18px; margin: 24px 0; background: rgba(232,201,155,.06); border-radius: 12px; }
-.practice-feedback { padding: 14px 16px; margin: 16px 0; border: 1px solid var(--gold); border-radius: 12px; overflow-wrap: anywhere; }
+.practice-feedback { padding: 0; margin: 10px 0 18px; border: 0; border-radius: 0; background: none; color: var(--ink-muted); font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
 .practice-feedback p { margin: 0; }
 .practice-feedback small { display: block; margin-top: 6px; color: var(--ink-muted); }
 .water-lesson h4[id] { scroll-margin-top: 32px; }
@@ -106,3 +106,6 @@
 .journey-page button { min-height:44px; }
 .journey-page :is(button, textarea, select, summary):focus-visible { outline:2px solid var(--gold); outline-offset:4px; }
 .water-lesson [hidden] { display:none; }
+
+/* Selected practice stage remains above passive save feedback in the hierarchy. */
+.journey-page nav[aria-label="Practice stages"] .journey-button[aria-pressed="true"] { background: rgba(232,201,155,.14); color: var(--gold); font-weight: 600; }
