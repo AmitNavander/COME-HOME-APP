@@ -105,8 +105,9 @@ function WaterLesson({ day, onClose }: { day: number; onClose: () => void }) {
     <section hidden={!full && step !== 0}>
     <h4 id="water-step-0" tabIndex={-1}>1. Today’s Wisdom From Water</h4><p className="journey-muted">Allow 5–10 minutes to read slowly and reflect.</p><blockquote>{lesson.wisdom}</blockquote><details key={`teaching-${full}`} open={full || undefined} className="journey-disclosure"><summary>Read today’s teaching</summary><p>{lesson.teaching}</p>
     {guide.teaching.map(paragraph => <p key={paragraph}>{paragraph}</p>)}</details>
-    <p className="water-pause">What feels relevant to you today?</p>
-    {nextButton(0)}
+    <p>How does today’s lesson connect with your life right now?</p>
+    <p className="journey-muted">Think of one situation, feeling or habit. Pause to reflect; no writing is needed here.</p>
+    <button type="button" className="journey-button journey-primary" onClick={() => continueFrom(0)}>Continue to water ceremony →</button>
     </section>
     <section hidden={!full && step !== 1}>
     <h4 id="water-step-1" tabIndex={-1}>2. Sacred Water Ceremony</h4><p className="journey-muted">Allow 5–10 minutes. Follow one step at a time.</p>
