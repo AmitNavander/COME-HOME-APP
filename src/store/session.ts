@@ -36,6 +36,7 @@ function set(patch: Partial<SessionState>) {
 }
 
 export const session = {
+  get practiceSeconds() { return state.practiceSeconds; },
   advancePractice: (seconds: number) => set({ practiceSeconds: state.practiceSeconds + seconds }),
   reset: () => set(FRESH),
   go: (step: Step) => set({ step }),

@@ -41,9 +41,9 @@ export default function Support() {
 
         <Reveal delay={0.3}>
           <PracticeClock />
-          <Transport favKey={path ? `path:${path}` : undefined} />
+          <Transport playOnly favKey={path ? `path:${path}` : undefined} />
           <p style={{ color: 'var(--ink-muted)', textAlign: 'center', fontSize: 'var(--t-sm)', marginTop: 16 }}>
-            Read the prompts at your pace. The music can continue while you rest.
+            The music gently ends when your practice time is complete.
           </p>
           <div className="mt-5 flex justify-center">
             <Button variant="ghost" onClick={() => session.go('music')}>
