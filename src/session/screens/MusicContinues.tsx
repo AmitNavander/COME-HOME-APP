@@ -18,15 +18,15 @@ import Reveal from '../../ui/Reveal';
  * collapses to the docked mini bar WITHOUT stopping audio (§ always an exit).
  */
 export default function MusicContinues() {
-  const { path } = useSessionState();
+  const { path, music } = useSessionState();
   const meta = PATHS.find((p) => p.id === path);
-  const title = meta?.title ?? pathTitle(path);
+  const title = music?.title ?? meta?.title ?? pathTitle(path);
   const tag = `Music · ${meta?.duration ?? '2 min'} suggested sitting`;
 
   useEffect(() => {
-    audioControls.ensureLoaded(SESSION_AUDIO.musicTrack);
+    audioControls.ensureLoaded(music?.src ?? SESSION_AUDIO.musicTrack, { loop: !!music });
     player.begin();
-  }, []);
+  }, [music]);
 
   // Minimise → mini bar; audio keeps playing (nav skips the stop while collapsed).
   const collapse = () => {
@@ -75,7 +75,7 @@ export default function MusicContinues() {
 
         <Reveal delay={0.44} className="mt-9">
           <div className="flex items-center justify-center" style={{ gap: 22 }}>
-            <HeartButton favKey={`path:${path ?? 'session'}`} label="this session" />
+            {!music && <HeartButton favKey={`path:${path ?? 'session'}`} label="this session" />}
             <AmbientToggle />
             <button
               onClick={complete}

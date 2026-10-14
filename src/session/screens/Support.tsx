@@ -1,7 +1,7 @@
 import PracticeClock from '../PracticeClock';
 import { useEffect } from 'react';
-import { session, useSessionState } from '../../store/session';
-import { pathTitle } from '../../data/paths';
+import { session, useSessionState, type PathId } from '../../store/session';
+import { PATHS, pathTitle } from '../../data/paths';
 import { audioControls, SESSION_AUDIO } from '../../audio/audioStore';
 import Transport from '../../audio/Transport';
 import Reveal from '../../ui/Reveal';
@@ -11,19 +11,19 @@ const LINES = ['Feel your feet.', 'Feel this breath.', 'Let’s be here right no
 
 /** §6.4 Support (player). Guided lines fade in over the dusk scene; transport below. */
 export default function Support() {
-  const { path } = useSessionState();
+  const { path, music } = useSessionState();
 
   useEffect(() => {
-    audioControls.ensureLoaded(SESSION_AUDIO.musicTrack);
-  }, []);
+    audioControls.ensureLoaded(music?.src ?? SESSION_AUDIO.musicTrack, { loop: !!music });
+  }, [music]);
 
   return (
     <div className="screen">
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col">
         <Reveal delay={0.05} className="pt-1">
-          <div className="eyebrow">On-screen guidance · music</div>
+          <div className="eyebrow">{music ? 'Music-only meditation' : 'On-screen guidance · music'}</div>
           <div className="serif" style={{ fontSize: 'var(--t-xl)', marginTop: 2 }}>
-            {pathTitle(path)}
+            {music?.title ?? pathTitle(path)}
           </div>
         </Reveal>
 
@@ -40,8 +40,10 @@ export default function Support() {
         </div>
 
         <Reveal delay={0.3}>
+          {music && <label className="journey-label">Practice duration<select value={path ?? 'stay-5'} onChange={e => { audioControls.pause(); session.pickPath(e.target.value as PathId); }}>{PATHS.map(item => <option key={item.id} value={item.id}>{item.duration}</option>)}</select></label>}
+          {music && <p className="journey-muted">Music repeats for longer sittings.</p>}
           <PracticeClock />
-          <Transport playOnly favKey={path ? `path:${path}` : undefined} />
+          <Transport playOnly favKey={!music && path ? `path:${path}` : undefined} />
           <p style={{ color: 'var(--ink-muted)', textAlign: 'center', fontSize: 'var(--t-sm)', marginTop: 16 }}>
             The music gently ends when your practice time is complete.
           </p>

@@ -24,9 +24,10 @@ export type SessionState = {
   path: PathId | null;
   checkins: Checkin[];
   practiceSeconds: number;
+  music: { title: string; src: string } | null;
 };
 
-const FRESH: SessionState = { step: 'opening', emotion: null, path: null, checkins: [], practiceSeconds: 0 };
+const FRESH: SessionState = { step: 'opening', emotion: null, path: null, checkins: [], practiceSeconds: 0, music: null };
 let state: SessionState = FRESH;
 const listeners = new Set<() => void>();
 
@@ -39,6 +40,7 @@ export const session = {
   get practiceSeconds() { return state.practiceSeconds; },
   advancePractice: (seconds: number) => set({ practiceSeconds: state.practiceSeconds + seconds }),
   reset: () => set(FRESH),
+  chooseMusic: (music: { title: string; src: string }) => set({ music }),
   go: (step: Step) => set({ step }),
   pickEmotion: (emotion: Emotion) => set({ emotion, step: 'response' }),
   /** Meditate flow (§task2): record the arrival (if any) and go straight to the

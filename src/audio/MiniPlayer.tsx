@@ -27,7 +27,7 @@ export default function MiniPlayer() {
 
 function MiniBar() {
   const { playing, hasSource, error } = useAudio();
-  const { path } = useSessionState();
+  const { path, music } = useSessionState();
   const b = useBreath();
   const unavailable = !hasSource || error;
 
@@ -46,7 +46,7 @@ function MiniBar() {
     <div
       role="button"
       tabIndex={0}
-      aria-label={`${pathTitle(path)} — open player`}
+      aria-label={`${music?.title ?? pathTitle(path)} — open player`}
       onClick={expand}
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && expand()}
       className="glass glass-strong mini-in"
@@ -85,7 +85,7 @@ function MiniBar() {
           className="serif"
           style={{ fontSize: 'var(--t-md)', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
         >
-          {pathTitle(path)}
+          {music?.title ?? pathTitle(path)}
         </div>
         <div className="eyebrow" style={{ marginTop: 1 }}>
           {playing ? 'Playing' : 'Paused'}

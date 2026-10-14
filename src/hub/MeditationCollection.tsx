@@ -18,6 +18,10 @@ export default function MeditationCollection() {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('Meditation');
   const entries = [
+    ...[
+      { id: 'water-rests', title: 'Where the Water Rests', detail: 'Calm & stillness · Music only', src: '/audio/where-the-water-rests.mp3' },
+      { id: 'softer-moment', title: 'A Softer Moment', detail: 'Relax & unwind · Soft ambient piano', src: '/audio/a-softer-moment.mp3' },
+    ].map(track => ({ ...track, group: 'Meditation', open: () => { programme.clearActiveDay(); session.reset(); session.chooseMusic(track); session.pickPath('stay-5'); app.setView('session'); } })),
     ...PATHS.map(path => ({ id: `path:${path.id}`, title: path.title, group: 'Meditation', detail: `${path.duration} suggested sitting · on-screen prompts and music`, open: () => { programme.clearActiveDay(); session.reset(); session.pickPath(path.id); app.setView('session'); } })),
     ...PROGRAMMES.filter(p => !p.comingSoon).map(p => ({ id: `programme:${p.id}`, title: p.title, group: 'Programmes', detail: `${p.days.length} days · ${p.blurb}`, open: () => programme.open(p.id) })),
     ...SLEEP_ITEMS.filter(item => item.src).map(item => ({ id: item.id, title: item.title, group: 'Sleep & sound', detail: `${item.kind}${item.length ? ` · ${item.length}` : ''}`, open: () => { programme.clearActiveDay(); openSleep(item); } })),
