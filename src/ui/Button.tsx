@@ -14,16 +14,16 @@ export default function Button({
   ...rest
 }: { variant?: Variant; children: ReactNode } & ButtonHTMLAttributes<HTMLButtonElement>) {
   const base =
-    'inline-flex items-center justify-center min-h-[52px] px-8 select-none font-medium transition-[transform,box-shadow,opacity] duration-300 active:scale-[0.97]';
+    'inline-flex items-center justify-center min-h-[44px] px-4 py-2.5 text-sm leading-normal select-none font-medium transition-[background-color,opacity] duration-150';
   const styles: React.CSSProperties =
     variant === 'primary'
       ? {
-          background: 'linear-gradient(180deg, #F0D6AA, var(--gold-deep))',
+          background: 'var(--gold)',
           color: '#11242d',
-          borderRadius: 999,
-          boxShadow: '0 10px 30px rgba(232,201,155,0.28), inset 0 1px 0 rgba(255,255,255,0.5)',
+          borderRadius: 12,
+          border: '1px solid var(--gold)',
         }
-      : { color: 'var(--ink-muted)', background: 'transparent', borderRadius: 999 };
+      : { color: 'var(--ink-muted)', background: 'transparent', borderRadius: 12 };
   return (
     <button
       className={`${base} ${variant === 'ghost' ? 'hover:opacity-80' : 'hover:brightness-[1.04]'} ${className}`}

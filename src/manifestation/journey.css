@@ -11,7 +11,7 @@
 .journey-row > span:nth-child(2) { flex: 1; }
 .journey-row small { display: block; color: var(--gold); text-transform: uppercase; letter-spacing: .12em; }
 .journey-number { color: var(--gold); font-size: 18px; }
-.journey-button { display: inline-block; padding: 12px 18px; border: 1px solid var(--gold); border-radius: 16px; margin: 6px 6px 6px 0; color: var(--ink); }
+.journey-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; max-width: 100%; padding: 10px 16px; font-family: var(--font-ui); font-size: 14px; font-weight: 500; line-height: 1.5; border: 1px solid var(--gold); border-radius: 12px; margin: 6px 6px 6px 0; color: var(--ink); transition: background-color .16s ease, border-color .16s ease; }
 .journey-label { display: block; margin: 18px 0; }
 .journey-label input, .journey-label textarea { display: block; width: 100%; background: rgba(120,140,150,.1); color: var(--ink); border: 1px solid var(--ink-muted); border-radius: 12px; padding: 12px; margin-top: 8px; }
 .journey-label textarea { min-height: 140px; resize: vertical; }
@@ -21,7 +21,7 @@
 .vision-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
 .vision-card { border: 1px solid var(--ink-muted); border-radius: 16px; overflow: hidden; padding: 12px; overflow-wrap: anywhere; }
 .vision-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; }
-.journey-button:disabled { opacity: .5; cursor: wait; }
+.journey-button:disabled { opacity: .5; cursor: not-allowed; }
 .journey-label select { display: block; width: 100%; padding: 12px; margin-top: 8px; border-radius: 12px; background: var(--surface, #19303d); color: var(--ink); border: 1px solid var(--ink-muted); }
 .water-lesson h4 { font-size: 1.15rem; font-weight: 600; margin: 28px 0 12px; line-height: 1.4; }
 .water-lesson h3 { margin-top: 24px; font-size: 1.5rem; line-height: 1.3; }
@@ -68,7 +68,7 @@
 
 /* Calm entry points; full exercises remain available behind explicit disclosures. */
 .journey-disclosure { margin: 16px 0; border: 1px solid rgba(232,201,155,.22); border-radius: 18px; padding: 16px; background: var(--glass-bg); }
-.journey-disclosure > summary { cursor: pointer; color: var(--ink); font-weight: 600; min-height: 32px; }
+.journey-disclosure > summary { cursor: pointer; color: var(--ink); font-weight: 600; min-height: 44px; align-content: center; }
 .journey-disclosure > summary small { display: block; font-weight: 400; color: var(--ink-muted); margin-top: 6px; }
 .journey-disclosure[open] > summary { margin-bottom: 20px; }
 .journey-primary { background: var(--gold); color: #14232c; font-weight: 600; }
@@ -109,3 +109,18 @@
 
 /* Selected practice stage remains above passive save feedback in the hierarchy. */
 .journey-page nav[aria-label="Practice stages"] .journey-button[aria-pressed="true"] { background: rgba(232,201,155,.14); color: var(--gold); font-weight: 600; }
+
+/* Home offers three equal entry points; no card receives a special accent. */
+.home-page { display: flex; flex-direction: column; gap: 12px; padding: 16px 0 20px; }
+.home-page header h1 { margin: 8px 0 6px; font-size: clamp(28px, 6vw, 36px); }
+.home-page > .journey-card { margin: 0; padding: 18px; border-radius: 16px; background: var(--bg-deep); border: 1px solid var(--hairline); box-shadow: none; }
+.home-page .eyebrow, .home-page .daily-affirmation h2 { color: var(--ink-muted); font-size: 11px; line-height: 1.5; font-weight: 500; letter-spacing: .1em; margin: 0 0 8px; }
+.home-page h2.serif, .home-page .daily-affirmation-text { font-size: 22px; font-weight: 500; line-height: 1.35; margin: 0 0 8px; }
+.home-page p:not(.daily-affirmation-text) { font-size: 14px; line-height: 1.5; color: var(--ink-muted); margin: 0 0 12px; }
+.home-page .journey-button { margin: 0; }
+.home-page [role="status"] { margin-top: 12px !important; margin-bottom: 0 !important; }
+
+@media (hover: hover) {
+  .journey-button:not(:disabled):hover { background: rgba(232,201,155,.12); }
+  .journey-primary:not(:disabled):hover { background: var(--gold-deep); }
+}

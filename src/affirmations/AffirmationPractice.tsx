@@ -31,7 +31,7 @@ function Practice({ owner, day }: { owner: string; day: string }) {
   const [count, setCount] = useState(saved.count);
   const choose = (text: string) => { update(text, 0); };
   return <div className="screen"><main className="journey-page">
-    <button className="journey-button" onClick={() => hub.setTab('home')}>← Back to Today</button>
+    <button className="journey-button" onClick={() => hub.setTab('home')}>← Back to Home</button>
     <div className="eyebrow">Affirmations · Free</div>
     <h1 className="serif">Words to return to.</h1>
     <p>One affirmation. Three slow repetitions. One small action.</p>
@@ -47,6 +47,6 @@ function Practice({ owner, day }: { owner: string; day: string }) {
       {affirmations.filter(item => item.theme === theme).map(item => <button key={item.text} className="journey-row" aria-pressed={chosen === item.text} onClick={() => choose(item.text)}>{item.text}{chosen === item.text ? ' ✓' : ''}</button>)}
       <button className="journey-button" onClick={() => choose(daily.text)}>Use today’s affirmation</button>
     </details>
-    <PracticeReminder title="My affirmation practice" action={`Repeat slowly: ${chosen}`} prompt="Pause, repeat your words and choose one small action." location="Today → Practise this affirmation" label="Remind me to practise" />
+    <PracticeReminder title="My affirmation practice" action={`Repeat slowly: ${chosen}`} prompt="Pause, repeat your words and choose one small action." location="Home → Practice Affirmation" label="Remind me to practise" />
   </main></div>;
 }

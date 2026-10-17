@@ -17,7 +17,7 @@ const ProfileTab = lazy(() => import('./tabs/ProfileTab'));
 const AffirmationPractice = lazy(() => import('../affirmations/AffirmationPractice'));
 
 const TABS: TabItem[] = [
-  { id: 'home', label: 'Today', Icon: Home },
+  { id: 'home', label: 'Home', Icon: Home },
   { id: 'manifest', label: 'Manifest', Icon: Sparkles },
   { id: 'library', label: 'Meditate', Icon: Library },
   { id: 'journal', label: 'Journal', Icon: PenLine },
@@ -38,13 +38,13 @@ export default function Hub() {
   const padBottom = immersive ? 24 : active && collapsed ? 168 : 104;
   return (
     <div style={{ minHeight: '100%', paddingBottom: padBottom }}>
-      <Suspense fallback={<div className="screen" />}>
+      <Suspense fallback={<div className="screen"><p role="status" className="eyebrow">Loading your space…</p></div>}>
         <motion.div
           key={tab}
           className="min-h-full"
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduce ? 0.001 : 0.42, ease: [0.22, 0.61, 0.36, 1] }}
+          transition={{ duration: reduce ? 0 : 0.2, ease: [0.22, 0.61, 0.36, 1] }}
         >
           {tab === 'home' && <HomeTab />}
           {tab === 'manifest' && <ManifestTab onImmersiveChange={setManifestImmersive} />}
@@ -56,7 +56,7 @@ export default function Hub() {
           {tab === 'profile' && <ProfileTab />}
         </motion.div>
       </Suspense>
-      {!immersive && <TabBar items={TABS} active={tab} onChange={(id) => hub.setTab(id as TabId)} />}
+      {!immersive && <TabBar items={TABS} active={tab === 'affirmations' ? 'home' : tab} onChange={(id) => hub.setTab(id as TabId)} />}
     </div>
   );
 }

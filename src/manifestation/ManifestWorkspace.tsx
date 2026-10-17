@@ -7,8 +7,8 @@ import FoundationSession from './FoundationSession';
 import { foundationDays, nextFoundationDay } from './foundationDays';
 import WaterWorkbook from './WaterWorkbook';
 import VisionBoard from './VisionBoard';
-import WaterCourse from './WaterCourse';
-import GoalWorkflow from './GoalWorkflow';
+import WaterCourse from './WaterWorkshop';
+import GoalWorkflow from './GoalPlan';
 import Plans, { PlusBadge, PremiumPreview } from '../membership/Plans';
 import { useAuth } from '../lib/auth';
 import { useAccountCloud } from '../lib/accountCloud';
@@ -34,6 +34,7 @@ export default function ManifestWorkspace({ onImmersiveChange }: { onImmersiveCh
   if (section !== null) return <div className="screen"><main className="journey-page">
     <button className="journey-button" onClick={() => setSection(null)}>← Back to Manifest</button>
     <div className="eyebrow">Manifest · {section === 'goal' ? 'My goal plan' : section === 'water' ? 'Water workshop' : 'Vision board'}</div>
+    <h1 className="serif">{section === 'goal' ? 'My goal plan' : section === 'water' ? 'Manifesting Through Water™' : 'My vision board'}</h1>
     {section !== 'water' && <p className="journey-muted">Save before leaving this exercise.</p>}
     <PremiumPreview>
       {section === 'goal' && <GoalWorkflow />}

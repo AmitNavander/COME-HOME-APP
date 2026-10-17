@@ -25,10 +25,9 @@
   --t-xl: 1.8rem;
   --t-2xl: 2.4rem;
 
-  /* Editorial display serif (§Phase C) — Fraunces (OFL), loaded in index.html.
-     Optical sizing on the .serif classes lifts titles at large sizes. */
-  --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+  /* One family for headings, body copy and controls. */
   --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-ui); /* Compatibility alias for existing display classes. */
 
   --radius-card: 16px;
   --radius-chip: 14px;
@@ -74,12 +73,12 @@ body {
 /* ---- Typography helpers ---- */
 .serif {
   font-family: var(--font-serif);
-  font-weight: 300;
+  font-weight: 500;
   font-optical-sizing: auto;
 }
 .serif-italic {
   font-family: var(--font-serif);
-  font-weight: 300;
+  font-weight: 400;
   font-style: italic;
   font-optical-sizing: auto;
 }
@@ -578,10 +577,10 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 160px;
+  height: calc(92px + var(--safe-bottom));
   z-index: 49;
   pointer-events: none;
-  background: linear-gradient(180deg, transparent 0%, rgba(5, 13, 18, 0.5) 46%, rgba(5, 13, 18, 0.8) 72%, rgba(4, 11, 16, 0.94) 100%);
+  background: linear-gradient(180deg, transparent, var(--bg-deep) 20%);
 }
 /* Minimalist floating nav: no container, just the four options over the scroll-edge
    scrim. The active option lights up gold with a soft glow; a dark drop-shadow keeps
@@ -593,6 +592,8 @@ body {
   max-width: 420px;
   gap: 2px;
   padding: 4px 8px;
+  background: var(--bg-deep);
+  border-top: 1px solid var(--hairline);
 }
 .tabbar-btn {
   flex: 1;
@@ -619,6 +620,13 @@ body {
 .tabbar-btn:active {
   transform: scale(0.96);
 }
+
+button, input, textarea, select { font-family: var(--font-ui); }
+button:not(:disabled), summary { cursor: pointer; }
+:is(button, a, input, textarea, select, summary):focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+button:disabled { cursor: not-allowed; }
+html { scroll-padding-bottom: calc(110px + var(--safe-bottom)); }
+.information-body summary { min-height: 44px; padding: 10px 0; cursor: pointer; }
 
 /* ============================================================
    BREATHE — living orb + per-phase counter (§6)

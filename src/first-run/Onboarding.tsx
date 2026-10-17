@@ -10,7 +10,7 @@ import '../manifestation/journey.css';
 const options: { id: EntryChoice; title: string; text: string }[] = [
   { id: 'meditate', title: 'I want to meditate', text: 'Find calm, breathe, rest and explore the meditation library.' },
   { id: 'manifest', title: 'I want to manifest', text: 'Build clarity through intention, visualization and practical action. Begin with a guided foundation.' },
-  { id: 'both', title: 'I want to explore both', text: 'See two clearly separated paths on Today and choose what you need each day.' },
+  { id: 'both', title: 'I want to explore both', text: 'See two clearly separated paths on Home and choose what you need each day.' },
 ];
 export default function Onboarding() {
   const { user, loading } = useAuth();

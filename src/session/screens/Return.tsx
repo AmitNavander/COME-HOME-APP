@@ -1,6 +1,5 @@
 import Button from '../../ui/Button';
 import Reveal from '../../ui/Reveal';
-import ReflectionPrompt from '../../ui/ReflectionPrompt';
 
 /** §6.7 Return — the soft landing. */
 export default function Return({ onExit }: { onExit: () => void }) {
@@ -8,9 +7,9 @@ export default function Return({ onExit }: { onExit: () => void }) {
     <div className="screen items-center justify-center text-center">
       <div className="mx-auto flex w-full max-w-md flex-col items-center">
         <Reveal delay={0.1}>
-          <h2 className="serif" style={{ fontSize: 'var(--t-2xl)' }}>
+          <h1 className="serif" style={{ fontSize: 'var(--t-2xl)' }}>
             You came home to yourself.
-          </h2>
+          </h1>
         </Reveal>
         <Reveal delay={0.35}>
           <p className="serif" style={{ color: 'var(--gold)', marginTop: 10, fontSize: 'var(--t-lg)' }}>
@@ -22,10 +21,7 @@ export default function Return({ onExit }: { onExit: () => void }) {
             Take what you need into the rest of your day.
           </p>
         </Reveal>
-        <Reveal delay={0.7} className="mt-9 w-full">
-          <ReflectionPrompt />
-        </Reveal>
-        <Reveal delay={0.95} className="mt-8">
+        <Reveal delay={0.2} className="mt-8">
           <Button onClick={onExit}>Finish meditation</Button>
         </Reveal>
       </div>

@@ -29,7 +29,7 @@ export default function DailyAffirmation() {
     <h2 id="daily-affirmation-heading" className="eyebrow">Today’s affirmation</h2>
     <p className="serif daily-affirmation-text">{daily.text}</p>
     <p className="journey-muted">{daily.theme} · Repeat slowly, aloud or within. Let the words guide your day.</p>
-    <button className="journey-button" onClick={() => hub.setTab('affirmations')}>{complete ? "Practised today · Repeat again" : "Practise this affirmation"}</button>
+    <button className="journey-button journey-primary" onClick={() => hub.setTab('affirmations')}>Practice Affirmation</button>
     {complete && <p role="status">You made time for your words today. Tomorrow brings a new affirmation.</p>}
   </section>;
 }
