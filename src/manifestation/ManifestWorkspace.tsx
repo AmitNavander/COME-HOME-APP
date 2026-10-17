@@ -1,5 +1,7 @@
 import { readResume } from './practiceProgress';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
+import { ArrowUpRight, BookOpen, Check, Compass, Droplets, Image, X } from 'lucide-react';
 import { app } from '../store/app';
 import { useJourney } from './journeyStore';
 import './journey.css';
@@ -9,17 +11,14 @@ import WaterWorkbook from './WaterWorkbook';
 import VisionBoard from './VisionBoard';
 import WaterCourse from './WaterWorkshop';
 import GoalWorkflow from './GoalPlan';
-import Plans, { PlusBadge, PremiumPreview } from '../membership/Plans';
-import { useAuth } from '../lib/auth';
-import { useAccountCloud } from '../lib/accountCloud';
+import { PLUS_FEATURES, PremiumPreview } from '../membership/Plans';
 import { openGuidedJournal } from '../journal/context';
 
 const waterDays = ['Sacred Initiation', 'Water of Clarity', 'Release', 'Emotional Healing', 'Gratitude', 'Forgiveness', 'Purification Ceremony', 'Intention', 'Voice Imprinting', 'Belief', 'Visualization', 'Embodied Feeling', 'Aligned Action', 'Prosperity Flow', 'Receiving', 'Trust', 'Surrender', 'Expansion', 'Synchronicity', 'Integration', 'Become'];
 
 export default function ManifestWorkspace({ onImmersiveChange }: { onImmersiveChange?: (immersive: boolean) => void }) {
   const { data } = useJourney();
-  const { user } = useAuth();
-  const cloud = useAccountCloud();
+  const [overlay, setOverlay] = useState<'guide' | 'plus' | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
   const [resumeWaterDay, setResumeWaterDay] = useState<number | null>(null);
   const resume = readResume(data);
@@ -46,20 +45,41 @@ export default function ManifestWorkspace({ onImmersiveChange }: { onImmersiveCh
     <div className="eyebrow">Manifest</div><h1 className="serif">What are you ready to create?</h1>
     <p>Choose one goal. Take one small step.</p>
     {resume && <section className="journey-card journey-hero"><div className="eyebrow">Continue where you left off</div><h2 className="serif">{resume.kind === 'water' ? 'Water workshop' : 'Foundation'} · Day {resume.day + 1}</h2><button className="journey-button journey-primary" onClick={() => { if (resume.kind === 'foundation') setSelected(resume.day); else { setResumeWaterDay(resume.day); setSection('water'); } }}>Continue my practice →</button></section>}
-    <details className="journey-disclosure"><summary>New here? Your manifestation guide</summary><ManifestGuide /></details>
+    <button className="manifest-guide-link" onClick={() => setOverlay('guide')}><BookOpen size={18} aria-hidden="true" /><span>Manifestation guide</span><ArrowUpRight size={16} aria-hidden="true" /></button>
     <section className="journey-card"><div className="eyebrow">Free · seven-day reflection journey</div><h2 className="serif">Your next practice</h2>
       <p>Seven days of reflection and practical action, at your pace.</p>
-      <progress aria-label="Foundation progress" max={7} value={data.completed.length} /><p>{data.completed.length} of 7 completed</p>
+      <div className="manifest-progress">
+        <div className="manifest-progress-caption"><span>Your foundation</span><span>{foundationDays.filter((_, i) => data.completed.includes(i)).length} / 7 complete</span></div>
+        <ol className="manifest-days" aria-label="Seven-day foundation progress">{foundationDays.map((day, i) => <li key={day.title}><button className={data.completed.includes(i) ? 'is-complete' : ''} aria-current={nextDay === i ? 'step' : undefined} aria-label={`Day ${i + 1}: ${day.title}, ${data.completed.includes(i) ? 'completed' : nextDay === i ? 'next practice' : 'not completed'}`} onClick={() => setSelected(i)}><span>{data.completed.includes(i) ? <Check size={16} aria-hidden="true" /> : i + 1}</span><small>Day {i + 1}</small></button></li>)}</ol>
+      </div>
       {nextDay !== null ? <button className="journey-button journey-primary" onClick={() => setSelected(nextDay)}>Continue day {nextDay + 1} · {foundationDays[nextDay].title}</button> : <p role="status">Your foundation week is complete. Revisit any day below.</p>}
       <details className="journey-disclosure"><summary>View all 7 foundation days</summary>{foundationDays.map(({title, minutes}, i) => <button className="journey-row" key={title} onClick={() => setSelected(i)}><span className="journey-number">{i + 1}</span><span>Day {i + 1} · {title}<small>{minutes} min · {data.completed.includes(i) ? 'Completed' : data.answers[String(i)] ? 'Draft saved' : 'Ready when you are'}</small></span><span aria-hidden>{data.completed.includes(i) ? '✓' : '→'}</span></button>)}</details>
     </section>
-    <h2 className="serif">Choose your next journey</h2>
-    <button className="journey-row" onClick={() => setSection('goal')}><span>My goal plan <PlusBadge /><small>Define → Visualize → Act → Review</small></span></button>
-    <button className="journey-row" onClick={() => { setResumeWaterDay(null); setSection('water'); }}><span>Manifesting Through Water™ <PlusBadge /><small>A guided written workshop · 21 days</small></span></button>
-    <button className="journey-row" onClick={() => setSection('vision')}><span>My vision board <PlusBadge /><small>Create images of the direction you choose</small></span></button>
-    <button className="journey-button" onClick={() => openGuidedJournal('manifestation')}>Reflect on my manifestation practice</button>
-    <details className="journey-disclosure"><summary>More resources and plans</summary><button className="journey-button" onClick={() => app.setView('manifestation')}>Open foundation practice library</button><Plans /></details>
-    <p className="journey-muted">{!user.isGuest && cloud.enabled ? 'Your saved journey follows your private account.' : 'Your saved journey stays on this device, including on shared devices. Turn on private account saving from You to use it across devices.'} Practices support reflection and action, not guaranteed outcomes.</p>
+    <section className="manifest-journeys" aria-labelledby="journey-heading">
+      <div className="manifest-section-heading"><div className="eyebrow">Explore at your pace</div><h2 id="journey-heading">Choose your journey</h2><p>Three ways to turn intention into a daily practice.</p></div>
+      <div className="manifest-journey-grid">
+        {[
+          { id: 'goal' as const, title: 'My goal plan', detail: 'Give your intention a clear direction, then make space for one meaningful action.', meta: 'Plan · Visualize · Act · Review', Icon: Compass },
+          { id: 'water' as const, title: 'Manifesting Through Water™', detail: 'A guided written workshop with daily rituals, reflection and practical steps.', meta: '21 days · Guided workshop', Icon: Droplets },
+          { id: 'vision' as const, title: 'My vision board', detail: 'Bring your direction into view with images, words and a personal wallpaper.', meta: 'Create · Collect · Revisit', Icon: Image },
+        ].map(({ id, title, detail, meta, Icon }) => <button key={id} className="manifest-journey-card" onClick={() => { if (id === 'water') setResumeWaterDay(null); setSection(id); }}>
+          <span className="manifest-card-top"><Icon size={24} strokeWidth={1.5} aria-hidden="true" /><span className="manifest-plus-label">COME HOME PLUS</span></span>
+          <span className="manifest-card-title">{title}</span><span className="manifest-card-description">{detail}</span>
+          <span className="manifest-card-bottom"><span>{meta}</span><ArrowUpRight size={18} aria-hidden="true" /></span>
+        </button>)}
+      </div>
+    </section>
+    <button className="manifest-reflect" onClick={() => openGuidedJournal('manifestation')}>Reflect on my practice <ArrowUpRight size={18} aria-hidden="true" /></button>
+    <button className="manifest-plus-entry" onClick={() => setOverlay('plus')}><span><span className="eyebrow">Come Home Plus</span><strong>More space to explore.</strong><span>Discover the journeys and what’s included</span></span><ArrowUpRight size={22} aria-hidden="true" /></button>
+    {overlay && <ManifestDialog title={overlay === 'guide' ? 'Your manifestation guide' : 'Come Home Plus'} onClose={() => setOverlay(null)}>
+      {overlay === 'guide' ? <ManifestGuide /> : <div className="manifest-plus-content">
+        <div className="eyebrow">A deeper daily practice</div><h2>Make room for what matters.</h2><p>Build on your foundation with tools for clarity, creativity and consistent action.</p>
+        <ul>{PLUS_FEATURES.map((feature, i) => <li key={feature}><span className="manifest-benefit-number">0{i + 1}</span><span>{feature}</span></li>)}</ul>
+        <div className="manifest-access"><strong>Included during early access</strong><p>Explore these journeys without charge. Membership pricing will be announced before launch.</p></div>
+        <button className="journey-button journey-primary" onClick={() => { setOverlay(null); document.getElementById('journey-heading')?.scrollIntoView({ block: 'start' }); }}>Explore the journeys</button>
+        <button className="manifest-library-link" onClick={() => { setOverlay(null); app.setView('manifestation'); }}>Open free foundation library <ArrowUpRight size={16} aria-hidden="true" /></button>
+      </div>}
+    </ManifestDialog>}
   </main></div>;
 }
 
@@ -84,3 +104,18 @@ function ManifestGuide() {
   </div>;
 }
 
+
+function ManifestDialog({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+  useEffect(() => {
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const modal = ref.current;
+    modal?.showModal();
+    return () => { modal?.close(); opener?.focus({ preventScroll: true }); };
+  }, []);
+  return createPortal(<dialog ref={ref} className="information-dialog manifest-dialog" aria-labelledby={titleId} onCancel={onClose} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+    <div className="manifest-dialog-toolbar"><h1 id={titleId}>{title}</h1><button autoFocus aria-label={`Close ${title}`} onClick={onClose}><X size={20} /></button></div>
+    <div className="manifest-dialog-body">{children}</div>
+  </dialog>, document.body);
+}

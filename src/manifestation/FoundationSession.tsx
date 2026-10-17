@@ -4,13 +4,9 @@ import { RESUME_KEY } from './practiceProgress';
 import PracticeReminder from './PracticeReminder';
 import { foundationDays } from './foundationDays';
 import { getJourneySnapshot, useJourney } from './journeyStore';
-import { useAuth } from '../lib/auth';
-import { useAccountCloud } from '../lib/accountCloud';
 
 export default function FoundationSession({ day, onClose }: { day: number; onClose: () => void }) {
   const { data, save } = useJourney();
-  const { user } = useAuth();
-  const cloud = useAccountCloud();
   const lesson = foundationDays[day];
   const [reflection, setReflection] = useState(data.answers[String(day)] || '');
   const [evening, setEvening] = useState(data.answers[`evening:${day}`] || '');
@@ -55,7 +51,6 @@ export default function FoundationSession({ day, onClose }: { day: number; onClo
       </div>
 
     </form>
-    <p className="journey-muted">{!user.isGuest && cloud.enabled ? 'Your saved writing follows your private account.' : 'Your saved writing stays on this device. Turn on account saving from You if you want it across devices.'}</p>
   </main></div>;
 }
 
