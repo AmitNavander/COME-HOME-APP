@@ -1,11 +1,6 @@
-/**
- * Crisis-support resources (§6.6). Placeholder + data-driven — reads as a neutral
- * placeholder, never a medical claim (§15). Real numbers/links drop in here later.
- */
-export type Resource = { id: string; label: string; detail: string; href?: string };
-
+/** Support resources verified with the helpline directory on 17 October 2026. */
+export type Resource = { id: string; label: string; detail: string; href: string };
 export const CRISIS_RESOURCES: Resource[] = [
-  { id: 'talk', label: 'Talk to someone now', detail: 'Placeholder — a crisis line will be listed here.' },
-  { id: 'text', label: 'Text support', detail: 'Placeholder — a text support line will be listed here.' },
-  { id: 'local', label: 'Find local help', detail: 'Placeholder — local resources will be listed here.' },
+  { id: 'talk', label: 'Call Tele-MANAS · 14416', detail: 'India · Free mental health support, available 24/7. Opens your phone app.', href: 'tel:+9114416?oai_link_source=model_response_hotline' },
+  { id: 'website', label: 'Visit Tele-MANAS', detail: 'Learn about the service on its official website. Opens in a new tab.', href: 'https://telemanas.mohfw.gov.in/home?oai_link_source=model_response_hotline' },
 ];

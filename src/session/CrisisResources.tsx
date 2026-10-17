@@ -1,49 +1,57 @@
-import { useEffect } from 'react';
+import { useEffect, useId, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Button from '../ui/Button';
 import { CRISIS_RESOURCES } from '../data/resources';
 
-/** §6.6 soft, opt-in crisis-support panel. Never alarmist, always dismissible.
- *  Content is a neutral placeholder, data-driven (§15). */
+/** Native modal keeps focus inside, above transformed session transitions. */
 export default function CrisisResources({ onClose }: { onClose: () => void }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const modal = dialog.current;
+    modal?.showModal();
+    return () => {
+      modal?.close();
+      opener?.focus();
+    };
+  }, []);
 
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Support options"
-      style={{ position: 'fixed', inset: 0, zIndex: 20, display: 'flex' }}
+  return createPortal(
+    <dialog
+      ref={dialog}
+      className="information-dialog"
+      aria-labelledby={titleId}
+      onCancel={onClose}
+      onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}
+      style={{ maxWidth: 448 }}
     >
-      <div
-        onClick={onClose}
-        aria-hidden
-        style={{ position: 'absolute', inset: 0, background: 'rgba(4,12,17,0.6)', backdropFilter: 'blur(6px)' }}
-      />
-      <div className="mx-auto my-auto w-full max-w-md" style={{ position: 'relative', padding: '0 22px' }}>
-        <div className="glass" style={{ padding: 22 }}>
-          <div className="eyebrow">Support options</div>
-          <p className="serif" style={{ fontSize: 'var(--t-lg)', marginTop: 6 }}>
-            You don't have to hold this alone.
-          </p>
-          <div className="mt-4 flex flex-col gap-3">
-            {CRISIS_RESOURCES.map((r) => (
-              <div key={r.id} className="glass" style={{ padding: '14px 16px' }}>
-                <div style={{ color: 'var(--ink)', fontSize: 'var(--t-md)' }}>{r.label}</div>
-                <div style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-sm)', marginTop: 2 }}>{r.detail}</div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-5 flex justify-center">
-            <Button variant="ghost" onClick={onClose}>
-              I'm okay for now
-            </Button>
-          </div>
+      <div style={{ padding: 22 }}>
+        <h2 id={titleId} className="eyebrow">Support options</h2>
+        <p style={{ fontSize: 'var(--t-lg)', marginTop: 6 }}>You don't have to hold this alone.</p>
+        <p style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-sm)', marginTop: 10 }}>
+          These services are for people in India. If you are elsewhere, contact a local healthcare professional or a support service in your country.
+        </p>
+        <div className="mt-4 flex flex-col gap-3">
+          {CRISIS_RESOURCES.map((resource) => (
+            <a
+              key={resource.id}
+              href={resource.href}
+              target={resource.href.startsWith('https:') ? '_blank' : undefined}
+              rel={resource.href.startsWith('https:') ? 'noopener noreferrer' : undefined}
+              className="glass focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+              style={{ display: 'block', padding: '14px 16px', minHeight: 44, outlineColor: 'var(--gold)' }}
+            >
+              <span style={{ color: 'var(--gold)', fontSize: 'var(--t-md)' }}>{resource.label}</span>
+              <span style={{ display: 'block', color: 'var(--ink-muted)', fontSize: 'var(--t-sm)', marginTop: 4 }}>{resource.detail}</span>
+            </a>
+          ))}
+        </div>
+        <div className="mt-5 flex justify-center">
+          <Button variant="ghost" onClick={onClose}>Close support options</Button>
         </div>
       </div>
-    </div>
+    </dialog>,
+    document.body,
   );
 }
