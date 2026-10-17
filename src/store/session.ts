@@ -43,9 +43,9 @@ export const session = {
   chooseMusic: (music: { title: string; src: string }) => set({ music }),
   go: (step: Step) => set({ step }),
   pickEmotion: (emotion: Emotion) => set({ emotion, step: 'response' }),
-  /** Check-in records a feeling, not a meditation choice. Let the user choose
-   *  their practice before opening the player. */
-  beginMeditation: (emotion: Emotion | null) => set({ emotion, path: null, music: null, step: 'response', practiceSeconds: 0 }),
+  /** Open the selected feeling's practice directly in the music player. */
+  beginMeditation: (emotion: Emotion | null, music: SessionState['music'] = null) =>
+    set({ emotion, path: music ? 'stay-5' : 'grounding-2', music, step: 'music', practiceSeconds: 0, checkins: [] }),
   pickPath: (path: PathId) => set({ path, step: 'support', practiceSeconds: 0 }),
   /** Record a check-in privately. Does NOT advance — the screen may reveal the
    *  soft crisis row first (§6.6), then the user chooses to continue. */

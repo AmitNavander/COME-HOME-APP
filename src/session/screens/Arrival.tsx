@@ -5,6 +5,8 @@ import GradientIcon from '../../ui/GradientIcon';
 import { session, type Emotion } from '../../store/session';
 import { FEELINGS } from '../../data/feelings';
 import { saveLastArrival } from '../../lib/storage';
+import { FEELING_FLOWS, flowTrackSrc } from '../../data/flows';
+import { audioControls, SESSION_AUDIO } from '../../audio/audioStore';
 
 /** §6.2 Arrival — meet the person where they are. The six felt-states as the same
  *  tiles the Support grid uses; tap one or several, then Begin (§task2). */
@@ -13,11 +15,16 @@ export default function Arrival({ onExit }: { onExit: () => void }) {
   const toggle = (id: Emotion) =>
     setSelected((s) => (s.includes(id) ? [] : [id]));
 
-  // Record the optional check-in, then ask which meditation the user wants.
+  // Start audio inside the button gesture so mobile autoplay policies allow it.
   const begin = () => {
     const primary = selected[0] ?? null;
     if (primary) saveLastArrival(primary);
-    session.beginMeditation(primary);
+    const practice = FEELING_FLOWS.find((entry) => entry.id === primary)?.practice;
+    const music = practice ? { title: practice.title, src: flowTrackSrc(practice.track) } : null;
+    audioControls.stop();
+    audioControls.ensureLoaded(music?.src ?? SESSION_AUDIO.musicTrack, { loop: !!music });
+    session.beginMeditation(primary, music);
+    void audioControls.play();
   };
 
   return (
@@ -28,7 +35,7 @@ export default function Arrival({ onExit }: { onExit: () => void }) {
             How are you arriving today?
           </h2>
           <p style={{ color: 'var(--ink-muted)', marginTop: 6, fontSize: 'var(--t-md)' }}>
-            Choose one feeling, or skip this check-in. Next, choose your meditation.
+            Choose a feeling to begin a meditation for this moment, or skip to a grounding practice.
           </p>
         </Reveal>
 
@@ -54,7 +61,7 @@ export default function Arrival({ onExit }: { onExit: () => void }) {
         </Reveal>
 
         <Reveal delay={0.5} className="mt-8 flex flex-col items-center gap-4">
-          <Button onClick={begin}>{selected.length ? "Choose my meditation" : "Skip check-in and choose"}</Button>
+          <Button onClick={begin}>{selected.length ? "Begin Meditation" : "Skip and Begin"}</Button>
           <Button variant="ghost" onClick={onExit}>
             Browse meditations
           </Button>
