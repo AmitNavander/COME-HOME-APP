@@ -14,10 +14,10 @@ export default function Response({ onExit }: { onExit: () => void }) {
         </Reveal>
         <Reveal delay={0.22}>
           <h2 className="serif" style={{ fontSize: 'var(--t-xl)', marginTop: 18 }}>
-            I'm here with you.
+            Choose your meditation.
           </h2>
           <p style={{ color: 'var(--ink-muted)', marginTop: 6, marginBottom: 26, fontSize: 'var(--t-md)' }}>
-            Let's make this moment smaller.
+            Choose the practice and time that feel right for you.
           </p>
         </Reveal>
 

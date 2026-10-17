@@ -43,14 +43,16 @@ export const session = {
   chooseMusic: (music: { title: string; src: string }) => set({ music }),
   go: (step: Step) => set({ step }),
   pickEmotion: (emotion: Emotion) => set({ emotion, step: 'response' }),
-  /** Meditate flow (§task2): record the arrival (if any) and go straight to the
-   *  player — no duration/support detour. */
-  beginMeditation: (emotion: Emotion | null) => set({ emotion, path: 'grounding-2', step: 'support', practiceSeconds: 0 }),
+  /** Check-in records a feeling, not a meditation choice. Let the user choose
+   *  their practice before opening the player. */
+  beginMeditation: (emotion: Emotion | null) => set({ emotion, path: null, music: null, step: 'response', practiceSeconds: 0 }),
   pickPath: (path: PathId) => set({ path, step: 'support', practiceSeconds: 0 }),
   /** Record a check-in privately. Does NOT advance — the screen may reveal the
    *  soft crisis row first (§6.6), then the user chooses to continue. */
   recordCheckin: (c: Checkin) => set({ checkins: [...state.checkins, c] }),
 };
+
+export const getSessionSnapshot = (): SessionState => state;
 
 /**
  * Soft, opt-in crisis-support reveal (§6.6): "Still struggling" twice in a

@@ -5,7 +5,6 @@ import GradientIcon from '../../ui/GradientIcon';
 import { session, type Emotion } from '../../store/session';
 import { FEELINGS } from '../../data/feelings';
 import { saveLastArrival } from '../../lib/storage';
-import { audioControls, SESSION_AUDIO } from '../../audio/audioStore';
 
 /** §6.2 Arrival — meet the person where they are. The six felt-states as the same
  *  tiles the Support grid uses; tap one or several, then Begin (§task2). */
@@ -14,14 +13,10 @@ export default function Arrival({ onExit }: { onExit: () => void }) {
   const toggle = (id: Emotion) =>
     setSelected((s) => (s.includes(id) ? [] : [id]));
 
-  // Begin: record the first chosen feeling (history's "last arrival" is one),
-  // start the default track on this tap (a user gesture — mobile autoplay), then
-  // open the player. No selection is fine — no presumed feeling.
+  // Record the optional check-in, then ask which meditation the user wants.
   const begin = () => {
     const primary = selected[0] ?? null;
     if (primary) saveLastArrival(primary);
-    audioControls.ensureLoaded(SESSION_AUDIO.musicTrack);
-    void audioControls.play();
     session.beginMeditation(primary);
   };
 
@@ -33,7 +28,7 @@ export default function Arrival({ onExit }: { onExit: () => void }) {
             How are you arriving today?
           </h2>
           <p style={{ color: 'var(--ink-muted)', marginTop: 6, fontSize: 'var(--t-md)' }}>
-            Choose one feeling, or begin without a check-in.
+            Choose one feeling, or skip this check-in. Next, choose your meditation.
           </p>
         </Reveal>
 
@@ -59,7 +54,7 @@ export default function Arrival({ onExit }: { onExit: () => void }) {
         </Reveal>
 
         <Reveal delay={0.5} className="mt-8 flex flex-col items-center gap-4">
-          <Button onClick={begin}>{selected.length ? "Begin a gentle meditation" : "Begin without a check-in"}</Button>
+          <Button onClick={begin}>{selected.length ? "Choose my meditation" : "Skip check-in and choose"}</Button>
           <Button variant="ghost" onClick={onExit}>
             Browse meditations
           </Button>
