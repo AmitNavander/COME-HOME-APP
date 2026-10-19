@@ -3,7 +3,7 @@ import './journey.css';
 import { Bell } from 'lucide-react';
 import { defaultReminderTime, googleCalendarLink, reminderCalendar } from './reminderCalendar';
 
-export default function PracticeReminder({ day, title, action, location = 'Manifest → Foundation', label = 'Set reminder', prompt = 'Take a mindful pause. What is one small action you can practise today?' }: { day?: number; title: string; action: string; location?: string; label?: string; prompt?: string }) {
+export default function PracticeReminder({ standalone = false, day, title, action, location = 'Manifest → Foundation', label = 'Set reminder', prompt = 'Take a mindful pause. What is one small action you can practise today?' }: { standalone?: boolean; day?: number; title: string; action: string; location?: string; label?: string; prompt?: string }) {
   const [expanded, setExpanded] = useState(false);
   const panelId = useId();
   const [start, setStart] = useState(defaultReminderTime);
@@ -37,8 +37,8 @@ export default function PracticeReminder({ day, title, action, location = 'Manif
     } catch (error) { setMessage(error instanceof Error ? error.message : 'Could not prepare the reminder. Please try again.'); }
   }
   return <section className="practice-reminder">
-    <button type="button" className="journey-button reminder-button" aria-expanded={expanded} aria-controls={panelId} onClick={() => setExpanded(value => !value)}><Bell size={18} aria-hidden="true" />{label}<span aria-hidden="true">{expanded ? '−' : '+'}</span></button>
-    <div id={panelId} hidden={!expanded} className="reminder-settings">
+    {!standalone && <button type="button" className="journey-button reminder-button" aria-expanded={expanded} aria-controls={panelId} onClick={() => setExpanded(value => !value)}><Bell size={18} aria-hidden="true" />{label}<span aria-hidden="true">{expanded ? '−' : '+'}</span></button>}
+    <div id={panelId} hidden={!standalone && !expanded} className="reminder-settings">
     <label className="journey-label">First reminder (your local time)<input type="datetime-local" value={start} onChange={e => { setStart(e.target.value); setMessage(''); }} /></label>
     <label className="journey-label">Repeat<select value={repeat} onChange={e => { setRepeat(e.target.value as typeof repeat); setMessage(''); }}><option value="once">Just once</option><option value="daily7">Daily for 7 days</option><option value="daily21">Daily for 21 days</option><option value="weekly4">Weekly for 4 weeks</option></select></label>
     <label className="water-check"><input type="checkbox" checked={includeAction} onChange={e => { setIncludeAction(e.target.checked); setMessage(''); }} />Include my practice or action text in the calendar event</label>

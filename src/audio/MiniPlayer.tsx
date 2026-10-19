@@ -61,7 +61,7 @@ function MiniBar() {
         alignItems: 'center',
         gap: 12,
         padding: '9px 12px',
-        borderRadius: 16,
+        borderRadius: 'var(--radius-card)',
         cursor: 'pointer',
       }}
     >

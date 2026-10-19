@@ -25,7 +25,7 @@ export default function SleepTab() {
       <div className="mx-auto w-full max-w-md pt-6 pb-10">
         <Reveal delay={0.05}>
           <div className="flex items-center gap-3">
-            <span className="glass grid place-items-center" style={{ width: 42, height: 42, borderRadius: 14 }}>
+            <span className="glass grid place-items-center" style={{ width: 42, height: 42, borderRadius: 'var(--radius-card)' }}>
               <GradientIcon name="moon" size={22} />
             </span>
             <div>
@@ -57,7 +57,7 @@ export default function SleepTab() {
                       className="glass flex w-full items-center gap-4 px-5 py-4 text-left transition-transform duration-300 active:scale-[0.99]"
                       style={{ borderRadius: 'var(--radius-card)', transitionTimingFunction: 'var(--ease-calm)' }}
                     >
-                      <span className="glass grid shrink-0 place-items-center" style={{ width: 44, height: 44, borderRadius: 14 }}>
+                      <span className="glass grid shrink-0 place-items-center" style={{ width: 44, height: 44, borderRadius: 'var(--radius-card)' }}>
                         <GradientIcon name={TYPE_ICON[group.type]} size={20} />
                       </span>
                       <span className="flex-1">

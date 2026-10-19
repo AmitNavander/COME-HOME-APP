@@ -30,7 +30,7 @@
   --font-serif: var(--font-ui); /* Compatibility alias for existing display classes. */
 
   --radius-card: 16px;
-  --radius-chip: 14px;
+  --radius-chip: var(--radius-card);
   --pad-screen: 22px;
 
   /* calm easing everywhere — §5 */

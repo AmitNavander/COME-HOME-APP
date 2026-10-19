@@ -20,10 +20,10 @@ export default function Button({
       ? {
           background: 'var(--gold)',
           color: '#11242d',
-          borderRadius: 12,
+          borderRadius: 'var(--radius-card)',
           border: '1px solid var(--gold)',
         }
-      : { color: 'var(--ink-muted)', background: 'transparent', borderRadius: 12 };
+      : { color: 'var(--ink-muted)', background: 'transparent', borderRadius: 'var(--radius-card)' };
   return (
     <button
       className={`${base} ${variant === 'ghost' ? 'hover:opacity-80' : 'hover:brightness-[1.04]'} ${className}`}

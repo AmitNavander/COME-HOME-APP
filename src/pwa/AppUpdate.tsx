@@ -9,7 +9,7 @@ export default function AppUpdate() {
   const [error, setError] = useState(false);
   const { needRefresh: [needRefresh], updateServiceWorker } = useRegisterSW();
   if (!needRefresh || later || view !== 'hub') return null;
-  return <aside aria-label="App update" className="glass glass-strong" style={{ position: 'fixed', zIndex: 100, top: 'max(12px, env(safe-area-inset-top))', left: '50%', transform: 'translateX(-50%)', width: 'min(92vw, 420px)', padding: 18, borderRadius: 20 }}>
+  return <aside aria-label="App update" className="glass glass-strong" style={{ position: 'fixed', zIndex: 100, top: 'max(12px, env(safe-area-inset-top))', left: '50%', transform: 'translateX(-50%)', width: 'min(92vw, 420px)', padding: 18, borderRadius: 'var(--radius-card)' }}>
     <strong>A fresh version of COME HOME is ready</strong>
     <p className="journey-muted">Finish and save your work before updating. This reloads the app.</p>
     <div className="flex gap-2">

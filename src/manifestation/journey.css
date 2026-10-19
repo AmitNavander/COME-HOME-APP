@@ -2,7 +2,7 @@
 .journey-page h1 { font-size: clamp(30px, 6vw, 44px); line-height: 1.16; margin: 16px 0; }
 .journey-page h2 { font-size: 26px; line-height: 1.25; margin: 12px 0; }
 .journey-page p { margin: 12px 0; }
-.journey-card { display: block; border: 1px solid var(--glass-border, rgba(232,201,155,.24)); background: var(--glass-bg, rgba(25,42,53,.62)); border-radius: 24px; padding: 24px; margin: 22px 0; }
+.journey-card { display: block; border: 1px solid var(--glass-border, rgba(232,201,155,.24)); background: var(--glass-bg, rgba(25,42,53,.62)); border-radius: var(--radius-card); padding: 24px; margin: 22px 0; }
 .journey-hero { background: linear-gradient(135deg, rgba(181,143,82,.2), rgba(40,86,97,.3)); border-color: var(--gold); }
 .journey-muted { color: var(--ink-muted); font-size: 13px; }
 .journey-quote { font-size: 24px; }
@@ -11,33 +11,33 @@
 .journey-row > span:nth-child(2) { flex: 1; }
 .journey-row small { display: block; color: var(--gold); text-transform: uppercase; letter-spacing: .12em; }
 .journey-number { color: var(--gold); font-size: 18px; }
-.journey-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; max-width: 100%; padding: 10px 16px; font-family: var(--font-ui); font-size: 14px; font-weight: 500; line-height: 1.5; border: 1px solid var(--gold); border-radius: 12px; margin: 6px 6px 6px 0; color: var(--ink); transition: background-color .16s ease, border-color .16s ease; }
+.journey-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; max-width: 100%; padding: 10px 16px; font-family: var(--font-ui); font-size: 14px; font-weight: 500; line-height: 1.5; border: 1px solid var(--gold); border-radius: var(--radius-card); margin: 6px 6px 6px 0; color: var(--ink); transition: background-color .16s ease, border-color .16s ease; }
 .journey-label { display: block; margin: 18px 0; }
-.journey-label input, .journey-label textarea { display: block; width: 100%; background: rgba(120,140,150,.1); color: var(--ink); border: 1px solid var(--ink-muted); border-radius: 12px; padding: 12px; margin-top: 8px; }
+.journey-label input, .journey-label textarea { display: block; width: 100%; background: rgba(120,140,150,.1); color: var(--ink); border: 1px solid var(--ink-muted); border-radius: var(--radius-card); padding: 12px; margin-top: 8px; }
 .journey-label textarea { min-height: 140px; resize: vertical; }
 .journey-page progress { width: 100%; accent-color: var(--gold); }
 .journey-page button:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
 .journey-grid { display: flex; flex-wrap: wrap; }
 .vision-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
-.vision-card { border: 1px solid var(--ink-muted); border-radius: 16px; overflow: hidden; padding: 12px; overflow-wrap: anywhere; }
-.vision-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; }
+.vision-card { border: 1px solid var(--ink-muted); border-radius: var(--radius-card); overflow: hidden; padding: 12px; overflow-wrap: anywhere; }
+.vision-card img { width: 100%; height: 160px; object-fit: cover; border-radius: var(--radius-card); }
 .journey-button:disabled { opacity: .5; cursor: not-allowed; }
-.journey-label select { display: block; width: 100%; padding: 12px; margin-top: 8px; border-radius: 12px; background: var(--surface, #19303d); color: var(--ink); border: 1px solid var(--ink-muted); }
+.journey-label select { display: block; width: 100%; padding: 12px; margin-top: 8px; border-radius: var(--radius-card); background: var(--surface, #19303d); color: var(--ink); border: 1px solid var(--ink-muted); }
 .water-lesson h4 { font-size: 1.15rem; font-weight: 600; margin: 28px 0 12px; line-height: 1.4; }
 .water-lesson h3 { margin-top: 24px; font-size: 1.5rem; line-height: 1.3; }
 .water-lesson blockquote { border-left: 2px solid var(--gold); margin: 18px 0; padding: 8px 16px; font-style: italic; }
-.water-pause { padding: 16px; margin: 22px 0; border: 1px solid var(--glass-border, #987d55); border-radius: 14px; }
+.water-pause { padding: 16px; margin: 22px 0; border: 1px solid var(--glass-border, #987d55); border-radius: var(--radius-card); }
 .water-pause h4 { margin-top: 0; }
 .water-steps { list-style: decimal; padding-left: 24px; }
 .water-steps li { padding-left: 4px; margin: 18px 0; }
 .water-check { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; }
 .water-check input { flex-shrink: 0; width: 20px; height: 20px; margin-top: 3px; accent-color: var(--gold); }
 .goal-stages { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0; }
-.goal-stages button { border: 1px solid var(--ink-muted); border-radius: 12px; padding: 10px 12px; }
+.goal-stages button { border: 1px solid var(--ink-muted); border-radius: var(--radius-card); padding: 10px 12px; }
 .goal-stages button[aria-current="step"] { border-color: var(--gold); background: rgba(232,201,155,.18); }
 .goal-workflow h3 { font-size: 24px; margin: 20px 0 12px; }
 .goal-actions { display: flex; flex-wrap: wrap; }
-.entry-option { display: flex; align-items: flex-start; gap: 14px; border: 1px solid var(--ink-muted); border-radius: 20px; padding: 22px; margin: 16px 0; cursor: pointer; }
+.entry-option { display: flex; align-items: flex-start; gap: 14px; border: 1px solid var(--ink-muted); border-radius: var(--radius-card); padding: 22px; margin: 16px 0; cursor: pointer; }
 .entry-option.selected { border-color: var(--gold); background: rgba(232,201,155,.12); }
 .entry-option input { width: 20px; height: 20px; flex-shrink: 0; margin-top: 4px; accent-color: var(--gold); }
 .entry-option strong { display: block; font-size: 20px; margin-bottom: 8px; }
@@ -49,9 +49,9 @@
 .access-badge { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--gold); }
 .plus-badge { display: inline-block; border: 1px solid var(--gold); background: rgba(232,201,155,.12); color: var(--gold); border-radius: 999px; padding: 4px 10px; font-size: 11px; font-weight: 600; letter-spacing: .06em; white-space: nowrap; }
 .information-links { display: flex; flex-direction: column; gap: 8px; }
-.information-links button { padding: 12px; text-align: left; color: var(--gold); min-height: 44px; border-radius: 12px; }
+.information-links button { padding: 12px; text-align: left; color: var(--gold); min-height: 44px; border-radius: var(--radius-card); }
 .information-links.compact { flex-direction: row; justify-content: center; flex-wrap: wrap; font-size: 13px; padding-bottom: 16px; }
-.information-dialog { margin: auto; width: min(92vw, 680px); max-height: 88dvh; padding: 0; border: 1px solid var(--gold); border-radius: 20px; background: #10232c; color: #edf0ec; overflow: auto; }
+.information-dialog { margin: auto; width: min(92vw, 680px); max-height: 88dvh; padding: 0; border: 1px solid var(--gold); border-radius: var(--radius-card); background: #10232c; color: #edf0ec; overflow: auto; }
 .information-dialog::backdrop { background: rgba(3,12,18,.78); }
 .information-toolbar { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 20px; background: #10232c; border-bottom: 1px solid rgba(232,201,155,.2); z-index: 1; }
 .information-body { padding: 8px 24px 28px; line-height: 1.7; }
@@ -63,11 +63,11 @@
 .information-links button:focus-visible, .information-dialog button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .premium-preview { margin-top: 32px; }
 .premium-preview > .journey-card { margin-top: 8px; }
-.wallpaper-preview { display: block; width: min(100%, 270px); height: auto; margin: 20px auto; border: 1px solid var(--gold); border-radius: 20px; }
+.wallpaper-preview { display: block; width: min(100%, 270px); height: auto; margin: 20px auto; border: 1px solid var(--gold); border-radius: var(--radius-card); }
 .wallpaper-result h4 { margin-top: 20px; font-weight: 600; }
 
 /* Calm entry points; full exercises remain available behind explicit disclosures. */
-.journey-disclosure { margin: 16px 0; border: 1px solid rgba(232,201,155,.22); border-radius: 18px; padding: 16px; background: var(--glass-bg); }
+.journey-disclosure { margin: 16px 0; border: 1px solid rgba(232,201,155,.22); border-radius: var(--radius-card); padding: 16px; background: var(--glass-bg); }
 .journey-disclosure > summary { cursor: pointer; color: var(--ink); font-weight: 600; min-height: 44px; align-content: center; }
 .journey-disclosure > summary small { display: block; font-weight: 400; color: var(--ink-muted); margin-top: 6px; }
 .journey-disclosure[open] > summary { margin-bottom: 20px; }
@@ -85,7 +85,7 @@
 .journey-page .daily-affirmation-text { font-size: clamp(23px, 5vw, 30px); line-height: 1.4; margin: 0 0 16px; text-wrap: pretty; }
 
 /* Practice guidance stays inside the selected journey, away from Today. */
-.practice-next { border-left: 3px solid var(--gold); padding: 12px 18px; margin: 24px 0; background: rgba(232,201,155,.06); border-radius: 12px; }
+.practice-next { border-left: 3px solid var(--gold); padding: 12px 18px; margin: 24px 0; background: rgba(232,201,155,.06); border-radius: var(--radius-card); }
 .practice-feedback { padding: 0; margin: 10px 0 18px; border: 0; border-radius: 0; background: none; color: var(--ink-muted); font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
 .practice-feedback p { margin: 0; }
 .practice-feedback small { display: block; margin-top: 6px; color: var(--ink-muted); }
@@ -113,7 +113,7 @@
 /* Home offers three equal entry points; no card receives a special accent. */
 .home-page { display: flex; flex-direction: column; gap: 12px; padding: 16px 0 20px; }
 .home-page header h1 { margin: 8px 0 6px; font-size: clamp(28px, 6vw, 36px); }
-.home-page > .journey-card { margin: 0; padding: 18px; border-radius: 16px; background: var(--bg-deep); border: 1px solid var(--hairline); box-shadow: none; }
+.home-page > .journey-card { margin: 0; padding: 18px; border-radius: var(--radius-card); background: var(--bg-deep); border: 1px solid var(--hairline); box-shadow: none; }
 .home-page .eyebrow, .home-page .daily-affirmation h2 { color: var(--ink-muted); font-size: 11px; line-height: 1.5; font-weight: 500; letter-spacing: .1em; margin: 0 0 8px; }
 .home-page h2.serif, .home-page .daily-affirmation-text { font-size: 22px; font-weight: 500; line-height: 1.35; margin: 0 0 8px; }
 .home-page p:not(.daily-affirmation-text) { font-size: 14px; line-height: 1.5; color: var(--ink-muted); margin: 0 0 12px; }
@@ -140,7 +140,7 @@
 .manifest-section-heading { margin:30px 0 18px; }
 .manifest-section-heading p { color:var(--ink-muted); font-size:14px; }
 .manifest-journey-grid { display:grid; gap:12px; }
-.manifest-journey-card { width:100%; text-align:left; display:flex; flex-direction:column; padding:22px; border:1px solid var(--glass-border,rgba(232,201,155,.2)); background:var(--glass-bg,rgba(25,42,53,.5)); border-radius:20px; transition:border-color .18s ease,background-color .18s ease; }
+.manifest-journey-card { width:100%; text-align:left; display:flex; flex-direction:column; padding:22px; border:1px solid var(--glass-border,rgba(232,201,155,.2)); background:var(--glass-bg,rgba(25,42,53,.5)); border-radius: var(--radius-card); transition:border-color .18s ease,background-color .18s ease; }
 .manifest-card-top { display:flex; align-items:center; justify-content:space-between; gap:16px; color:var(--gold); margin-bottom:20px; }
 .manifest-plus-label { font-size:9px; letter-spacing:.14em; color:var(--ink-muted); }
 .manifest-card-title { font-size:21px; font-weight:500; line-height:1.35; margin-bottom:8px; overflow-wrap:anywhere; }
@@ -148,7 +148,7 @@
 .manifest-card-bottom { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:20px; padding-top:14px; border-top:1px solid var(--hairline); color:var(--gold); font-size:11px; }
 .manifest-card-bottom svg { flex-shrink:0; }
 .manifest-reflect { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:52px; width:100%; text-align:left; font-size:14px; margin:18px 0; padding:8px 2px; }
-.manifest-plus-entry { display:flex; align-items:center; justify-content:space-between; gap:18px; width:100%; border:1px solid rgba(232,201,155,.3); border-radius:20px; padding:22px; text-align:left; background:linear-gradient(120deg,rgba(232,201,155,.09),rgba(232,201,155,.02)); }
+.manifest-plus-entry { display:flex; align-items:center; justify-content:space-between; gap:18px; width:100%; border:1px solid rgba(232,201,155,.3); border-radius: var(--radius-card); padding:22px; text-align:left; background:linear-gradient(120deg,rgba(232,201,155,.09),rgba(232,201,155,.02)); }
 .manifest-plus-entry > span { display:flex; flex-direction:column; gap:8px; }
 .manifest-plus-entry strong { font-size:21px; font-weight:500; }
 .manifest-plus-entry > span > span:last-child { font-size:13px; color:var(--ink-muted); }
@@ -164,10 +164,36 @@
 .manifest-plus-content ul { list-style:none; padding:0; margin:24px 0; }
 .manifest-plus-content li { display:flex; align-items:flex-start; gap:16px; padding:20px 0; border-top:1px solid var(--hairline); font-size:15px; }
 .manifest-benefit-number { color:var(--gold); font-size:12px; padding-top:3px; }
-.manifest-access { border-radius:14px; background:rgba(232,201,155,.07); padding:16px; margin-bottom:20px; }
+.manifest-access { border-radius: var(--radius-card); background:rgba(232,201,155,.07); padding:16px; margin-bottom:20px; }
 .manifest-access strong { font-size:14px; color:var(--gold); }
 .manifest-access p { margin-bottom:0; }
 .manifest-library-link { display:flex; align-items:center; gap:8px; min-height:44px; font-size:13px; color:var(--ink-muted); margin-top:10px; text-align:left; }
 @media (hover:hover) { .manifest-journey-card:hover { border-color:var(--gold); background:rgba(232,201,155,.07); } }
 @media (max-width:380px) { .manifest-journey-card { padding:18px; } .manifest-dialog-body { padding:20px; } .manifest-card-title { font-size:20px; } }
 @media (prefers-reduced-motion:reduce) { .manifest-journey-card { transition:none; } }
+/* Meditate overview and dedicated reminder/library views. */
+.meditate-start { border:1px solid var(--glass-border,rgba(232,201,155,.22)); border-radius:var(--radius-card); background:var(--glass-bg,rgba(25,42,53,.5)); padding:20px; margin-bottom:16px; }
+.meditate-start h2 { font-size:21px; line-height:1.35; }
+.meditate-start p { font-size:14px; color:var(--ink-muted); margin:8px 0 18px; }
+.meditate-actions { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.meditate-button { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:8px 14px; border:1px solid var(--hairline); border-radius:var(--radius-card); font-size:13px; line-height:1.4; font-weight:500; }
+.meditate-primary { background:var(--gold); border-color:var(--gold); color:#14232c; }
+.meditate-shortcuts { display:grid; gap:12px; margin-bottom:12px; }
+.meditate-navigation { display:flex; align-items:center; gap:14px; width:100%; text-align:left; padding:18px; border:1px solid var(--glass-border,rgba(232,201,155,.22)); border-radius:var(--radius-card); background:var(--glass-bg,rgba(25,42,53,.5)); }
+.meditate-navigation > svg { flex-shrink:0; color:var(--gold); }
+.meditate-navigation > span { flex:1; min-width:0; }
+.meditate-navigation strong { display:block; font-size:16px; font-weight:500; line-height:1.4; }
+.meditate-navigation small { display:block; color:var(--ink-muted); font-size:12px; margin-top:4px; line-height:1.5; }
+.meditate-panel { max-width:640px; }
+.meditate-panel-body { padding:20px; }
+.meditation-catalogue > [role="status"] { font-size:12px; color:var(--ink-muted); margin:16px 0 8px; }
+.meditation-filters { display:flex; flex-wrap:wrap; gap:8px; }
+.meditation-filters button { min-height:44px; border:1px solid var(--hairline); border-radius:var(--radius-card); padding:8px 12px; font-size:12px; }
+.meditation-filters button[aria-pressed="true"] { background:rgba(232,201,155,.16); border-color:var(--gold); color:var(--gold); }
+.meditation-session { display:flex; align-items:center; justify-content:space-between; gap:16px; width:100%; text-align:left; padding:16px; margin:10px 0; border:1px solid var(--hairline); border-radius:var(--radius-card); background:rgba(232,201,155,.03); font-size:15px; }
+.meditation-session small { display:block; color:var(--ink-muted); font-size:12px; line-height:1.6; margin-top:6px; }
+.meditation-session > span:last-child { color:var(--gold); flex-shrink:0; }
+.meditate-start button:focus-visible,.meditate-navigation:focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
+.meditate-panel .practice-reminder { margin:0; }
+.meditate-panel .reminder-settings { padding-top:0; }
+@media(max-width:480px) { .meditate-panel { width:calc(100vw - 24px); max-height:92dvh; } }

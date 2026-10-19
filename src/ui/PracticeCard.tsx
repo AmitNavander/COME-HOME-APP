@@ -19,7 +19,7 @@ export default function PracticeCard({
       className="glass flex flex-col items-start gap-3 px-4 py-4 text-left transition-transform duration-300 active:scale-[0.98]"
       style={{ borderRadius: 'var(--radius-card)', transitionTimingFunction: 'var(--ease-calm)' }}
     >
-      <span className="glass grid place-items-center" style={{ width: 40, height: 40, borderRadius: 12 }}>
+      <span className="glass grid place-items-center" style={{ width: 40, height: 40, borderRadius: 'var(--radius-card)' }}>
         <Icon size={18} strokeWidth={1.5} color="var(--gold)" />
       </span>
       <span>

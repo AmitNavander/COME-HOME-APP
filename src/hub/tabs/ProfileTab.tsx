@@ -79,7 +79,7 @@ export default function ProfileTab() {
           <ProfileSection title="Preferences" subtitle="Reminder, atmosphere and starting path" icon={<SlidersHorizontal size={17} />}>
             <div className="glass" style={{ borderRadius: 'var(--radius-card)', overflow: 'hidden' }}>
               <Row label="Gentle daily reminder" last={!prefs.reminder.enabled}><Switch on={prefs.reminder.enabled} label="Daily reminder" onToggle={toggleReminder} /></Row>
-              {prefs.reminder.enabled && <Row label="Around"><input type="time" aria-label="Reminder time" value={prefs.reminder.time} onChange={e => prefsStore.setReminder({ enabled: true, time: e.target.value })} className="glass px-3 py-2" style={{ color: 'var(--ink)', colorScheme: 'dark', borderRadius: 10 }} /></Row>}
+              {prefs.reminder.enabled && <Row label="Around"><input type="time" aria-label="Reminder time" value={prefs.reminder.time} onChange={e => prefsStore.setReminder({ enabled: true, time: e.target.value })} className="glass px-3 py-2" style={{ color: 'var(--ink)', colorScheme: 'dark', borderRadius: 'var(--radius-card)' }} /></Row>}
               <Row label="Atmosphere" last><ThemeChoice value={prefs.theme} onChange={prefsStore.setTheme} /></Row>
             </div>
             <p className="journey-muted">{reminderDenied ? 'Notifications are off in your device settings.' : 'A gentle invitation, never a streak or pressure.'}</p>
@@ -192,7 +192,7 @@ function ProgrammeCard({ p }: { p: Programme }) {
 }
 
 function Switch({ on, label, onToggle }: { on: boolean; label: string; onToggle: () => void }) {
-  return <button role="switch" aria-checked={on} aria-label={label} onClick={onToggle} style={{ width: 46, height: 44, borderRadius: 12, background: 'transparent', position: 'relative' }}><span aria-hidden style={{ position: 'absolute', inset: '8px 0', borderRadius: 999, background: on ? 'var(--gold)' : 'var(--hairline)' }} /><span style={{ position: 'absolute', top: 11, left: on ? 21 : 3, width: 22, height: 22, borderRadius: 999, background: '#10222b', transition: 'left .3s var(--ease-calm)' }} /></button>;
+  return <button role="switch" aria-checked={on} aria-label={label} onClick={onToggle} style={{ width: 46, height: 44, borderRadius: 'var(--radius-card)', background: 'transparent', position: 'relative' }}><span aria-hidden style={{ position: 'absolute', inset: '8px 0', borderRadius: 999, background: on ? 'var(--gold)' : 'var(--hairline)' }} /><span style={{ position: 'absolute', top: 11, left: on ? 21 : 3, width: 22, height: 22, borderRadius: 999, background: '#10222b', transition: 'left .3s var(--ease-calm)' }} /></button>;
 }
 
 function Row({ label, children, last = false }: { label: string; children: React.ReactNode; last?: boolean }) {
@@ -200,5 +200,5 @@ function Row({ label, children, last = false }: { label: string; children: React
 }
 
 function ThemeChoice({ value, onChange }: { value: Theme; onChange: (theme: Theme) => void }) {
-  return <div className="flex gap-1">{(['still', 'warm'] as Theme[]).map(theme => <button key={theme} onClick={() => onChange(theme)} aria-pressed={value === theme} style={{ minHeight: 44, padding: '8px 12px', borderRadius: 12, fontSize: 'var(--t-xs)', color: value === theme ? 'var(--gold)' : 'var(--ink-muted)', border: `1px solid ${value === theme ? 'var(--gold)' : 'var(--hairline)'}` }}>{theme === 'still' ? 'Still' : 'Warm'}</button>)}</div>;
+  return <div className="flex gap-1">{(['still', 'warm'] as Theme[]).map(theme => <button key={theme} onClick={() => onChange(theme)} aria-pressed={value === theme} style={{ minHeight: 44, padding: '8px 12px', borderRadius: 'var(--radius-card)', fontSize: 'var(--t-xs)', color: value === theme ? 'var(--gold)' : 'var(--ink-muted)', border: `1px solid ${value === theme ? 'var(--gold)' : 'var(--hairline)'}` }}>{theme === 'still' ? 'Still' : 'Warm'}</button>)}</div>;
 }

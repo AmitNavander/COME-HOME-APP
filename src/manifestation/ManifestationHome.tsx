@@ -71,7 +71,7 @@ export default function ManifestationHome() {
             <div className="flex items-center gap-3">
               <span
                 className="grid shrink-0 place-items-center"
-                style={{ width: 42, height: 42, borderRadius: 14, background: 'rgba(232,201,155,0.14)' }}
+                style={{ width: 42, height: 42, borderRadius: 'var(--radius-card)', background: 'rgba(232,201,155,0.14)' }}
               >
                 <Sparkles size={20} strokeWidth={1.45} color="var(--gold)" />
               </span>
