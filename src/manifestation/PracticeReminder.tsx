@@ -3,7 +3,7 @@ import './journey.css';
 import { Bell } from 'lucide-react';
 import { defaultReminderTime, googleCalendarLink, reminderCalendar } from './reminderCalendar';
 
-export default function PracticeReminder({ standalone = false, day, title, action, location = 'Manifest → Foundation', label = 'Set reminder', prompt = 'Take a mindful pause. What is one small action you can practise today?' }: { standalone?: boolean; day?: number; title: string; action: string; location?: string; label?: string; prompt?: string }) {
+export default function PracticeReminder({ compact = false, standalone = false, day, title, action, location = 'Manifest → Foundation', label = 'Set reminder', prompt = 'Take a mindful pause. What is one small action you can practise today?' }: { compact?: boolean; standalone?: boolean; day?: number; title: string; action: string; location?: string; label?: string; prompt?: string }) {
   const [expanded, setExpanded] = useState(false);
   const panelId = useId();
   const [start, setStart] = useState(defaultReminderTime);
@@ -41,15 +41,19 @@ export default function PracticeReminder({ standalone = false, day, title, actio
     <div id={panelId} hidden={!standalone && !expanded} className="reminder-settings">
     <label className="journey-label">First reminder (your local time)<input type="datetime-local" value={start} onChange={e => { setStart(e.target.value); setMessage(''); }} /></label>
     <label className="journey-label">Repeat<select value={repeat} onChange={e => { setRepeat(e.target.value as typeof repeat); setMessage(''); }}><option value="once">Just once</option><option value="daily7">Daily for 7 days</option><option value="daily21">Daily for 21 days</option><option value="weekly4">Weekly for 4 weeks</option></select></label>
+    {!compact && <>
     <label className="water-check"><input type="checkbox" checked={includeAction} onChange={e => { setIncludeAction(e.target.checked); setMessage(''); }} />Include my practice or action text in the calendar event</label>
     {includeAction && <p className="water-pause">{action}</p>}
     <p className="journey-muted">Personal text may be visible in shared calendars and notifications. Without it, your reminder uses a gentle, general prompt.</p>
+    </>}
     <div className="journey-actions"><button type="button" className="journey-button" onClick={openGoogle}>Open Google Calendar</button>
     <button type="button" className="journey-button" onClick={download}>Download calendar file (.ics)</button></div>
-    <p className="journey-muted">Google Calendar opens in a new tab and may ask you to sign in. For Apple Calendar or another calendar, use the calendar file option.</p>
     <p role="status">{message}</p>
+    {compact ? <p className="journey-muted">Save the event in your calendar to activate the reminder. Use the calendar file for Apple Calendar or other calendar apps.</p> : <>
+    <p className="journey-muted">Google Calendar opens in a new tab and may ask you to sign in. For Apple Calendar or another calendar, use the calendar file option.</p>
     <p>Your calendar handles alerts, including while COME HOME is closed. The reminder text stays the same; it does not change with your progress. To change, snooze or stop reminders, use your calendar; completing or updating a practice here will not cancel them.</p>
     <details><summary>Apple Calendar and other calendars</summary><p>Download the .ics file, open it with your calendar and confirm Add or Import. Check the time, repeat schedule and alert. If your iPhone only saves the file without offering Calendar, import it on a Mac using Calendar → File → Import, or use Google Calendar instead. Choose a calendar that syncs to your phone.</p><p>To change an existing reminder, edit it in your calendar instead of adding another copy. COME HOME cannot confirm whether you finished saving it.</p></details>
+    </>}
     </div>
   </section>;
 }

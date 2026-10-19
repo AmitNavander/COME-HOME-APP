@@ -2,8 +2,9 @@ import { draftKey, readDraft, writeDraft } from '../lib/practiceDraft';
 import SaveFeedback from '../manifestation/SaveFeedback';
 import { hub } from '../store/hub';
 import PracticeReminder from '../manifestation/PracticeReminder';
-import { useEffect, useRef, useState } from 'react';
-import { PenLine, Trash2, ArrowLeft } from 'lucide-react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
+import { PenLine, Trash2, ArrowLeft, Bell, ChevronDown, Check, X } from 'lucide-react';
 import Reveal from '../ui/Reveal';
 import Button from '../ui/Button';
 import ExitButton from '../ui/ExitButton';
@@ -11,7 +12,6 @@ import { app } from '../store/app';
 import { nav } from '../nav/history';
 import { setDepth } from '../store/water';
 import { useAuth } from '../lib/auth';
-import { useAccountCloud } from '../lib/accountCloud';
 import { journalGuides, type JournalPath } from './guidance';
 import { takeJournalContext, clearJournalContext } from './context';
 import {
@@ -41,7 +41,7 @@ type Draft = { id?: string; prompt?: string; text: string; example?: string };
 export default function Journal() { const { user } = useAuth(); return <AccountJournal key={user.id} />; }
 function AccountJournal() {
   const { user } = useAuth();
-  const cloud = useAccountCloud();
+  const [panel, setPanel] = useState<'reflection' | 'reminder' | null>(null);
   const [context] = useState(takeJournalContext);
   const [path, setPath] = useState<JournalPath>(context?.path ?? 'personal');
   const guide = journalGuides[path];
@@ -111,9 +111,7 @@ function AccountJournal() {
           <h1 className="serif" style={{ fontSize: 'var(--t-2xl)', marginTop: 8, marginBottom: 8 }}>
             A page, just for you
           </h1>
-          <p style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-md)', lineHeight: 1.55 }}>
-            Get to know your feelings, needs and next steps. {!user.isGuest && cloud.enabled ? 'Entries save on this device, with private account sync enabled.' : 'Entries stay on this device and are never shared with other users.'}
-          </p>
+
         </Reveal>
 
         {saveError && <p role="alert">{saveError}</p>}
@@ -123,8 +121,7 @@ function AccountJournal() {
           <div className="eyebrow" style={{ marginTop: 26, marginBottom: 12 }}>
             What would you like to reflect on?
           </div>
-          <label className="journey-label">Your reflection<select value={path} onChange={e => setPath(e.target.value as JournalPath)}>{Object.entries(journalGuides).map(([key, value]) => <option key={key} value={key}>{value.label}</option>)}</select></label>
-          <p style={{ marginBottom: 16, lineHeight: 1.6 }}>{guide.instruction}</p>
+          <button className="journal-selector" aria-haspopup="dialog" onClick={() => setPanel('reflection')}><span>{guide.label}</span><ChevronDown size={18} aria-hidden="true" /></button>
           {path === 'affirmation' && context?.affirmation && <blockquote className="serif" style={{ color: 'var(--gold)', marginBottom: 16 }}>{context.affirmation}</blockquote>}
           <div className="flex flex-col gap-2">
             {guide.questions.map((p) => (
@@ -134,7 +131,7 @@ function AccountJournal() {
                 className="glass flex w-full items-center gap-3 px-5 py-4 text-left transition-transform duration-300 active:scale-[0.99]"
                 style={{ borderRadius: 'var(--radius-card)', transitionTimingFunction: 'var(--ease-calm)' }}
               >
-                <span className="serif-italic flex-1" style={{ color: 'var(--ink)', fontSize: 'var(--t-md)' }}>
+                <span className="flex-1" style={{ color: 'var(--ink)', fontSize: 'var(--t-md)' }}>
                   {p}
                 </span>
                 <PenLine size={16} strokeWidth={1.6} color="var(--gold)" aria-hidden style={{ opacity: 0.7 }} />
@@ -143,14 +140,13 @@ function AccountJournal() {
           </div>
         </Reveal>
 
-        <PracticeReminder title="Return to my journal" action="Pause, reflect and write a few honest lines in my journal." prompt="Make room for a short reflection. What have you noticed today?" location="Journal" label="Remind me to write" />
-
-        {/* The one clear primary — a blank page, no prompt at all. */}
-        <Reveal delay={0.24}>
-          <div className="mt-4">
-            <Button onClick={openBlank}>Start a blank page</Button>
-          </div>
-        </Reveal>
+        <div className="journal-actions">
+          <button className="journal-action journal-action-primary" onClick={openBlank}><PenLine size={16} aria-hidden="true" />Start a Blank Page</button>
+          <button className="journal-action" onClick={() => setPanel('reminder')}><Bell size={16} aria-hidden="true" />Remind Me to Write</button>
+        </div>
+        {panel && <JournalDialog title={panel === 'reflection' ? 'Choose Your Reflection' : 'Writing Reminder'} onClose={() => setPanel(null)}>
+          {panel === 'reflection' ? <div className="journal-choices" role="group" aria-label="Reflection topics">{Object.entries(journalGuides).map(([key, value]) => <button key={key} aria-pressed={path === key} onClick={() => { setPath(key as JournalPath); setPanel(null); }}><span>{value.label}</span>{path === key && <Check size={18} aria-hidden="true" />}</button>)}</div> : <PracticeReminder standalone compact title="Return to my journal" action="Pause, reflect and write a few honest lines in my journal." prompt="Make room for a short reflection. What have you noticed today?" location="Journal" />}
+        </JournalDialog>}
 
         {/* What’s been written before — tap to reopen, soft two-tap to remove. */}
         {entries.length > 0 && (
@@ -315,3 +311,17 @@ function Writer({
   );
 }
 
+
+function JournalDialog({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) {
+  const ref = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const modal = ref.current;
+    modal?.showModal();
+    return () => { modal?.close(); opener?.focus({ preventScroll: true }); };
+  }, []);
+  return createPortal(<dialog ref={ref} className="information-dialog journal-dialog" aria-label={title} onCancel={onClose} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+    <header className="manifest-dialog-toolbar"><h1>{title}</h1><button autoFocus aria-label={`Close ${title}`} onClick={onClose}><X size={20} /></button></header>
+    <div className="journal-dialog-body">{children}</div>
+  </dialog>, document.body);
+}
