@@ -215,3 +215,38 @@
 .journal-choices button[aria-pressed="true"] { border-color:var(--gold); color:var(--gold); background:rgba(232,201,155,.1); }
 .journal-selector:focus-visible,.journal-action:focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
 .journal-dialog select { appearance:none; padding-right:42px; background-image:linear-gradient(45deg,transparent 50%,#c6cbc8 50%),linear-gradient(135deg,#c6cbc8 50%,transparent 50%); background-position:calc(100% - 21px) 50%,calc(100% - 16px) 50%; background-size:5px 5px; background-repeat:no-repeat; }
+/* You: focused settings destinations, consistent spacing and controls. */
+.profile-page { width:100%; max-width:520px; margin:0 auto; padding:28px 0 32px; font-family:var(--font-ui); line-height:1.6; }
+.profile-header { margin-bottom:24px; }
+.profile-header h1 { font-size:clamp(28px,7vw,38px); font-weight:500; line-height:1.2; margin:8px 0; }
+.profile-header p { color:var(--ink-muted); font-size:14px; margin:8px 0 0; }
+.profile-navigation { display:grid; gap:8px; }
+.profile-navigation button { display:flex; align-items:center; gap:14px; padding:15px 16px; width:100%; min-height:78px; border:1px solid var(--glass-border,rgba(232,201,155,.18)); border-radius:var(--radius-card); background:var(--glass-bg,rgba(25,42,53,.5)); text-align:left; transition:background-color .16s ease,border-color .16s ease; }
+.profile-nav-icon { color:var(--gold); display:grid; place-items:center; width:36px; height:36px; flex-shrink:0; }
+.profile-nav-label { flex:1; min-width:0; }
+.profile-nav-label strong { display:block; font-size:15px; font-weight:500; line-height:1.4; }
+.profile-nav-label small { display:block; font-size:12px; line-height:1.5; color:var(--ink-muted); margin-top:3px; }
+.profile-navigation button > svg { flex-shrink:0; color:var(--ink-muted); }
+.profile-back { display:inline-flex; align-items:center; gap:8px; min-height:44px; margin:0 0 16px; padding:8px 10px 8px 0; color:var(--ink-muted); font-size:13px; border-radius:var(--radius-card); }
+.profile-page button:focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
+.profile-content { font-size:14px; }
+.profile-content h2 { font-size:23px; line-height:1.3; margin:8px 0 14px; font-weight:500; }
+.profile-content h3 { font-size:19px; line-height:1.4; }
+.profile-content p { margin:12px 0; }
+.profile-content .journey-card { padding:20px; margin:0 0 16px; }
+.profile-content .journey-button { padding:8px 14px; font-size:13px; margin:6px 6px 6px 0; }
+.profile-programmes { display:grid; gap:12px; }
+.profile-programmes button { min-height:0 !important; }
+.profile-setting-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:16px; }
+.profile-setting-row > button { flex-shrink:0; }
+.profile-device-copy { margin-top:16px; padding-top:16px; border-top:1px solid var(--hairline); }
+.profile-device-copy h4 { font-size:14px; color:var(--gold); }
+.profile-export { border:1px solid var(--glass-border,rgba(232,201,155,.2)); border-radius:var(--radius-card); background:var(--glass-bg,rgba(25,42,53,.5)); padding:20px; }
+.profile-content .information-links { gap:8px; }
+.profile-content .information-links button { border:1px solid var(--hairline); padding:16px; border-radius:var(--radius-card); background:rgba(232,201,155,.04); }
+.profile-content progress { width:100%; accent-color:var(--gold); }
+.profile-content .plans-grid { grid-template-columns:1fr; gap:16px; }
+.profile-content .plans-grid > section { padding:16px; border:1px solid var(--hairline); border-radius:var(--radius-card); }
+.profile-content .plans-grid h3 { margin-top:0; }
+@media (hover:hover) { .profile-navigation button:hover { background:rgba(232,201,155,.08); border-color:rgba(232,201,155,.45); } }
+@media (prefers-reduced-motion:reduce) { .profile-navigation button { transition:none; } }

@@ -1,3 +1,4 @@
+import { profileNavigation, useProfilePage, PROFILE_PAGES, type ProfilePage } from '../store/profile';
 import { useEffect, useRef } from 'react';
 import { app, useView } from '../store/app';
 import { hub, useHubTab, type TabId } from '../store/hub';
@@ -24,7 +25,8 @@ import { firstRunDone } from '../lib/storage';
  */
 type Loc = string; // 'first-run' | 'session' | `tool:${ToolId}` | `hub:${TabId}`
 
-const locOf = (view: string, tab: TabId): Loc =>
+const locOf = (view: string, tab: TabId, profilePage: ProfilePage): Loc =>
+  view === 'hub' && tab === 'profile' && profilePage !== 'overview' ? `profile:${profilePage}` :
   view === 'session'
     ? 'session'
     : view === 'tool'
@@ -107,6 +109,13 @@ function applyLoc(loc: Loc): Loc {
     app.setView('flow');
     return 'flow';
   }
+  if (loc.startsWith('profile:')) {
+    const page = loc.slice(8) as ProfilePage;
+    profileNavigation.open(PROFILE_PAGES.includes(page) ? page : 'overview');
+    app.setView('hub'); hub.setTab('profile');
+    return loc;
+  }
+  if (loc === 'hub:profile') profileNavigation.open('overview');
   const tab = loc.slice(4) as TabId;
   app.setView('hub');
   hub.setTab(tab);
@@ -124,7 +133,8 @@ export const nav = {
 export function useAppHistory(): void {
   const view = useView();
   const tab = useHubTab();
-  const loc = locOf(view, tab);
+  const profilePage = useProfilePage();
+  const loc = locOf(view, tab, profilePage);
   const curRef = useRef<Loc | null>(null);
 
   // Seed a root entry so the first Back lands here, and the one past it exits.

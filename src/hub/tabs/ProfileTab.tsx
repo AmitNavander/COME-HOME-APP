@@ -1,9 +1,8 @@
+import { profileNavigation, useProfilePage } from '../../store/profile';
+import { nav } from '../../nav/history';
 import { useEffect, useState } from 'react';
-import { Heart, PenLine, ShieldCheck, SlidersHorizontal } from 'lucide-react';
-import Reveal from '../../ui/Reveal';
+import { ArrowLeft, ChevronRight, ChartNoAxesCombined, Compass, ShieldCheck, SlidersHorizontal, Sparkles, CircleHelp, Download } from 'lucide-react';
 import ReflectionTrail from '../../journey/ReflectionTrail';
-import { openSanctuary } from '../../sanctuary/Sanctuary';
-import { openJournal } from '../../journal/Journal';
 import { usePrefs, prefsStore } from '../../store/prefs';
 import { deleteAccount, requestPasswordReset, signInWithGoogle, signOut, useAuth } from '../../lib/auth';
 import { isSupabaseConfigured } from '../../lib/supabase';
@@ -17,11 +16,11 @@ import Plans from '../../membership/Plans';
 import JourneyExport from '../JourneyExport';
 import { app } from '../../store/app';
 import InformationLinks from '../../information/InformationLinks';
-import InstallApp from '../../pwa/InstallApp';
 import { disableAccountCloud, enableAccountCloud, refreshAccountCloud, useAccountCloud } from '../../lib/accountCloud';
 
 /** A calm overview first. Detail stays one tap away in clearly named sections. */
 export default function ProfileTab() {
+  const page = useProfilePage();
   const prefs = usePrefs();
   const { user } = useAuth();
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -30,6 +29,17 @@ export default function ProfileTab() {
   const [presence, setPresence] = useState<string[]>([]);
   const [reminderDenied, setReminderDenied] = useState(false);
   useProgrammeProgress();
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [page]);
+  const pages = [
+    { id: 'progress' as const, title: 'My Progress', subtitle: 'Your practice and reflections', Icon: ChartNoAxesCombined },
+    { id: 'journeys' as const, title: 'My Journeys', subtitle: 'Meditation programmes', Icon: Compass },
+    { id: 'preferences' as const, title: 'Preferences', subtitle: 'Atmosphere and reminders', Icon: SlidersHorizontal },
+    { id: 'plans' as const, title: 'Plans & Access', subtitle: 'Explore Come Home Plus', Icon: Sparkles },
+    { id: 'help' as const, title: 'Help & Information', subtitle: 'Support, privacy and terms', Icon: CircleHelp },
+    { id: 'account' as const, title: 'Privacy & Account', subtitle: 'Sign-in and account controls', Icon: ShieldCheck },
+    { id: 'export' as const, title: 'Export My Journey', subtitle: 'Download a personal copy', Icon: Download },
+  ];
+  const currentPage = pages.find(item => item.id === page);
 
   useEffect(() => {
     getHistory().then(setHistory);
@@ -49,34 +59,24 @@ export default function ProfileTab() {
 
   return (
     <div className="screen">
-      <div className="mx-auto w-full max-w-md pt-6 pb-10">
-        <Reveal delay={0.04}>
-          <div className="eyebrow">You</div>
-          <h1 className="serif" style={{ fontSize: 'var(--t-2xl)', marginTop: 8 }}>Your space</h1>
-          <p style={{ color: 'var(--ink-muted)', marginTop: 8, lineHeight: 1.55 }}>
-            {user.isGuest ? 'Your practice is saved on this device.' : `Welcome, ${user.name?.split(' ')[0] || 'back'}. Your account and journey are here.`}
-          </p>
-        </Reveal>
-
-        <Reveal delay={0.1}>
-          <div className="grid grid-cols-2 gap-3 mt-6">
-            <QuickAction icon={<PenLine size={19} />} title="Journal" detail={journal[0] ? `Last written ${new Date(journal[0].ts).toLocaleDateString()}` : 'Write freely'} onClick={openJournal} />
-            <QuickAction icon={<Heart size={19} fill="currentColor" />} title="Sanctuary" detail="Saved practices" onClick={openSanctuary} />
-          </div>
-        </Reveal>
-
-        <div className="mt-6 flex flex-col gap-3">
-          <InstallApp />
-          <ProfileSection title="My progress" subtitle="Manifestation and monthly reflection">
+      <div className="profile-page">
+        {page === 'overview' ? <>
+          <header className="profile-header"><div className="eyebrow">You</div><h1>Your Space</h1><p>{user.isGuest ? 'Make your practice your own.' : `Welcome, ${user.name?.split(' ')[0] || 'back'}.`}</p></header>
+          <nav className="profile-navigation" aria-label="Your settings">{pages.map(({ id, title, subtitle, Icon }) => <button key={id} onClick={() => profileNavigation.open(id)}><span className="profile-nav-icon"><Icon size={21} strokeWidth={1.6} aria-hidden="true" /></span><span className="profile-nav-label"><strong>{title}</strong><small>{subtitle}</small></span><ChevronRight size={18} aria-hidden="true" /></button>)}</nav>
+        </> : <>
+          <button className="profile-back" onClick={() => nav.back()}><ArrowLeft size={18} aria-hidden="true" />Back to You</button>
+          <header className="profile-header"><div className="eyebrow">Your Space</div><h1>{currentPage?.title}</h1><p>{currentPage?.subtitle}</p></header>
+          <div className="profile-content">
+          {page === 'progress' && <section>
             <JourneyProgress />
             <div className="mt-5"><ReflectionTrail history={history} reflections={reflections} journal={journal} presence={presence} /></div>
-          </ProfileSection>
+          </section>}
 
-          <ProfileSection title="My journeys" subtitle="Meditation programmes at your pace">
-            <div className="grid grid-cols-2 gap-3">{PROGRAMMES.map(p => <ProgrammeCard key={p.id} p={p} />)}</div>
-          </ProfileSection>
+          {page === 'journeys' && <section>
+            <div className="profile-programmes">{PROGRAMMES.map(p => <ProgrammeCard key={p.id} p={p} />)}</div>
+          </section>}
 
-          <ProfileSection title="Preferences" subtitle="Reminder, atmosphere and starting path" icon={<SlidersHorizontal size={17} />}>
+          {page === 'preferences' && <section>
             <div className="glass" style={{ borderRadius: 'var(--radius-card)', overflow: 'hidden' }}>
               <Row label="Gentle daily reminder" last={!prefs.reminder.enabled}><Switch on={prefs.reminder.enabled} label="Daily reminder" onToggle={toggleReminder} /></Row>
               {prefs.reminder.enabled && <Row label="Around"><input type="time" aria-label="Reminder time" value={prefs.reminder.time} onChange={e => prefsStore.setReminder({ enabled: true, time: e.target.value })} className="glass px-3 py-2" style={{ color: 'var(--ink)', colorScheme: 'dark', borderRadius: 'var(--radius-card)' }} /></Row>}
@@ -84,34 +84,21 @@ export default function ProfileTab() {
             </div>
             <p className="journey-muted">{reminderDenied ? 'Notifications are off in your device settings.' : 'A gentle invitation, never a streak or pressure.'}</p>
             <button className="journey-button" onClick={() => app.setView('onboarding')}>Change my starting path</button>
-          </ProfileSection>
+          </section>}
 
-          <ProfileSection title="Plans and access" subtitle="What is included in Free and COME HOME+"><Plans /></ProfileSection>
-          <ProfileSection title="Help & information" subtitle="Help, privacy and terms"><InformationLinks /></ProfileSection>
+          {page === 'plans' && <section><Plans /></section>}
+          {page === 'help' && <section><InformationLinks /></section>}
 
-          <ProfileSection title="Privacy and account" subtitle="Cloud saving, export and account controls" icon={<ShieldCheck size={17} />}>
-            <JourneyExport />
+          {page === 'account' && <section>
+
             <AccountSection />
-          </ProfileSection>
-        </div>
+          </section>}
+          {page === 'export' && <JourneyExport standalone />}
+          </div>
+        </>}
       </div>
     </div>
   );
-}
-
-function QuickAction({ icon, title, detail, onClick }: { icon: React.ReactNode; title: string; detail: string; onClick: () => void }) {
-  return <button onClick={onClick} className="glass px-4 py-4 text-left" style={{ borderRadius: 'var(--radius-card)', minHeight: 118 }}>
-    <span style={{ color: 'var(--gold)' }}>{icon}</span>
-    <span className="serif" style={{ display: 'block', fontSize: 'var(--t-lg)', marginTop: 12 }}>{title}</span>
-    <span style={{ display: 'block', color: 'var(--ink-muted)', fontSize: 'var(--t-xs)', marginTop: 4 }}>{detail}</span>
-  </button>;
-}
-
-function ProfileSection({ title, subtitle, icon, children }: { title: string; subtitle: string; icon?: React.ReactNode; children: React.ReactNode }) {
-  return <details className="journey-disclosure">
-    <summary>{icon && <span style={{ color: 'var(--gold)', marginRight: 8 }}>{icon}</span>}{title}<small>{subtitle}</small></summary>
-    <div style={{ marginTop: 14 }}>{children}</div>
-  </details>;
 }
 
 function AccountSection() {
@@ -169,7 +156,7 @@ function AccountSection() {
       {cloud.updatedAt && <p className="eyebrow">Last saved {new Date(cloud.updatedAt).toLocaleString()}</p>}
       {!cloud.enabled ? <>
         <button className="journey-button journey-primary" disabled={busy || cloud.phase === 'syncing'} onClick={() => void runCloudAction(() => enableAccountCloud('cloud'))}>{cloud.phase === 'syncing' ? 'Connecting…' : 'Turn on cloud saving'}</button>
-        <details className="journey-disclosure" style={{ marginTop: 10 }}><summary>Use this device’s current journey</summary><p>This replaces the account copy with the journey currently on this device.</p>{movingDevice ? <div className="flex gap-2"><button className="journey-button" disabled={busy} onClick={() => void runCloudAction(() => enableAccountCloud('device'))}>Confirm and save</button><button className="journey-button" disabled={busy} onClick={() => setMovingDevice(false)}>Cancel</button></div> : <button className="journey-button" disabled={busy} onClick={() => setMovingDevice(true)}>Choose device copy</button>}</details>
+        <section className="profile-device-copy"><h4>Use This Device’s Journey</h4><p>This replaces the account copy with the journey currently on this device.</p>{movingDevice ? <div className="flex gap-2"><button className="journey-button" disabled={busy} onClick={() => void runCloudAction(() => enableAccountCloud('device'))}>Confirm and save</button><button className="journey-button" disabled={busy} onClick={() => setMovingDevice(false)}>Cancel</button></div> : <button className="journey-button" disabled={busy} onClick={() => setMovingDevice(true)}>Choose device copy</button>}</section>
       </> : <div className="flex flex-col gap-2"><button className="journey-button" disabled={busy || cloud.phase === 'syncing'} onClick={() => void runCloudAction(refreshAccountCloud)}>{cloud.phase === 'syncing' ? 'Syncing…' : 'Refresh from cloud'}</button><button className="journey-button" disabled={busy || cloud.phase === 'syncing'} onClick={() => void runCloudAction(disableAccountCloud)}>Use only this device</button></div>}
     </div>
 
@@ -196,7 +183,7 @@ function Switch({ on, label, onToggle }: { on: boolean; label: string; onToggle:
 }
 
 function Row({ label, children, last = false }: { label: string; children: React.ReactNode; last?: boolean }) {
-  return <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: last ? 'none' : '1px solid var(--hairline)', minHeight: 56 }}><span style={{ color: 'var(--ink)', fontSize: 'var(--t-md)' }}>{label}</span>{children}</div>;
+  return <div className="profile-setting-row" style={{ borderBottom: last ? 'none' : '1px solid var(--hairline)', minHeight: 56 }}><span style={{ color: 'var(--ink)', fontSize: 'var(--t-md)' }}>{label}</span>{children}</div>;
 }
 
 function ThemeChoice({ value, onChange }: { value: Theme; onChange: (theme: Theme) => void }) {

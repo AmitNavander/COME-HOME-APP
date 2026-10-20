@@ -25,8 +25,8 @@ test('account deletion verifies the caller and removes private files before the 
   assert.doesNotMatch(auth, /SUPABASE_SERVICE_ROLE_KEY/);
 });
 
-test('profile starts with calm collapsed sections rather than all settings expanded', () => {
-  assert.match(profile, /function ProfileSection/);
-  assert.match(profile, /<details className="journey-disclosure">/);
-  assert.match(profile, /Privacy and account/);
+test('profile offers dedicated destinations without install or duplicate journal shortcuts', () => {
+  assert.match(profile, /profileNavigation.open/);
+  assert.match(profile, /Back to You/);
+  assert.doesNotMatch(profile, /<details|<InstallApp|<QuickAction/);
 });
