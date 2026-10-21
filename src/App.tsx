@@ -25,7 +25,7 @@ import { ambient } from './audio/ambient';
 import { reminders } from './lib/reminders';
 import { notifications } from './lib/notifications';
 import { useAuth } from './lib/auth';
-import { useAppHistory } from './nav/history';
+import { useAppHistory, consumeRestoredDestination } from './nav/history';
 import PasswordRecovery from './first-run/PasswordRecovery';
 import AppUpdate from './pwa/AppUpdate';
 
@@ -89,7 +89,7 @@ export default function App() {
     if (loading || view !== 'hub') return;
     const choice = readEntryChoice(user.id);
     if (!choice) { routedUser.current = user.id; app.setView('onboarding'); }
-    else if (routedUser.current !== user.id) { routedUser.current = user.id; hub.setTab(entryTab(choice)); }
+    else if (routedUser.current !== user.id) { routedUser.current = user.id; if (!consumeRestoredDestination()) hub.setTab(entryTab(choice)); }
   }, [view, loading, user.id]);
 
   // Hub / first-run / onboarding sit at their own water depth (§4); the session flow manages its own.

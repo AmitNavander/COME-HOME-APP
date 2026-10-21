@@ -26,7 +26,7 @@ export default function MiniPlayer() {
 }
 
 function MiniBar() {
-  const { playing, hasSource, error } = useAudio();
+  const { playing, hasSource, error, playbackError } = useAudio();
   const { path, music } = useSessionState();
   const b = useBreath();
   const unavailable = !hasSource || error;
@@ -44,11 +44,6 @@ function MiniBar() {
 
   return (
     <div
-      role="button"
-      tabIndex={0}
-      aria-label={`${music?.title ?? pathTitle(path)} — open player`}
-      onClick={expand}
-      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && expand()}
       className="glass glass-strong mini-in"
       style={{
         position: 'fixed',
@@ -80,7 +75,7 @@ function MiniBar() {
         }}
       />
 
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <button onClick={expand} aria-label={`${music?.title ?? pathTitle(path)} — open player`} style={{ flex: 1, minWidth: 0, minHeight: 44, textAlign: 'left' }}>
         <div
           className="serif"
           style={{ fontSize: 'var(--t-md)', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
@@ -88,9 +83,9 @@ function MiniBar() {
           {music?.title ?? pathTitle(path)}
         </div>
         <div className="eyebrow" style={{ marginTop: 1 }}>
-          {playing ? 'Playing' : 'Paused'}
+          {playbackError ? 'Could not play · tap Play to retry' : error ? 'Audio unavailable · open to retry' : playing ? 'Playing' : 'Paused'}
         </div>
-      </div>
+      </button>
 
       <button
         onClick={(e) => {
@@ -100,7 +95,7 @@ function MiniBar() {
         disabled={unavailable}
         aria-label={playing ? 'Pause' : 'Play'}
         className="grid place-items-center transition-transform duration-300 active:scale-[0.92]"
-        style={{ width: 40, height: 40, borderRadius: 999, color: 'var(--gold)', opacity: unavailable ? 0.4 : 1, transitionTimingFunction: 'var(--ease-calm)' }}
+        style={{ width: 44, height: 44, borderRadius: 999, color: 'var(--gold)', opacity: unavailable ? 0.4 : 1, transitionTimingFunction: 'var(--ease-calm)' }}
       >
         {playing ? (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -121,7 +116,7 @@ function MiniBar() {
         }}
         aria-label="Stop and close player"
         className="grid place-items-center transition-transform duration-300 active:scale-[0.92]"
-        style={{ width: 40, height: 40, borderRadius: 999, color: 'var(--ink-muted)', transitionTimingFunction: 'var(--ease-calm)' }}
+        style={{ width: 44, height: 44, borderRadius: 999, color: 'var(--ink-muted)', transitionTimingFunction: 'var(--ease-calm)' }}
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
           <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />

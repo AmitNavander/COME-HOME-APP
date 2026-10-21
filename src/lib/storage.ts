@@ -153,7 +153,9 @@ export function loadProgrammeProgress(): ProgrammeProgress {
   }
 }
 export function saveProgrammeProgress(p: ProgrammeProgress): void {
-  local()?.setItem(PROGRAMME_KEY, JSON.stringify(p));
+  const storage = local();
+  if (!storage) throw new Error('Programme storage is unavailable');
+  storage.setItem(PROGRAMME_KEY, JSON.stringify(p));
   notifyCloudDataChanged();
 }
 
@@ -197,16 +199,14 @@ export type FlowVisit = {
   left: 'lighter' | 'a-little' | 'still-heavy';
 };
 
-export type HistoryEntry = { ts: number; emotion: Emotion | null; checkins: Checkin[]; flow?: FlowVisit };
+export type HistoryEntry = { id?: string; ts: number; emotion: Emotion | null; checkins: Checkin[]; flow?: FlowVisit };
 
 // Best-effort — a failed IDB op never blocks or breaks a session.
-export async function addHistory(e: HistoryEntry): Promise<void> {
+export async function addHistory(e: HistoryEntry, strict = false): Promise<void> {
   try {
-    const list = (await get<HistoryEntry[]>(HISTORY_KEY)) ?? [];
-    await set(HISTORY_KEY, [e, ...list].slice(0, 200)); // ponytail: cap 200 entries
-  } catch {
-    /* ignore */
-  }
+    await update<HistoryEntry[]>(HISTORY_KEY, list => [e, ...(list ?? []).filter(item => !e.id || item.id !== e.id)].slice(0, 200));
+    notifyCloudDataChanged();
+  } catch (error) { if (strict) throw error; }
 }
 export async function getHistory(): Promise<HistoryEntry[]> {
   try {

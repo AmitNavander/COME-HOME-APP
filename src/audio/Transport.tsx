@@ -47,7 +47,7 @@ export default function Transport({
    *  for looping sleep sounds that have no meaningful position). */
   playOnly?: boolean;
 }) {
-  const { playing, position, duration, error, hasSource } = useAudio();
+  const { playing, position, duration, error, hasSource, playbackError } = useAudio();
   // No configured source, or the source failed/stalled → calm "coming soon".
   const unavailable = !hasSource || error;
   const pct = duration > 0 ? Math.min(100, (position / duration) * 100) : 0;
@@ -122,9 +122,11 @@ export default function Transport({
 
       {favKey && <HeartButton favKey={favKey} label="this session" />}
 
+      {playbackError && <p role="alert">{playbackError}</p>}
+      {error && hasSource && <button className="journey-button" onClick={() => audioControls.retry()}>Retry Audio</button>}
       {unavailable && (
         <p className="serif-italic" style={{ color: 'var(--ink-muted)', fontSize: 'var(--t-md)', textAlign: 'center' }}>
-          The guided sound isn&rsquo;t here yet. Rest here as long as you like.
+          {error ? 'The audio could not load. Check your connection and retry.' : 'No audio is available for this practice.'} Rest here as long as you like.
         </p>
       )}
     </div>

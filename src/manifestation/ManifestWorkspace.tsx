@@ -1,3 +1,6 @@
+import { manifestNavigation, useManifestPage } from '../store/manifest';
+import { nav } from '../nav/history';
+import { useAuth } from '../lib/auth';
 import { readResume } from './practiceProgress';
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
@@ -19,10 +22,14 @@ const waterDays = ['Sacred Initiation', 'Water of Clarity', 'Release', 'Emotiona
 export default function ManifestWorkspace({ onImmersiveChange }: { onImmersiveChange?: (immersive: boolean) => void }) {
   const { data } = useJourney();
   const [overlay, setOverlay] = useState<'guide' | 'plus' | null>(null);
-  const [selected, setSelected] = useState<number | null>(null);
+  const page = useManifestPage();
+  const { user } = useAuth();
+  const selected = page.startsWith('foundation:') ? Number(page.split(':')[1]) : null;
+  const setSelected = (day: number | null) => day === null ? nav.parent('hub:manifest') : manifestNavigation.open(`foundation:${day}`);
   const [resumeWaterDay, setResumeWaterDay] = useState<number | null>(null);
   const resume = readResume(data);
-  const [section, setSection] = useState<'goal' | 'water' | 'vision' | null>(null);
+  const section = page === 'goal' || page === 'water' || page === 'vision' ? page : null;
+  const setSection = (next: 'goal' | 'water' | 'vision' | null) => next === null ? nav.parent('hub:manifest') : manifestNavigation.open(next);
   const nextDay = nextFoundationDay(data.completed);
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -34,9 +41,9 @@ export default function ManifestWorkspace({ onImmersiveChange }: { onImmersiveCh
     <button className="journey-button" onClick={() => setSection(null)}>← Back to Manifest</button>
     <div className="eyebrow">Manifest · {section === 'goal' ? 'My goal plan' : section === 'water' ? 'Water workshop' : 'Vision board'}</div>
     <h1 className="serif">{section === 'goal' ? 'My goal plan' : section === 'water' ? 'Manifesting Through Water™' : 'My vision board'}</h1>
-    {section !== 'water' && <p className="journey-muted">Save before leaving this exercise.</p>}
+    {section === 'vision' && <p className="journey-muted">Save before leaving this exercise.</p>}
     <PremiumPreview>
-      {section === 'goal' && <GoalWorkflow />}
+      {section === 'goal' && <GoalWorkflow key={user.id} />}
       {section === 'water' && <><WaterCourse initialDay={resumeWaterDay} /><details className="journey-disclosure"><summary>Previous workbook entries</summary><WaterWorkbook titles={waterDays} /></details></>}
       {section === 'vision' && <VisionBoard />}
     </PremiumPreview>

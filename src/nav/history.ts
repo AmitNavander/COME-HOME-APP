@@ -1,3 +1,5 @@
+import { durableDestination } from './destinations';
+import { manifestNavigation, useManifestPage, validManifestPage } from '../store/manifest';
 import { profileNavigation, useProfilePage, PROFILE_PAGES, type ProfilePage } from '../store/profile';
 import { useEffect, useRef } from 'react';
 import { app, useView } from '../store/app';
@@ -25,7 +27,8 @@ import { firstRunDone } from '../lib/storage';
  */
 type Loc = string; // 'first-run' | 'session' | `tool:${ToolId}` | `hub:${TabId}`
 
-const locOf = (view: string, tab: TabId, profilePage: ProfilePage): Loc =>
+const locOf = (view: string, tab: TabId, profilePage: ProfilePage, manifestPage: string): Loc =>
+  view === 'hub' && tab === 'manifest' && manifestPage !== 'overview' ? `manifest:${manifestPage}` :
   view === 'hub' && tab === 'profile' && profilePage !== 'overview' ? `profile:${profilePage}` :
   view === 'session'
     ? 'session'
@@ -43,8 +46,8 @@ const locOf = (view: string, tab: TabId, profilePage: ProfilePage): Loc =>
               ? 'journal'
               : view === 'flow'
                 ? 'flow'
-                : view === 'first-run'
-                  ? 'first-run'
+                : view === 'first-run' || view === 'onboarding'
+                  ? view
                   : `hub:${tab}`;
 
 // The loc a popstate is currently restoring — so the mirror effect below knows
@@ -115,6 +118,13 @@ function applyLoc(loc: Loc): Loc {
     app.setView('hub'); hub.setTab('profile');
     return loc;
   }
+  if (loc.startsWith('manifest:') && validManifestPage(loc.slice(9))) {
+    manifestNavigation.open(loc.slice(9) as Parameters<typeof manifestNavigation.open>[0]);
+    app.setView('hub'); hub.setTab('manifest');
+    return loc;
+  }
+  if (loc === 'hub:manifest') manifestNavigation.open('overview');
+  if (loc === 'onboarding') { app.setView('onboarding'); return loc; }
   if (loc === 'hub:profile') profileNavigation.open('overview');
   const tab = loc.slice(4) as TabId;
   app.setView('hub');
@@ -124,8 +134,14 @@ function applyLoc(loc: Loc): Loc {
 
 /** Go back one level (used by in-app exit affordances so the stack stays synced). */
 export const nav = {
+  parent(destination: string) {
+    if (history.state?.from === destination) { history.back(); return; }
+    poppingTo = applyLoc(destination);
+    history.replaceState({ appNav: true, loc: poppingTo, root: true }, '', routeUrl(poppingTo));
+  },
   back() {
-    if (typeof history !== 'undefined') history.back();
+    if (typeof history !== 'undefined' && !history.state?.root) history.back();
+    else nav.parent('hub:home');
   },
 };
 
@@ -134,14 +150,15 @@ export function useAppHistory(): void {
   const view = useView();
   const tab = useHubTab();
   const profilePage = useProfilePage();
-  const loc = locOf(view, tab, profilePage);
+  const manifestPage = useManifestPage();
+  const loc = locOf(view, tab, profilePage, manifestPage);
   const curRef = useRef<Loc | null>(null);
 
   // Seed a root entry so the first Back lands here, and the one past it exits.
   useEffect(() => {
     curRef.current = loc;
     try {
-      history.replaceState({ appNav: true, loc, root: true }, '');
+      history.replaceState({ ...history.state, appNav: true, loc, root: history.state?.appNav ? !!history.state.root : true }, '', routeUrl(loc));
     } catch {
       /* history unavailable — Back handling degrades to the browser default */
     }
@@ -161,12 +178,30 @@ export function useAppHistory(): void {
     if (curRef.current === loc) return;
     const wasPop = poppingTo === loc;
     poppingTo = null;
+    const from = curRef.current;
     curRef.current = loc;
     if (wasPop) return;
     try {
-      history.pushState({ appNav: true, loc }, '');
+      history.pushState({ appNav: true, loc, from }, '', routeUrl(loc));
     } catch {
       /* ignore */
     }
   }, [loc]);
+}
+
+// Only durable destinations may be restored. A reload never autoplays a session.
+function routeUrl(loc: string) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('screen', loc);
+  return url.pathname + url.search + url.hash;
+}
+let restoredDestination = false;
+export function initializeNavigation() {
+  const destination = durableDestination(new URLSearchParams(window.location.search).get('screen'));
+  if (destination && firstRunDone()) { applyLoc(destination); restoredDestination = true; }
+}
+export function consumeRestoredDestination() {
+  const restored = restoredDestination;
+  restoredDestination = false;
+  return restored;
 }

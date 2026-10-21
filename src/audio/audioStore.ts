@@ -17,9 +17,10 @@ export const TRACK = '/audio/track.mp3';
 export type SessionAudio = { voiceTrack?: string; musicTrack: string | null };
 export const SESSION_AUDIO: SessionAudio = { musicTrack: TRACK };
 
-type Snap = { playing: boolean; position: number; duration: number; ready: boolean; error: boolean; hasSource: boolean };
+type Snap = { playbackError?: string; playing: boolean; position: number; duration: number; ready: boolean; error: boolean; hasSource: boolean };
 let snap: Snap = { playing: false, position: 0, duration: 0, ready: false, error: false, hasSource: true };
 let loadedSrc: string | null = null;
+let loadedLoop = false;
 let markedPresence = false; // §Phase A, fire markPresence once per session (storage dedups per day)
 
 // Stall guard: if a load never reports metadata OR error (e.g. a hung request on
@@ -57,7 +58,7 @@ function mediaPosition() {
 
 // Wire the element once, at module load — handlers outlive any screen so playback
 // keeps going across the Support → Music transition.
-audio.on('play', () => (emit({ playing: true }), mediaState('playing'), ambient.setDucked(true)));
+audio.on('play', () => (emit({ playing: true, playbackError: undefined }), mediaState('playing'), ambient.setDucked(true)));
 audio.on('pause', () => (emit({ playing: false }), mediaState('paused'), ambient.setDucked(false)));
 audio.on('ended', () => (emit({ playing: false }), mediaState('paused'), ambient.setDucked(false)));
 audio.on('loadedmetadata', () => (clearStall(), emit({ duration: audio.duration, ready: true, error: false })));
@@ -79,8 +80,10 @@ export const audioControls = {
     }
     if (loadedSrc === src) return;
     loadedSrc = src;
+    emit({ playbackError: undefined });
     clearStall();
-    audio.setLoop(!!opts.loop);
+    loadedLoop = !!opts.loop;
+    audio.setLoop(loadedLoop);
     audio.setVolume(1); // restore after any prior sleep-timer fade
     emit({ error: false, ready: false, position: 0, duration: 0, playing: false, hasSource: true });
     audio.load(src);
@@ -104,8 +107,15 @@ export const audioControls = {
       await audio.play();
       markedPresence || ((markedPresence = true), void markPresence()); // a real sitting counts (§Phase A)
     } catch {
-      /* gesture/policy rejection — stays paused */
+      emit({ playing: false, playbackError: 'Playback could not start. Tap Play to try again.' });
     }
+  },
+  retry() {
+    const source = loadedSrc;
+    if (!source) return;
+    loadedSrc = null;
+    audioControls.ensureLoaded(source, { loop: loadedLoop });
+    void audioControls.play();
   },
   pause: () => audio.pause(),
   toggle() {
@@ -126,7 +136,7 @@ export const audioControls = {
     audio.setLoop(false);
     audio.setVolume(1);
     loadedSrc = null;
-    emit({ playing: false, position: 0 });
+    emit({ playing: false, position: 0, playbackError: undefined });
   },
   /** Sleep timer (§Phase6): gently fade the volume to silence, then pause. Restores
    *  the volume afterward so the next play is at full level.

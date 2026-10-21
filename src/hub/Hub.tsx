@@ -1,3 +1,4 @@
+import { profileNavigation } from '../store/profile';
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Home, Sparkles, PenLine, Library, User } from 'lucide-react';
@@ -56,7 +57,7 @@ export default function Hub() {
           {tab === 'profile' && <ProfileTab />}
         </motion.div>
       </Suspense>
-      {!immersive && <TabBar items={TABS} active={tab === 'affirmations' ? 'home' : tab} onChange={(id) => hub.setTab(id as TabId)} />}
+      {!immersive && <TabBar items={TABS} active={tab === 'affirmations' ? 'home' : tab} onChange={(id) => { if (id === 'profile') profileNavigation.open('overview'); hub.setTab(id as TabId); }} />}
     </div>
   );
 }

@@ -115,7 +115,7 @@ function AccountJournal() {
         </Reveal>
 
         {saveError && <p role="alert">{saveError}</p>}
-        {savedMessage && <section className="journey-card"><SaveFeedback message={savedMessage} /><p>Let your reflection settle. Your next step can be one small action—or simply rest.</p><button className="journey-button" onClick={() => { hub.setTab(path === 'meditation' ? 'library' : path === 'manifestation' ? 'manifest' : path === 'affirmation' ? 'affirmations' : 'home'); app.setView('hub'); }}>Return to {path === 'meditation' ? 'Meditate' : path === 'manifestation' ? 'Manifest' : path === 'affirmation' ? 'Affirmations' : 'Today'}</button></section>}
+        {savedMessage && <section className="journey-card"><SaveFeedback message={savedMessage} /><p>Let your reflection settle. Your next step can be one small action—or simply rest.</p><button className="journey-button" onClick={() => { hub.setTab(path === 'meditation' ? 'library' : path === 'manifestation' ? 'manifest' : path === 'affirmation' ? 'affirmations' : 'home'); app.setView('hub'); }}>Return to {path === 'meditation' ? 'Meditate' : path === 'manifestation' ? 'Manifest' : path === 'affirmation' ? 'Affirmations' : 'Home'}</button></section>}
         {/* Gentle prompts — invitations, never assignments. */}
         <Reveal delay={0.14}>
           <div className="eyebrow" style={{ marginTop: 26, marginBottom: 12 }}>

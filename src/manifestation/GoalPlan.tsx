@@ -1,3 +1,5 @@
+import { useAuth } from '../lib/auth';
+import { draftKey, readDraft, writeDraft } from '../lib/practiceDraft';
 import SaveFeedback from './SaveFeedback';
 import PracticeReminder from './PracticeReminder';
 import { useEffect, useRef, useState } from 'react';
@@ -9,12 +11,21 @@ const stages = ['Define', 'Prepare', 'Visualize', 'Act', 'Review'];
 
 export default function GoalWorkflow() {
   const { data, save } = useJourney();
-  const [plan, setPlan] = useState(() => readPlan(data.answers, data.goal, data.why));
-  const [date, setDate] = useState(localDay);
-  const [day, setDay] = useState(() => readDay(data.answers[dailyKey(plan.id, date)]));
-  const [stage, setStage] = useState(() => nextStage(plan, day));
+  const { user } = useAuth();
+  const key = draftKey(user.id, 'goal');
+  const [restored] = useState(() => readDraft<{ plan: GoalPlan; day: DailyPractice; date: string; stage: number } | null>(key, null, validGoalDraft));
+  const [plan, setPlan] = useState(() => restored?.plan ?? readPlan(data.answers, data.goal, data.why));
+  const [date, setDate] = useState(() => restored?.date ?? localDay());
+  const [day, setDay] = useState(() => restored?.day ?? readDay(data.answers[dailyKey(plan.id, date)]));
+  const [stage, setStage] = useState(() => restored?.stage ?? nextStage(plan, day));
   const [status, setStatus] = useState('');
-  const [dirty, setDirty] = useState(false);
+  const [dirty, setDirty] = useState(!!restored);
+  const [draftError, setDraftError] = useState('');
+  useEffect(() => {
+    if (!dirty) return;
+    try { writeDraft(key, { plan, day, date, stage }); setDraftError(''); }
+    catch { setDraftError('Draft could not be saved. Keep this screen open and copy your writing before leaving.'); }
+  }, [key, plan, day, date, stage, dirty]);
   const heading = useRef<HTMLHeadingElement>(null);
   const savedPlan = readPlan(data.answers, data.goal, data.why);
   const reviews = readReviews(data.answers);
@@ -27,11 +38,11 @@ export default function GoalWorkflow() {
   useEffect(() => { heading.current?.focus(); }, [stage]);
   // Protect writing on browser reload/close. In-app tab changes still require Save.
   useEffect(() => {
-    if (!dirty) return;
+    if (!draftError) return;
     const guard = (event: BeforeUnloadEvent) => { event.preventDefault(); };
     window.addEventListener('beforeunload', guard);
     return () => window.removeEventListener('beforeunload', guard);
-  }, [dirty]);
+  }, [draftError]);
   function updatePlan(key: keyof GoalPlan, value: string) { setPlan(old => ({ ...old, [key]: value })); setDirty(true); setStatus(''); }
   function updateDay(key: keyof DailyPractice, value: string | boolean) { setDay(old => ({ ...old, [key]: value })); setDirty(true); setStatus(''); }
   function persist(next?: number, review = false) {
@@ -49,7 +60,8 @@ export default function GoalWorkflow() {
         answers[`manifest-review:v1:${id}`] = JSON.stringify({ id, at: new Date().toISOString(), plan: nextPlan, day: nextDay });
       }
       save({ ...data, goal: nextPlan.goal, why: nextPlan.why, answers });
-      setPlan(nextPlan); setDay(nextDay); setDirty(false);
+      writeDraft(key, null);
+      setPlan(nextPlan); setDay(nextDay); setDirty(false); setDraftError('');
       setStatus(review ? 'Review saved. Your next step is ready for your next practice.' : 'Saved on this device.');
       if (next !== undefined) setStage(next);
     } catch { setStatus('Could not save. Keep this page open and copy your writing before leaving.'); }
@@ -125,9 +137,17 @@ export default function GoalWorkflow() {
     </form>
     <PracticeReminder key={`${plan.id}:${stage}`} title={stage === 3 ? 'Take my planned action' : stage === 4 ? 'Review my goal progress' : 'Return to my goal practice'} action={stage === 3 ? day.action || 'Take one small planned action.' : stage === 4 ? day.next || 'Review progress, record evidence and choose the next step.' : 'Continue preparing and rehearsing the next step toward my goal.'} prompt={stage === 4 ? 'Review what happened, what you learned and your next step.' : 'Return to your goal plan and take one manageable next step.'} location="Manifest → My goal plan" label={stage === 3 ? 'Remind me to take action' : stage === 4 ? 'Set my next review reminder' : 'Remind me to continue'} />
     <SaveFeedback message={status} />
-    <p className="journey-muted">{dirty ? 'You have unsaved changes. ' : ''}Save before changing tabs. Your plan and writing stay in this browser.</p>
+    {draftError && <p role="alert">{draftError}</p>}
+    {dirty && !draftError && <p role="status" className="journey-muted">Draft saved. Continue whenever you’re ready.</p>}
     {date !== localDay() && <button className="journey-button" onClick={() => { if (dirty) { setStatus('Save your current writing before opening today.'); return; } const today = localDay(); const next = readDay(data.answers[dailyKey(plan.id, today)]); setDate(today); setDay(next); setStage(nextStage(plan, next)); }}>Open today’s practice</button>}
     <details><summary>Review history · {reviews.length} saved {reviews.length === 1 ? 'day' : 'days'}</summary>{reviews.length === 0 ? <p>Your reviews will appear here after you record an action and its result.</p> : reviews.map(review => <article className="water-pause" key={review.id}><h4>{review.plan.goal}</h4><p>{new Date(review.at).toLocaleDateString()} · {review.day.outcome === 'achieved' ? 'Goal achieved · self-reported' : review.day.outcome === 'revise' ? 'Plan needs adjustment' : 'In progress'}</p><p>Action: {review.day.action} ({review.day.status})</p><p>Progress: {review.day.actual}</p><p>Evidence: {review.day.evidence}</p><p>Learning: {review.day.learning}</p><p>Next: {review.day.next}</p></article>)}</details>
     <details><summary>Saved practice history</summary>{pastPractices.length === 0 ? <p>Your saved rehearsals and actions will appear here.</p> : pastPractices.map(item => <article key={item.key} className="water-pause"><h4>{item.goal || 'Earlier goal'}</h4><p>{item.date}</p><p>Rehearsal: {item.practice.scene || 'Not recorded'}</p><p>Action: {item.practice.action || 'Not recorded'} · {item.practice.status}</p>{item.practice.when && <p>Scheduled: {item.practice.when.replace('T', ' ')}</p>}</article>)}</details>
   </section>;
+}
+
+function validGoalDraft(value: unknown): boolean {
+  const v = value as { plan?: GoalPlan; day?: DailyPractice; date?: string; stage?: number } | null;
+  return !!v && typeof v.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v.date) && Number.isInteger(v.stage) && v.stage! >= 0 && v.stage! <= 4
+    && !!v.plan && Object.keys(readPlan({})).every(key => typeof v.plan![key as keyof GoalPlan] === 'string')
+    && !!v.day && Object.entries(blankDay()).every(([key, sample]) => typeof v.day![key as keyof DailyPractice] === typeof sample);
 }

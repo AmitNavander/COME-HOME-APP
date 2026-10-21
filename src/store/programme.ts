@@ -64,8 +64,9 @@ export const programme = {
     const { programmeId, dayIndex } = activeDay;
     const done = new Set(completedOf(programmeId));
     done.add(dayIndex);
-    progress = { ...progress, [programmeId]: [...done].sort((a, b) => a - b) };
-    saveProgrammeProgress(progress);
+    const next = { ...progress, [programmeId]: [...done].sort((a, b) => a - b) };
+    saveProgrammeProgress(next);
+    progress = next;
     activeDay = null;
     notify();
   },

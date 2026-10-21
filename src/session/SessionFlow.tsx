@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useReducedMotion } from '../lib/motion';
 import { setDepth, type DepthGroup } from '../store/water';
@@ -33,6 +33,10 @@ const CALMER: Step[] = ['support', 'music', 'checkin', 'return'];
 export default function SessionFlow() {
   const { step, emotion, checkins } = useSessionState();
   const reduce = useReducedMotion();
+  const completion = useRef({ id: crypto.randomUUID(), ts: Date.now() });
+  const busy = useRef(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
     setDepth(DEPTH[step]);
@@ -45,10 +49,15 @@ export default function SessionFlow() {
 
   // Save the completed session to on-device history (§8), record the programme day
   // if this session was launched from one (§Phase4), then land where we came from.
-  const finishAndExit = () => {
-    void addHistory({ ts: Date.now(), emotion, checkins });
-    programme.completeActiveDay();
-    nav.back();
+  const finishAndExit = async () => {
+    if (busy.current) return;
+    busy.current = true; setSaving(true); setSaveError('');
+    try {
+      await addHistory({ ...completion.current, emotion, checkins }, true);
+      programme.completeActiveDay();
+      nav.back();
+    } catch { setSaveError('Your session could not be fully saved. Please retry before leaving.'); }
+    finally { busy.current = false; setSaving(false); }
   };
 
   const screen = (() => {
@@ -66,7 +75,7 @@ export default function SessionFlow() {
       case 'checkin':
         return <CheckIn />;
       case 'return':
-        return <Return onExit={finishAndExit} />;
+        return <Return onExit={() => void finishAndExit()} saving={saving} error={saveError} />;
     }
   })();
 
@@ -78,7 +87,7 @@ export default function SessionFlow() {
     <>
       {/* The music step is the full player — it owns its own top-left collapse
           control, so the generic exit is hidden there (Phase A). */}
-      {step !== 'music' && <ExitButton onExit={toHub} />}
+      {step !== 'music' && step !== 'return' && <ExitButton onExit={toHub} />}
       <motion.div
         key={step}
         className="min-h-full"

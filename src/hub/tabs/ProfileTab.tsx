@@ -1,3 +1,4 @@
+import PracticeReminder from '../../manifestation/PracticeReminder';
 import { profileNavigation, useProfilePage } from '../../store/profile';
 import { nav } from '../../nav/history';
 import { useEffect, useState } from 'react';
@@ -64,7 +65,7 @@ export default function ProfileTab() {
           <header className="profile-header"><div className="eyebrow">You</div><h1>Your Space</h1><p>{user.isGuest ? 'Make your practice your own.' : `Welcome, ${user.name?.split(' ')[0] || 'back'}.`}</p></header>
           <nav className="profile-navigation" aria-label="Your settings">{pages.map(({ id, title, subtitle, Icon }) => <button key={id} onClick={() => profileNavigation.open(id)}><span className="profile-nav-icon"><Icon size={21} strokeWidth={1.6} aria-hidden="true" /></span><span className="profile-nav-label"><strong>{title}</strong><small>{subtitle}</small></span><ChevronRight size={18} aria-hidden="true" /></button>)}</nav>
         </> : <>
-          <button className="profile-back" onClick={() => nav.back()}><ArrowLeft size={18} aria-hidden="true" />Back to You</button>
+          <button className="profile-back" onClick={() => nav.parent('hub:profile')}><ArrowLeft size={18} aria-hidden="true" />Back to You</button>
           <header className="profile-header"><div className="eyebrow">Your Space</div><h1>{currentPage?.title}</h1><p>{currentPage?.subtitle}</p></header>
           <div className="profile-content">
           {page === 'progress' && <section>
@@ -78,11 +79,12 @@ export default function ProfileTab() {
 
           {page === 'preferences' && <section>
             <div className="glass" style={{ borderRadius: 'var(--radius-card)', overflow: 'hidden' }}>
-              <Row label="Gentle daily reminder" last={!prefs.reminder.enabled}><Switch on={prefs.reminder.enabled} label="Daily reminder" onToggle={toggleReminder} /></Row>
+              <Row label="Reminder While App Is Open" last={!prefs.reminder.enabled}><Switch on={prefs.reminder.enabled} label="Daily reminder" onToggle={toggleReminder} /></Row>
               {prefs.reminder.enabled && <Row label="Around"><input type="time" aria-label="Reminder time" value={prefs.reminder.time} onChange={e => prefsStore.setReminder({ enabled: true, time: e.target.value })} className="glass px-3 py-2" style={{ color: 'var(--ink)', colorScheme: 'dark', borderRadius: 'var(--radius-card)' }} /></Row>}
               <Row label="Atmosphere" last><ThemeChoice value={prefs.theme} onChange={prefsStore.setTheme} /></Row>
             </div>
-            <p className="journey-muted">{reminderDenied ? 'Notifications are off in your device settings.' : 'A gentle invitation, never a streak or pressure.'}</p>
+            <p className="journey-muted">{reminderDenied ? 'Notifications are off in your device settings.' : 'This reminder works while the app is open. For reminders when it is closed, add a calendar reminder below.'}</p>
+            <h2>Calendar Reminder</h2><PracticeReminder standalone compact title="A moment for myself" action="Take a moment to pause and reflect." location="Come Home" />
             <button className="journey-button" onClick={() => app.setView('onboarding')}>Change my starting path</button>
           </section>}
 

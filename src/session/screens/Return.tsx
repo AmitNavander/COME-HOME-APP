@@ -2,7 +2,7 @@ import Button from '../../ui/Button';
 import Reveal from '../../ui/Reveal';
 
 /** §6.7 Return — the soft landing. */
-export default function Return({ onExit }: { onExit: () => void }) {
+export default function Return({ onExit, saving, error }: { onExit: () => void; saving: boolean; error: string }) {
   return (
     <div className="screen items-center justify-center text-center">
       <div className="mx-auto flex w-full max-w-md flex-col items-center">
@@ -22,7 +22,8 @@ export default function Return({ onExit }: { onExit: () => void }) {
           </p>
         </Reveal>
         <Reveal delay={0.2} className="mt-8">
-          <Button onClick={onExit}>Finish meditation</Button>
+          <Button onClick={onExit} disabled={saving}>{saving ? 'Saving…' : error ? 'Retry Save' : 'Finish Meditation'}</Button>
+          {error && <p role="alert">{error}</p>}
         </Reveal>
       </div>
     </div>

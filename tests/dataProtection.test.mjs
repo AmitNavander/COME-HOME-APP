@@ -12,7 +12,7 @@ globalThis.__testStore = {
 };
 const stub = 'data:text/javascript,' + encodeURIComponent('export const {get,set,update,getMany}=globalThis.__testStore;');
 const hook = registerHooks({ resolve(specifier, context, next) { return specifier === 'idb-keyval' ? { url: stub, shortCircuit: true } : next(specifier, context); } });
-const { saveJournalEntry, deleteJournalEntry } = await import('../src/lib/storage.ts');
+const { saveJournalEntry, deleteJournalEntry, addHistory } = await import('../src/lib/storage.ts');
 const { exportJourney } = await import('../src/lib/journeyExport.ts');
 hook.deregister();
 
@@ -47,4 +47,16 @@ test('personal export contains saved work, excludes credentials and rejects part
   fail = false;
   values.set('come-home:manifest-journey:v1', '{invalid');
   await assert.rejects(exportJourney());
+});
+
+test('meditation completion retries expose failure and never duplicate a saved session', async () => {
+  const completion = { id: 'audit-session', ts: 100, emotion: 'stress', checkins: [] };
+  fail = true;
+  await assert.rejects(addHistory(completion, true), /unavailable/);
+  fail = false;
+  await addHistory(completion, true);
+  await addHistory(completion, true);
+  assert.equal(database.get('come-home:history').filter(item => item.id === completion.id).length, 1);
+  await addHistory({ ...completion, id: 'second-session' }, true);
+  assert.equal(database.get('come-home:history').length, 2);
 });
